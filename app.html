@@ -100,6 +100,7 @@ sup{font-size:.7em;line-height:0}
 .pad button{height:56px;border:1px solid var(--line);background:var(--paper);border-radius:10px;font:26px var(--f-math);touch-action:manipulation}
 .pad button:active{background:color-mix(in srgb,var(--ink) 12%,var(--paper))}
 .pad .wide{grid-column:span 2;font:17px var(--f-body)}
+.pad button.on,.keys button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .pad .fn{background:color-mix(in srgb,var(--ink) 8%,var(--paper))}
 .prev{min-height:44px;display:flex;align-items:center;font-family:var(--f-math);font-size:20px;color:var(--ink-soft)}
 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
@@ -169,9 +170,15 @@ function showAns(t){
 }
 
 /* ---------- Разбор введённого ответа ---------- */
+var SUPD='⁰¹²³⁴⁵⁶⁷⁸⁹';
 function parseAns(str){
   var s=String(str||'').trim().replace(/[−–—]/g,'-').replace(/,/g,'.');
+  s=s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g,function(x){return '^'+x.replace(/./g,function(c){return c==='⁻'?'-':SUPD.indexOf(c)})});
   var m;
+  if((m=s.match(/^(-?)\s*(\d+)\s*\^\s*(-?\d+)$/))){
+    var bs0=+m[2],ex0=+m[3];if(Math.abs(ex0)>12||(bs0===0&&ex0<0))return null;
+    return {kind:'pow',s:m[1]?-1:1,b:bs0,e:ex0,v:mul(F(m[1]?-1:1),pwr(F(bs0),ex0))};
+  }
   if((m=s.match(/^(-?)\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/))){
     var w=+m[2],n=+m[3],d=+m[4];if(!d)return null;
     return {kind:'mixed',s:m[1]?-1:1,w:w,n:n,d:d,v:F((m[1]?-1:1)*(w*d+n),d)};
@@ -191,6 +198,7 @@ function previewHTML(p){
   var sg=p.s<0?'−':'';
   if(p.kind==='mixed')return sg+p.w+fr(p.n,p.d);
   if(p.kind==='frac')return sg+fr(p.n,p.d);
+  if(p.kind==='pow')return sg+p.b+'<sup>'+(p.e<0?'−'+(-p.e):p.e)+'</sup>';
   return sg+(p.kind==='dec'?p.raw.replace('-','').replace('.',','):Math.abs(p.v.n));
 }
 var T_OTHER='Другая ошибка';
@@ -825,14 +833,15 @@ function renderRun(){
     h+='<div class="ans"><input id="in" class="'+cls.trim()+'" type="text" inputmode="'+(COARSE?'none':'text')+'" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="'+esc(r.input)+'"'+(locked?' disabled':'')+'>';
     if(!locked){
       if(COARSE){
-        var keys=['1','2','3','⌫','4','5','6','−','7','8','9','/','0',',',' '];
+        var keys=['1','2','3','⌫','4','5','6','−','7','8','9','/','0',',','pow',' '];
         h+='<div class="pad">';
         keys.forEach(function(k){
-          if(k===' ')h+='<button class="wide" data-k=" " aria-label="Пробел">пробел</button>';
+          if(k===' ')h+='<button data-k=" " aria-label="Пробел">␣</button>';
+          else if(k==='pow')h+='<button class="fn" data-pow="1" aria-pressed="'+!!r.pow+'" aria-label="Степень: следующие цифры станут показателем">xⁿ</button>';
           else h+='<button'+(k==='⌫'||k==='−'||k==='/'?' class="fn"':'')+' data-k="'+k+'"'+(k==='⌫'?' aria-label="Стереть"':'')+'>'+k+'</button>';
         });
         h+='</div>';
-      }else h+='<div class="keys"><button data-k="−" aria-label="Минус">−</button><button data-k="/" aria-label="Дробная черта">/</button><button data-k=" " aria-label="Пробел">␣</button></div>';
+      }else h+='<div class="keys"><button data-k="−" aria-label="Минус">−</button><button data-k="/" aria-label="Дробная черта">/</button><button data-k=" " aria-label="Пробел">␣</button><button data-pow="1" aria-pressed="'+!!r.pow+'" aria-label="Степень: следующие цифры станут показателем">xⁿ</button></div>';
     }
     h+='</div>';
     if(!locked)h+='<div class="prev" id="pv" aria-live="polite">'+previewHTML(parseAns(r.input))+'</div>';
@@ -847,7 +856,7 @@ function renderRun(){
   if(!locked)h+='<button class="btn main" id="go"'+(t.multi&&!r.sel.some(Boolean)?' disabled':'')+'>Ответить</button>';
   else h+='<button class="btn main" id="nxt">'+(total&&r.i===total-1?'Завершить':'Дальше')+'</button>';
   h+='</div>';
-  if(!locked&&!t.choice&&!t.multi)h+='<p class="note">Дробь вводите как 3/4, смешанное число как 1 1/2, отрицательное с минусом: −2/5.</p>';
+  if(!locked&&!t.choice&&!t.multi)h+='<p class="note">Дробь вводите как 3/4, смешанное число как 1 1/2, отрицательное с минусом: −2/5. Степень: нажмите xⁿ и введите показатель, например 2⁵.</p>';
   h+='</section>';
   app.innerHTML=h;
   document.getElementById('quit').onclick=function(){
@@ -893,13 +902,23 @@ function bindRun(){
   if(inp){
     inp.oninput=function(){r.input=inp.value;r.fb=null;var pv=document.getElementById('pv');if(pv)pv.innerHTML=previewHTML(parseAns(r.input));
       var old=app.querySelector('.fb');if(old)old.remove()};
-    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();submit()}};
+    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();submit()}
+      else if(r.pow&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[0-9-]$/.test(e.key)){e.preventDefault();putPow(e.key)}};
   }
+  function putPow(c){
+    var a=inp.selectionStart==null?inp.value.length:inp.selectionStart,z=inp.selectionEnd==null?a:inp.selectionEnd,ch=c==='-'?'⁻':SUPD[+c];
+    inp.value=inp.value.slice(0,a)+ch+inp.value.slice(z);inp.setSelectionRange(a+1,a+1);inp.dispatchEvent(new Event('input'))}
+  function powBtn(){app.querySelectorAll('[data-pow]').forEach(function(b){b.classList.toggle('on',!!r.pow);b.setAttribute('aria-pressed',!!r.pow)})}
+  powBtn();
+  app.querySelectorAll('[data-pow]').forEach(function(b){
+    b.onmousedown=function(e){e.preventDefault()};b.onpointerdown=function(e){e.preventDefault()};
+    b.onclick=function(){r.pow=!r.pow;powBtn();if(inp)inp.focus({preventScroll:true})}});
   app.querySelectorAll('[data-k]').forEach(function(b){
     b.onmousedown=function(e){e.preventDefault()};
     b.onpointerdown=function(e){e.preventDefault()};
     b.onclick=function(){if(!inp)return;
       var s=inp.selectionStart==null?inp.value.length:inp.selectionStart,e2=inp.selectionEnd==null?s:inp.selectionEnd,k=b.dataset.k,pos;
+      if(r.pow&&k!=='⌫'){if(k==='−')k='⁻';else if(/^[0-9]$/.test(k))k=SUPD[+k];else{r.pow=false;powBtn()}}
       if(k==='⌫'){
         if(s===e2&&s>0){inp.value=inp.value.slice(0,s-1)+inp.value.slice(e2);pos=s-1}
         else{inp.value=inp.value.slice(0,s)+inp.value.slice(e2);pos=s}
@@ -918,7 +937,7 @@ function bindRun(){
     if(total&&r.i===total-1)return finishRun();
     r.i++;
     if(r.kind==='train'){var g=modOf(r.mod).gen();r.tasks.push(r.i%3===2?g:multiOf(g))}
-    r.phase='ask';r.fb=null;r.input='';r.picked=null;r.sel=[];render();window.scrollTo(0,0);
+    r.phase='ask';r.fb=null;r.input='';r.pow=false;r.picked=null;r.sel=[];render();window.scrollTo(0,0);
   };
 }
 
