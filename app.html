@@ -761,8 +761,8 @@ function renderHome(){
     });
     return o+'</div>';
   }
-  h+='<section class="sheet"><h3>Программа 7 класса</h3><p class="note">Темы из учебника «Алгебра 7»: степени, выражения, одночлены.</p>'+modList(7)+'</section>';
   h+='<section class="sheet"><h3>Опора: знаки и дроби</h3><p class="note">Материал 6 класса. Нужен, чтобы решать задания 7 класса без ошибок в знаках и дробях.</p>'+modList(6)+'</section>';
+  h+='<section class="sheet"><h3>Программа 7 класса</h3><p class="note">Темы из учебника «Алгебра 7»: степени, выражения, одночлены.</p>'+modList(7)+'</section>';
   h+='<section class="sheet"><div class="row between"><div><h3>Итоговый тест</h3><p class="note">20 заданий: ввод ответа и выбор.'+(p.final?' Лучший результат: '+p.final.score+' из '+p.final.max+'.':'')+'</p></div><button class="btn main" id="fn">Сдать тест</button></div></section>';
   app.innerHTML=h;bindHeader();
   document.getElementById('nx').onclick=function(){
