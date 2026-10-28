@@ -163,6 +163,17 @@ function I(x){return x<0?'−'+(-x):String(x)}
 function Ip(x){return x<0?'('+I(x)+')':String(x)}
 function Pp(x,h){return x.n<0?'('+h+')':h}
 function EX(h){return '<span class="ex">'+h+'</span>'}
+function ansHint(t){
+  var a=t.ans,h;
+  if(/Ответ запишите/.test(t.q))return '';
+  if(a.d===1)h='Ответ — целое число.';
+  else if(t.form==='mixed')h='Ответ запишите смешанным числом, например 3 2/5.';
+  else if(t.form==='improper')h='Ответ запишите неправильной дробью, например 7/3.';
+  else if(Math.abs(a.n)>a.d)h='Ответ запишите несократимой дробью, например 7/3, или смешанным числом, например 2 1/3.';
+  else h='Ответ запишите обыкновенной несократимой дробью, например 3/4, а не десятичной.';
+  if(a.n<0)h+=' Знак минус впишите перед числом.';
+  return h;
+}
 function showAns(t){
   var a=t.ans;
   if(a.d!==1&&Math.abs(a.n)>a.d)return Hm(a)+' (или '+H(a)+')';
@@ -830,6 +841,7 @@ function renderRun(){
     h+='</div>';
   }else{
     var cls=locked?(r.fb.res==='ok'?' ok':' bad'):'';
+    var hint=ansHint(t);if(hint)h+='<p class="note" id="fmt">'+hint+'</p>';
     h+='<div class="ans"><input id="in" class="'+cls.trim()+'" type="text" inputmode="'+(COARSE?'none':'text')+'" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="'+esc(r.input)+'"'+(locked?' disabled':'')+'>';
     if(!locked){
       if(COARSE){
