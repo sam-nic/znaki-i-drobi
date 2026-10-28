@@ -714,20 +714,20 @@ async function saveEvent(ev){
 }
 
 /* ================= Ранеры заданий ================= */
+function typedGen(id){var t,i=0;do{t=modOf(id).gen()}while(t.choice&&++i<30);return t}
 function buildTasks(kind,modId){
   var tasks=[],i;
-  if(kind==='check'){for(i=0;i<5;i++)tasks.push(modOf(modId).gen());}
+  if(kind==='check'){for(i=0;i<5;i++)tasks.push(typedGen(modId));}
   if(kind==='diag'){
-    ['m10','m11','m12','m13','m14','m14','m15','m15','m2','m6','m7','m8','m9','m4'].forEach(function(id){tasks.push(modOf(id).gen())});
+    ['m10','m11','m12','m13','m14','m14','m15','m15','m2','m6','m7','m8','m9','m4'].forEach(function(id){tasks.push(typedGen(id))});
   }
   if(kind==='final'){
     var plan={m10:2,m11:2,m12:2,m13:1,m14:3,m15:3,m3:1,m6:1,m7:2,m8:2,m9:1};
-    Object.keys(plan).forEach(function(id){for(var k=0;k<plan[id];k++)tasks.push(modOf(id).gen())});
+    Object.keys(plan).forEach(function(id){for(var k=0;k<plan[id];k++)tasks.push(typedGen(id))});
     tasks=shuffle(tasks);
   }
   if(kind!=='check'&&kind!=='train'){
   }
-  if(kind!=='train')tasks=tasks.map(function(t,k){return k%4===3?t:multiOf(t)});
   return tasks;
 }
 function startRun(kind,modId){
@@ -771,7 +771,7 @@ function renderHome(){
   }
   h+='<section class="sheet"><h3>Опора: знаки и дроби</h3><p class="note">Материал 6 класса. Нужен, чтобы решать задания 7 класса без ошибок в знаках и дробях.</p>'+modList(6)+'</section>';
   h+='<section class="sheet"><h3>Программа 7 класса</h3><p class="note">Темы из учебника «Алгебра 7»: степени, выражения, одночлены.</p>'+modList(7)+'</section>';
-  h+='<section class="sheet"><div class="row between"><div><h3>Итоговый тест</h3><p class="note">20 заданий: ввод ответа и выбор.'+(p.final?' Лучший результат: '+p.final.score+' из '+p.final.max+'.':'')+'</p></div><button class="btn main" id="fn">Сдать тест</button></div></section>';
+  h+='<section class="sheet"><div class="row between"><div><h3>Итоговый тест</h3><p class="note">20 заданий: ответы нужно вписать.'+(p.final?' Лучший результат: '+p.final.score+' из '+p.final.max+'.':'')+'</p></div><button class="btn main" id="fn">Сдать тест</button></div></section>';
   app.innerHTML=h;bindHeader();
   document.getElementById('nx').onclick=function(){
     if(ns.act==='diag')startRun('diag');else if(ns.act==='final')startRun('final');else{st.mod=ns.mod;st.view='lesson';render();window.scrollTo(0,0)}};
@@ -936,7 +936,7 @@ function bindRun(){
     var total=r.kind==='train'?null:r.tasks.length;
     if(total&&r.i===total-1)return finishRun();
     r.i++;
-    if(r.kind==='train'){var g=modOf(r.mod).gen();r.tasks.push(r.i%3===2?g:multiOf(g))}
+    if(r.kind==='train'){var g=modOf(r.mod).gen();r.tasks.push(multiOf(g))}
     r.phase='ask';r.fb=null;r.input='';r.pow=false;r.picked=null;r.sel=[];render();window.scrollTo(0,0);
   };
 }
