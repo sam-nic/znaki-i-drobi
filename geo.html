@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Геометрия пером</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Neucha&family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&display=swap">
+<style>
+/* Раскладка: одна колонка, сверху шаги, ниже поле задания; тетрадная клетка как у основного приложения */
+:root{
+  --ground:#eef1f7; --grid:#dfe5f3; --paper:#fbfcfe; --ink:#1c2547; --soft:#5d688f; --line:#c9d1e6;
+  --pen:#c8372d; --ok:#1d7a4d; --ok-bg:#dff3e8; --bad-bg:#fbe3e0; --fill:rgba(200,55,45,.12);
+  --f-display:'Neucha','PT Sans',system-ui,sans-serif; --f-body:'PT Sans',system-ui,sans-serif; --f-math:'PT Serif',Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#131a36; --grid:#222c52; --paper:#192142; --ink:#e4e9fa; --soft:#9aa6cc; --line:#34406b;
+  --pen:#ff8173; --ok:#6fd49a; --ok-bg:#1d3a31; --bad-bg:#3b2430; --fill:rgba(255,129,115,.16); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#131a36; --grid:#222c52; --paper:#192142; --ink:#e4e9fa; --soft:#9aa6cc; --line:#34406b;
+  --pen:#ff8173; --ok:#6fd49a; --ok-bg:#1d3a31; --bad-bg:#3b2430; --fill:rgba(255,129,115,.16); color-scheme:dark}
+*{box-sizing:border-box}
+body{background-color:var(--ground);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--ink);font:17px/1.55 var(--f-body);
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:400 34px/1.1 var(--f-display);margin:0;text-wrap:balance}
+p{margin:0}
+.soft{color:var(--soft)}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.steps{display:flex;gap:8px;flex-wrap:wrap}
+.step{border:1px solid var(--line);background:var(--paper);border-radius:8px;min-height:44px;padding:8px 16px;font:inherit;color:inherit;cursor:pointer}
+.step[aria-current="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.step.done::after{content:" ✓";color:var(--ok)}
+.step[aria-current="true"].done::after{color:var(--paper)}
+.q{font:400 24px/1.5 var(--f-math)}
+.meta{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+canvas{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:4px;touch-action:none;cursor:crosshair}
+#board{aspect-ratio:960/736;background:var(--paper)}
+#wc{aspect-ratio:960/320;background:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button.btn{font:inherit;font-weight:700;color:var(--ink);border:1px solid var(--ink);background:transparent;border-radius:8px;min-height:48px;padding:10px 20px;cursor:pointer}
+button.btn.main{background:var(--ink);color:var(--paper)}
+button.btn.plain{font-weight:400}
+button:focus-visible,input:focus-visible{outline:2px solid var(--pen);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.fb{border:1px solid;border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok)}
+.fb.bad{background:var(--bad-bg);border-color:var(--pen)}
+.fb.wait{background:var(--paper);border-color:var(--line)}
+.fb b{font-size:18px}
+.fb .m{font-family:var(--f-math);font-size:19px}
+input[type=text]{font:24px var(--f-math);height:56px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);padding:0 14px;width:160px;max-width:100%}
+.end{display:flex;flex-direction:column;gap:8px}
+.end ul{margin:0;padding-left:20px}
+.demo{font-size:14px;color:var(--soft)}
+</style>
+</head><body>
+<main>
+  <div>
+    <h1>Геометрия пером</h1>
+    <p class="demo">Пробная версия: три задания показывают, как это будет работать.</p>
+  </div>
+  <nav class="steps" id="steps" aria-label="Задания"></nav>
+  <section class="sheet" id="sheet">
+    <div class="meta" id="meta"></div>
+    <div class="q" id="q"></div>
+    <div id="work"></div>
+    <div class="fb wait" id="fb" aria-live="polite" hidden></div>
+  </section>
+  <section class="sheet end" id="end" hidden></section>
+</main>
+<script>
+(function(){
+  /* ---------- Данные заданий ---------- */
+  var TASKS=[
+    {kind:'build',title:'Треугольник 3, 4, 5',q:'Постройте треугольник со сторонами 3, 4 и 5. Сторона клетки равна 1.',sides:[9,16,25]},
+    {kind:'build',title:'Равнобедренный',q:'Постройте равнобедренный треугольник: боковые стороны по 5, основание 6. Сторона клетки равна 1.',sides:[25,25,36]},
+    {kind:'write',title:'Третий угол',q:'В треугольнике два угла равны 50° и 70°. Чему равен третий угол? Напишите число пером или пальцем.',ans:60}
+  ];
+  var cur=0,done=[false,false,false],segs=[[],[],[]];
+  var M=32,C=56,COLS=16,ROWS=12;
+  function $(i){return document.getElementById(i)}
+  function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+  /* ---------- Каркас ---------- */
+  function renderSteps(){
+    $('steps').innerHTML=TASKS.map(function(t,i){
+      return '<button class="step'+(done[i]?' done':'')+'" data-i="'+i+'"'+(i===cur?' aria-current="true"':'')+'>'+(i+1)+'. '+t.title+'</button>'}).join('');
+    $('steps').querySelectorAll('.step').forEach(function(b){b.onclick=function(){go(+b.dataset.i)}});
+  }
+  function fb(cls,html){var f=$('fb');if(!cls){f.hidden=true;return}f.hidden=false;f.className='fb '+cls;f.innerHTML=html}
+  function go(i){
+    cur=i;$('end').hidden=true;$('sheet').hidden=false;
+    renderSteps();
+    $('meta').textContent='Задание '+(i+1)+' из '+TASKS.length;
+    $('q').textContent=TASKS[i].q;
+    fb(null);
+    if(TASKS[i].kind==='build')buildUI();else writeUI();
+  }
+
+  /* ---------- Построение по сетке ---------- */
+  var cv,cx,drag=null,hover=null;
+  function nodePx(n){return {x:M+n.i*C,y:M+n.j*C}}
+  function snap(e){
+    var r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*cv.height/r.height;
+    return {i:Math.max(0,Math.min(COLS,Math.round((x-M)/C))),j:Math.max(0,Math.min(ROWS,Math.round((y-M)/C)))};
+  }
+  function same(a,b){return a.i===b.i&&a.j===b.j}
+  function buildUI(){
+    $('work').innerHTML='<canvas id="board" width="960" height="736" aria-label="Клетчатое поле"></canvas>'+
+      '<div class="row" style="margin-top:12px"><button class="btn main" id="chk" type="button">Проверить</button><button class="btn plain" id="und" type="button">Отменить отрезок</button><button class="btn plain" id="clr" type="button">Очистить</button><span class="soft">Ведите пером от точки к точке. Тот же отрезок ещё раз убирает его.</span></div>';
+    cv=$('board');cx=cv.getContext('2d');drawBoard();
+    cv.addEventListener('pointerdown',function(e){e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
+      drag={a:snap(e),b:snap(e)};fb(null);drawBoard()});
+    cv.addEventListener('pointermove',function(e){e.preventDefault();hover=snap(e);if(drag)drag.b=hover;drawBoard()});
+    function end(e){if(!drag)return;var b=snap(e),a=drag.a;drag=null;
+      if(!same(a,b)){var S=segs[cur],k=-1;
+        S.forEach(function(s,n){if((same(s[0],a)&&same(s[1],b))||(same(s[0],b)&&same(s[1],a)))k=n});
+        if(k>=0)S.splice(k,1);else S.push([a,b]);
+        if(done[cur]){done[cur]=false;renderSteps()}}
+      drawBoard()}
+    cv.addEventListener('pointerup',end);
+    cv.addEventListener('pointercancel',function(){drag=null;drawBoard()});
+    cv.addEventListener('pointerleave',function(){hover=null;drawBoard()});
+    $('und').onclick=function(){segs[cur].pop();fb(null);if(done[cur]){done[cur]=false;renderSteps()}drawBoard()};
+    $('clr').onclick=function(){segs[cur]=[];fb(null);if(done[cur]){done[cur]=false;renderSteps()}drawBoard()};
+    $('chk').onclick=checkBuild;
+  }
+  function drawBoard(){
+    var W=cv.width,H=cv.height;cx.clearRect(0,0,W,H);
+    cx.fillStyle=css('--paper');cx.fillRect(0,0,W,H);
+    cx.strokeStyle=css('--grid');cx.lineWidth=1.5;
+    for(var i=0;i<=COLS;i++){cx.beginPath();cx.moveTo(M+i*C,M);cx.lineTo(M+i*C,M+ROWS*C);cx.stroke()}
+    for(var j=0;j<=ROWS;j++){cx.beginPath();cx.moveTo(M,M+j*C);cx.lineTo(M+COLS*C,M+j*C);cx.stroke()}
+    cx.fillStyle=css('--soft');
+    for(i=0;i<=COLS;i++)for(j=0;j<=ROWS;j++){cx.beginPath();cx.arc(M+i*C,M+j*C,3,0,6.283);cx.fill()}
+    var S=segs[cur],pen=css('--pen');
+    if(done[cur]&&S.length===3){
+      var P=triPts(S);if(P){cx.fillStyle=css('--fill');cx.beginPath();cx.moveTo(P[0].x,P[0].y);cx.lineTo(P[1].x,P[1].y);cx.lineTo(P[2].x,P[2].y);cx.closePath();cx.fill()}}
+    cx.strokeStyle=pen;cx.lineWidth=5;cx.lineCap='round';
+    S.forEach(function(s){var a=nodePx(s[0]),b=nodePx(s[1]);cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()});
+    cx.fillStyle=pen;
+    S.forEach(function(s){s.forEach(function(n){var p=nodePx(n);cx.beginPath();cx.arc(p.x,p.y,8,0,6.283);cx.fill()})});
+    if(drag){var a=nodePx(drag.a),b=nodePx(drag.b);cx.setLineDash([10,8]);cx.lineWidth=3;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();cx.setLineDash([])}
+    else if(hover){var h=nodePx(hover);cx.strokeStyle=pen;cx.lineWidth=2;cx.beginPath();cx.arc(h.x,h.y,12,0,6.283);cx.stroke()}
+  }
+  function triPts(S){
+    var pts=[];S.forEach(function(s){s.forEach(function(n){if(!pts.some(function(p){return same(p,n)}))pts.push(n)})});
+    return pts.length===3?pts.map(nodePx):null;
+  }
+  function d2(a,b){return (a.i-b.i)*(a.i-b.i)+(a.j-b.j)*(a.j-b.j)}
+  function len(q){var r=Math.sqrt(q);return Math.abs(r-Math.round(r))<1e-9?String(Math.round(r)):'√'+q}
+  function checkBuild(){
+    var S=segs[cur],T=TASKS[cur];
+    if(!S.length){fb('bad','<b>Отрезков нет</b><span>Проведите пером три отрезка между точками сетки.</span>');return}
+    var pts=[];S.forEach(function(s){s.forEach(function(n){if(!pts.some(function(p){return same(p,n)}))pts.push(n)})});
+    var deg={};S.forEach(function(s){s.forEach(function(n){var k=n.i+','+n.j;deg[k]=(deg[k]||0)+1})});
+    var closed=pts.length===3&&S.length===3&&Object.keys(deg).every(function(k){return deg[k]===2});
+    if(!closed){
+      fb('bad','<b>Пока это не треугольник</b><span>Нужны три отрезка, которые замыкаются в три вершины. Сейчас отрезков: '+S.length+', вершин: '+pts.length+'.</span>');return}
+    var q=[d2(pts[0],pts[1]),d2(pts[1],pts[2]),d2(pts[2],pts[0])].sort(function(a,b){return a-b});
+    var txt=q.map(len).join(', ');
+    if(q.join()===T.sides.join()){
+      done[cur]=true;renderSteps();drawBoard();
+      var ang=angles(pts);
+      fb('ok','<b>Верно</b><span class="m">Стороны: '+txt+'. Углы: '+ang.join('°, ')+'°.</span>'+(cur===0?'<span>Угол 90° есть, значит треугольник прямоугольный: 3² + 4² = 5².</span>':'<span>Две стороны равны, значит углы при основании тоже равны.</span>')+nextBtn());
+      bindNext();
+    }else{
+      fb('bad','<b>Стороны не подходят</b><span class="m">У вашего треугольника стороны: '+txt+'. Нужны: '+T.sides.map(len).join(', ')+'.</span><span>Подвиньте одну из вершин и проверьте снова.</span>');
+    }
+  }
+  function angles(p){
+    function ang(a,b,c){var ux=a.i-b.i,uy=a.j-b.j,vx=c.i-b.i,vy=c.j-b.j;return Math.round(Math.acos((ux*vx+uy*vy)/(Math.hypot(ux,uy)*Math.hypot(vx,vy)))*180/Math.PI)}
+    var r=[ang(p[2],p[0],p[1]),ang(p[0],p[1],p[2]),ang(p[1],p[2],p[0])].sort(function(a,b){return a-b});
+    var s=r[0]+r[1]+r[2];if(s!==180)r[2]+=180-s;return r;
+  }
+  function nextBtn(){return '<div class="row" style="margin-top:6px"><button class="btn main" id="nx" type="button">'+(cur<TASKS.length-1?'Дальше':'Завершить')+'</button></div>'}
+  function bindNext(){var b=$('nx');if(b)b.onclick=function(){if(cur<TASKS.length-1)go(cur+1);else finish()}}
+
+  /* ---------- Рукописный ответ ---------- */
+  var wc,wx,drawing=false,last=null,inked=false,sampleFn=null,canImg=false;
+  function writeUI(){
+    $('work').innerHTML='<canvas id="wc" width="960" height="320" aria-label="Поле для ответа"></canvas>'+
+      '<div class="row" style="margin-top:12px"><button class="btn main" id="rd" type="button">Проверить</button><button class="btn plain" id="wclr" type="button">Очистить</button><span class="soft" id="wnote"></span></div>'+
+      '<div class="row" id="typed" style="margin-top:12px" hidden><label for="ti" class="soft">Ответ цифрами</label><input id="ti" type="text" inputmode="numeric" autocomplete="off"><button class="btn" id="tchk" type="button">Проверить</button></div>';
+    wc=$('wc');wx=wc.getContext('2d');inked=false;
+    wx.fillStyle='#fff';wx.fillRect(0,0,wc.width,wc.height);
+    wc.addEventListener('pointerdown',function(e){e.preventDefault();try{wc.setPointerCapture(e.pointerId)}catch(_){}drawing=true;last=wp(e);stroke(last,last,e)});
+    wc.addEventListener('pointermove',function(e){if(!drawing)return;e.preventDefault();var p=wp(e);stroke(last,p,e);last=p});
+    function up(){drawing=false}
+    wc.addEventListener('pointerup',up);wc.addEventListener('pointercancel',up);
+    $('wclr').onclick=function(){wx.fillStyle='#fff';wx.fillRect(0,0,wc.width,wc.height);inked=false;fb(null)};
+    $('rd').onclick=readAnswer;
+    $('tchk').onclick=function(){verdict(parseInt($('ti').value.replace(/\D/g,''),10),false)};
+    showTyped('Напишите ответ пером и введите его цифрами для проверки.');
+  }
+  function wp(e){var r=wc.getBoundingClientRect();return {x:(e.clientX-r.left)*wc.width/r.width,y:(e.clientY-r.top)*wc.height/r.height}}
+  function stroke(a,b,e){
+    var w=(e.pointerType==='pen'&&e.pressure>0)?3+e.pressure*10:7;
+    wx.strokeStyle='#111';wx.lineWidth=w;wx.lineCap='round';wx.lineJoin='round';
+    wx.beginPath();wx.moveTo(a.x,a.y);wx.lineTo(b.x,b.y);wx.stroke();inked=true;
+  }
+  function showTyped(msg){$('typed').hidden=false;$('rd').hidden=true;$('wnote').textContent=msg}
+  async function readAnswer(){
+    if(!inked){fb('bad','<b>Поле пустое</b><span>Напишите ответ и нажмите «Проверить».</span>');return}
+    if(!sampleFn){showTyped('Распознавание сейчас недоступно: введите ответ цифрами.');fb(null);return}
+    var btn=$('rd');btn.disabled=true;fb('wait','<b>Читаю запись</b><span>Это занимает несколько секунд.</span>');
+    try{
+      var blob=await new Promise(function(res){wc.toBlob(res,'image/png')});
+      var out=await sampleFn.json('На картинке рукописный ответ школьника на задачу: найти третий угол треугольника. Определи число, которое записано. Ответь только JSON вида {"число": 60}. Если число прочитать нельзя, ответь {"число": null}. Ответ не оценивай.',{images:blob,modelTier:'quick'});
+      var v=out&&out['число'];
+      if(v===null||v===undefined||isNaN(Number(v))){fb('bad','<b>Запись не прочиталась</b><span>Напишите цифры крупнее и отдельно друг от друга.</span>');}
+      else verdict(Number(v),true);
+    }catch(e){
+      var c=e&&e.code;
+      if(c==='not_granted'||c==='sampling_disabled'||c==='images_unavailable'||c==='not_declared'||c==='capability_disabled'){showTyped('Распознавание не разрешено для этой страницы: введите ответ цифрами.');fb(null)}
+      else if(c==='rate_limited')fb('bad','<b>Слишком много запросов</b><span>Подождите немного и нажмите «Проверить» ещё раз.</span>');
+      else if(c!=='cancelled')fb('bad','<b>Не получилось прочитать запись</b><span>Нажмите «Проверить» ещё раз или введите ответ цифрами.</span>');
+      if(c!=='cancelled')$('typed').hidden=false;
+    }finally{btn.disabled=false}
+  }
+  function verdict(v,fromHand){
+    var T=TASKS[cur];
+    if(isNaN(v)){fb('bad','<b>Нужно число</b><span>Введите ответ цифрами.</span>');return}
+    if(v===T.ans){done[cur]=true;renderSteps();
+      fb('ok','<b>Верно: '+v+'°</b><span class="m">'+(fromHand?'Страница прочитала вашу запись как '+v+'. ':'')+'Сумма углов треугольника 180°: 180 − 50 − 70 = 60.</span>'+nextBtn());bindNext()}
+    else fb('bad','<b>Неверно'+(fromHand?': прочитано '+v:'')+'</b><span>Сумма углов треугольника равна 180°. Вычтите из неё два известных угла.</span>')
+  }
+
+  /* ---------- Итог ---------- */
+  function finish(){
+    var n=done.filter(Boolean).length;
+    $('sheet').hidden=true;$('end').hidden=false;
+    $('end').innerHTML='<div class="meta">Итог пробной версии</div><div class="q">Выполнено заданий: '+n+' из '+TASKS.length+'</div>'+
+      '<p>В полной версии:</p><ul><li>темы 7 класса: углы, смежные и вертикальные углы, признаки равенства треугольников, построения;</li><li>построения на сетке и свободный чертёж, который проверяет Claude;</li><li>ответы цифрами пишутся от руки;</li><li>результаты каждого этапа приходят папе на почту.</li></ul>'+
+      '<div class="row"><button class="btn main" id="again" type="button">Пройти заново</button></div>';
+    $('again').onclick=function(){done=[false,false,false];segs=[[],[],[]];go(0)};
+  }
+
+  /* ---------- Старт ---------- */
+  go(0);
+  window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').addEventListener&&matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(cv&&TASKS[cur].kind==='build')drawBoard()});
+})();
+</script>
+</body></html>

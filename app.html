@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Знаки и дроби</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Neucha&family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&display=swap">
+<style>
+/* Layout: одна колонка на листе в клетку. Главная: план занятий, затем экраны урока, заданий и итога. */
+:root{
+  --paper:#fbfcfe; --grid:#dfe7f2; --ground:#f0f4fa;
+  --ink:#1c2a55; --ink-soft:#56628a; --line:#c9d3e6;
+  --pen:#c4372b; --pen-bg:#fbe9e6;
+  --ok:#2c7a4b; --ok-bg:#e3f3e9; --part:#9a6a12; --part-bg:#fbf0d6;
+  --f-display:'Neucha','Comic Sans MS',cursive;
+  --f-body:'PT Sans',system-ui,sans-serif;
+  --f-math:'PT Serif',Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#192142; --grid:#222c52; --ground:#131a36;
+  --ink:#e4e9fa; --ink-soft:#9aa6cc; --line:#34406b;
+  --pen:#ff8173; --pen-bg:#3b2430;
+  --ok:#6fd49a; --ok-bg:#1d3a31; --part:#f0c46a; --part-bg:#3a3320;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#192142; --grid:#222c52; --ground:#131a36;
+  --ink:#e4e9fa; --ink-soft:#9aa6cc; --line:#34406b;
+  --pen:#ff8173; --pen-bg:#3b2430;
+  --ok:#6fd49a; --ok-bg:#1d3a31; --part:#f0c46a; --part-bg:#3a3320;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{
+  background-color:var(--ground);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink);font:17px/1.55 var(--f-body);
+  padding-block:20px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+#app{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance}
+h2{font-size:28px;line-height:1.1}
+h3{font-size:20px}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid var(--pen);outline-offset:2px}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-size:22px}
+.brand small{font-family:var(--f-body);font-size:13px;color:var(--ink-soft);margin-left:8px}
+.tabs{display:flex;gap:6px}
+.tab{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 16px;min-height:44px;font-size:16px}
+.tab[aria-current="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.meta{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.soft{color:var(--ink-soft)}
+.btn{border:1px solid var(--ink);background:transparent;border-radius:8px;padding:12px 20px;min-height:48px;font-size:17px;font-weight:700}
+.btn.main{background:var(--ink);color:var(--paper)}
+.btn.pen{background:var(--pen);border-color:var(--pen);color:#fff}
+.btn.sm{padding:8px 14px;min-height:44px;font-size:16px;font-weight:400}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
+.next{border:1px solid var(--pen);background:var(--pen-bg);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.mods{display:flex;flex-direction:column;gap:8px}
+.mod{display:flex;gap:12px;align-items:center;text-align:left;width:100%;min-height:64px;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:12px 14px}
+.mod .n{font-family:var(--f-display);font-size:24px;width:28px;flex:none;color:var(--ink-soft)}
+.mod .t{flex:1;min-width:0}
+.mod .t b{display:block}
+.mod .t span{font-size:15px;color:var(--ink-soft)}
+.lnk{display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+.rp{margin:0;white-space:pre-wrap;font:16px/1.5 var(--f-body);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 12px;user-select:all}
+sup{font-size:.7em;line-height:0}
+.chip{font-size:13px;border-radius:999px;padding:2px 10px;border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.chip.need{background:var(--pen-bg);border-color:var(--pen);color:var(--pen)}
+.chip.key{background:var(--part-bg);border-color:var(--part);color:var(--part)}
+.box{border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.box.rule{background:color-mix(in srgb,var(--ink) 6%,var(--paper));border-color:var(--ink)}
+.box.warn{background:var(--pen-bg);border-color:var(--pen)}
+.box .h{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.math{font-family:var(--f-math);font-size:19px;line-height:1.7}
+.ex{font-family:var(--f-math);font-size:24px;white-space:nowrap}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 2px;font-size:.9em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px}
+.fr>span:last-child{padding:0 4px}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.step{font-size:15px;border:1px solid var(--line);border-radius:999px;padding:3px 12px;color:var(--ink-soft)}
+.step[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ink)}
+.q{font-family:var(--f-math);font-size:20px;line-height:1.6}
+.ans{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ans input{font:24px var(--f-math);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:9px 12px;width:min(100%,240px)}
+.ans input.ok{border-color:var(--ok);background:var(--ok-bg)}
+.ans input.bad{border-color:var(--pen);background:var(--pen-bg)}
+.keys{display:flex;gap:6px}
+.keys button{min-width:44px;height:44px;border:1px solid var(--line);background:var(--paper);border-radius:8px;font:22px var(--f-math)}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:360px}
+.pad button{height:56px;border:1px solid var(--line);background:var(--paper);border-radius:10px;font:26px var(--f-math);touch-action:manipulation}
+.pad button:active{background:color-mix(in srgb,var(--ink) 12%,var(--paper))}
+.pad .wide{grid-column:span 2;font:17px var(--f-body)}
+.pad .fn{background:color-mix(in srgb,var(--ink) 8%,var(--paper))}
+.prev{min-height:44px;display:flex;align-items:center;font-family:var(--f-math);font-size:20px;color:var(--ink-soft)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.opt{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:10px;font-family:var(--f-math);font-size:22px;min-height:60px}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--pen);background:var(--pen-bg)}
+.opts.multi{grid-template-columns:1fr}
+.opt.chk{display:flex;align-items:center;gap:12px;text-align:left;font-size:20px;min-height:56px;line-height:1.5}
+.opt.chk .bx{flex:none;width:26px;height:26px;border:2px solid var(--ink);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font:700 18px var(--f-body);line-height:1}
+.opt.chk[aria-pressed="true"]{border-color:var(--ink);background:var(--grid)}
+.opt.chk[aria-pressed="true"] .bx{background:var(--ink);color:var(--paper)}
+.opt.miss{border-style:dashed;border-color:var(--ok)}
+.hint{font-size:15px;color:var(--ink-soft)}
+.opt.chk .lb{flex:1;min-width:0}
+.tag{display:block;font:14px var(--f-body);color:var(--ink-soft)}
+.fb{border:1px solid;border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok)}
+.fb.bad{background:var(--pen-bg);border-color:var(--pen)}
+.fb.form{background:var(--part-bg);border-color:var(--part)}
+.fb .sol{font-family:var(--f-math);font-size:18px;line-height:1.8}
+.score{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+.score .big{font-family:var(--f-display);font-size:60px;line-height:1}
+.score .mark{font-family:var(--f-display);font-size:60px;line-height:1;color:var(--pen)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:13px;border:1px solid var(--pen);color:var(--pen);background:var(--pen-bg);border-radius:999px;padding:2px 10px}
+.list{display:flex;flex-direction:column;gap:8px}
+.ev{border:1px solid var(--line);border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:4px}
+.ev .head{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.note{font-size:15px;color:var(--ink-soft)}
+svg text{fill:currentColor;font-family:var(--f-math)}
+@media (max-width:480px){.sheet{padding:16px 14px}.q{font-size:22px;line-height:1.7}.ex{font-size:26px}.math{font-size:20px}.row .btn{flex:1 1 150px}.opts{grid-template-columns:1fr 1fr}.opt{font-size:24px;min-height:64px}.ans input{width:100%;font-size:26px;height:56px}.prev{font-size:22px}.score .big,.score .mark{font-size:52px}h2{font-size:30px}}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(3px)}}}
+</style>
+</head><body>
+<div id="app"></div>
+<script>
+/* ================= Математика ================= */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=a%b;a=b;b=t}return a}
+function lcm(a,b){return a/gcd(a,b)*b}
+function F(n,d){if(d===undefined)d=1;if(!d)return null;if(d<0){n=-n;d=-d}var g=gcd(n,d)||1;return {n:n/g,d:d/g}}
+function add(a,b){return F(a.n*b.d+b.n*a.d,a.d*b.d)}
+function sub(a,b){return F(a.n*b.d-b.n*a.d,a.d*b.d)}
+function mul(a,b){return F(a.n*b.n,a.d*b.d)}
+function dvd(a,b){return b.n?F(a.n*b.d,a.d*b.n):null}
+function neg(a){return F(-a.n,a.d)}
+function eqF(a,b){return !!a&&!!b&&a.n===b.n&&a.d===b.d}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function sgn(){return Math.random()<.5?-1:1}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function mixedOf(x){var n=Math.abs(x.n),w=Math.floor(n/x.d);return {s:x.n<0?-1:1,w:w,n:n-w*x.d,d:x.d}}
+
+/* ---------- Запись чисел (HTML) ---------- */
+function fr(n,d){return '<span class="fr"><span>'+n+'</span><span>'+d+'</span></span>'}
+function Hr(n,d){return (n<0?'−':'')+(d===1?Math.abs(n):fr(Math.abs(n),d))}
+function H(x){return Hr(x.n,x.d)}
+function Hm(x){if(x.d===1||Math.abs(x.n)<x.d)return H(x);var m=mixedOf(x);return (m.s<0?'−':'')+m.w+(m.n?fr(m.n,m.d):'')}
+function Hmx(w,n,d){return w+fr(n,d)} // положительное смешанное число
+function I(x){return x<0?'−'+(-x):String(x)}
+function Ip(x){return x<0?'('+I(x)+')':String(x)}
+function Pp(x,h){return x.n<0?'('+h+')':h}
+function EX(h){return '<span class="ex">'+h+'</span>'}
+function showAns(t){
+  var a=t.ans;
+  if(a.d!==1&&Math.abs(a.n)>a.d)return Hm(a)+' (или '+H(a)+')';
+  return H(a);
+}
+
+/* ---------- Разбор введённого ответа ---------- */
+function parseAns(str){
+  var s=String(str||'').trim().replace(/[−–—]/g,'-').replace(/,/g,'.');
+  var m;
+  if((m=s.match(/^(-?)\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/))){
+    var w=+m[2],n=+m[3],d=+m[4];if(!d)return null;
+    return {kind:'mixed',s:m[1]?-1:1,w:w,n:n,d:d,v:F((m[1]?-1:1)*(w*d+n),d)};
+  }
+  if((m=s.match(/^(-?)\s*(\d+)\s*\/\s*(\d+)$/))){
+    var n2=+m[2],d2=+m[3];if(!d2)return null;
+    return {kind:'frac',s:m[1]?-1:1,n:n2,d:d2,v:F((m[1]?-1:1)*n2,d2)};
+  }
+  if((m=s.match(/^(-?)\s*(\d+)(?:\.(\d+))?$/))){
+    var dec=m[3]||'',den=Math.pow(10,dec.length),num=+(m[2]+dec);
+    return {kind:dec?'dec':'int',s:m[1]?-1:1,v:F((m[1]?-1:1)*num,den),raw:s};
+  }
+  return null;
+}
+function previewHTML(p){
+  if(!p)return '';
+  var sg=p.s<0?'−':'';
+  if(p.kind==='mixed')return sg+p.w+fr(p.n,p.d);
+  if(p.kind==='frac')return sg+fr(p.n,p.d);
+  return sg+(p.kind==='dec'?p.raw.replace('-','').replace('.',','):Math.abs(p.v.n));
+}
+var T_OTHER='Другая ошибка';
+function judge(t,input){
+  var p=parseAns(input);
+  if(!p)return {res:'invalid'};
+  if(!eqF(p.v,t.ans))return wrongOf(t,p.v);
+  if(p.kind==='frac'&&(gcd(p.n,p.d)!==1))return {res:'form',msg:'Значение верное, но дробь можно сократить. Сократите её до конца и введите ещё раз.'};
+  if(p.kind==='frac'&&p.d===1)return {res:'form',msg:'Целое число запишите без знаменателя.'};
+  if(p.kind==='mixed'){
+    if(p.n>=p.d||gcd(p.n,p.d)!==1)return {res:'form',msg:'Дробная часть записана неверно: она должна быть правильной и сокращённой.'};
+  }
+  if(t.form==='improper'&&p.kind==='mixed')return {res:'form',msg:'Здесь нужна неправильная дробь, а не смешанное число.'};
+  if(t.form==='mixed'&&p.kind!=='mixed')return {res:'form',msg:'Здесь нужно смешанное число: целая часть и правильная дробь, например 3 2/5.'};
+  return {res:'ok'};
+}
+function wrongOf(t,v){
+  for(var i=0;i<t.traps.length;i++)if(eqF(v,t.traps[i].v))return {res:'wrong',type:t.traps[i].type,msg:t.traps[i].msg};
+  return {res:'wrong',type:T_OTHER,msg:''};
+}
+
+/* ================= Задания ================= */
+function TR(v,type,msg){return {v:v,type:type,msg:msg}}
+function mk(mod,q,ans,traps,steps,form){
+  var seen=[ans];
+  var tr=(traps||[]).filter(function(t){
+    if(!t.v)return false;
+    for(var i=0;i<seen.length;i++)if(eqF(seen[i],t.v))return false;
+    seen.push(t.v);return true;
+  });
+  return {mod:mod,q:q,ans:ans,traps:tr,steps:steps,form:form||null};
+}
+/* показ дробей как числитель/знаменатель с знаком */
+function stAdd(x,y,isSub){
+  var L=lcm(x.d,y.d),nx=x.n*(L/x.d),ny=y.n*(L/y.d),r=isSub?nx-ny:nx+ny,res=F(r,L),s='';
+  if(x.d!==y.d)s+='Общий знаменатель '+L+': '+H(x)+' = '+Hr(nx,L)+(y.d===L||true?', '+H(y)+' = '+Hr(ny,L):'')+'. ';
+  s+=(isSub?'Вычитаем':'Складываем')+' числители: '+nx+(isSub?' − ':' + ')+Ip(ny)+' = '+r+'. ';
+  s+='Получаем '+Hr(r,L)+(eqF(res,{n:r,d:L})?'':' = '+H(res))+'.';
+  return s;
+}
+function stMul(x,y){
+  var n=x.n*y.n,d=x.d*y.d,res=F(n,d);
+  return 'Числитель умножаем на числитель, знаменатель на знаменатель: '+Hr(x.n,x.d)+' · '+Pp(y,H(y))+' = '+Hr(n,d)+(eqF(res,{n:n,d:d})?'':' = '+H(res))+'.'+(res.d!==1&&Math.abs(res.n)>res.d?' В виде смешанного числа: '+Hm(res)+'.':'');
+}
+function stDiv(x,y){
+  var inv=F(y.d*(y.n<0?-1:1),Math.abs(y.n));
+  return 'Деление заменяем умножением на перевёрнутую дробь: '+H(x)+' : '+Pp(y,H(y))+' = '+H(x)+' · '+Pp(inv,H(inv))+'. '+stMul(x,inv);
+}
+function toImp(w,n,d){return F(w*d+n,d)}
+
+/* --- m1: числовая прямая, модуль, сравнение --- */
+function gM1(){
+  var t=ri(0,3),a,b;
+  if(t===0){a=ri(2,15);
+    return mk('m1','Вычислите: '+EX('−(−'+a+')'),F(a),[TR(F(-a),'Знак результата','Минус перед отрицательным числом меняет знак: −(−'+a+') = '+a+'.')],'Минус и минус дают плюс: −(−'+a+') = '+a+'.');}
+  if(t===1){a=ri(2,15);
+    return mk('m1','Вычислите: '+EX('|−'+a+'|'),F(a),[TR(F(-a),'Модуль и сравнение','Модуль — расстояние до нуля, оно не бывает отрицательным: |−'+a+'| = '+a+'.')],'Модуль — расстояние от нуля до числа. До −'+a+' от нуля '+a+' единиц, поэтому |−'+a+'| = '+a+'.');}
+  if(t===2){a=ri(2,9);do{b=ri(2,9)}while(b===a);
+    var big=Math.min(a,b),small=Math.max(a,b);
+    return mk('m1','Какое из чисел '+EX('−'+a)+' и '+EX('−'+b)+' больше? Введите это число.',F(-big),[TR(F(-small),'Модуль и сравнение','Из двух отрицательных чисел больше то, что ближе к нулю: −'+big+' > −'+small+'.')],'На числовой прямой −'+big+' правее, чем −'+small+', значит оно больше. У отрицательных чисел больше то, у которого модуль меньше.');}
+  a=ri(5,15);b=ri(2,4);
+  return mk('m1','Вычислите: '+EX('|−'+a+'| − |'+b+'|'),F(a-b),[TR(F(-a-b),'Модуль и сравнение','Сначала раскройте модули: |−'+a+'| = '+a+', |'+b+'| = '+b+'.')],'Модули: |−'+a+'| = '+a+', |'+b+'| = '+b+'. Тогда '+a+' − '+b+' = '+(a-b)+'.');
+}
+
+/* --- m2: сложение и вычитание целых --- */
+function gM2(){
+  var t=ri(0,5),a,b;
+  if(t===0){a=ri(2,12);b=ri(a+1,20);
+    return mk('m2','Вычислите: '+EX('−'+a+' + '+b),F(b-a),[TR(F(-(a+b)),'Складывают модули вместо вычитания','Знаки разные, поэтому модули вычитают: '+b+' − '+a+'.'),TR(F(a-b),'Знак результата','Знак берут у числа с большим модулем. Здесь это +'+b+', результат положительный.')],'Знаки разные: из большего модуля вычитаем меньший, знак берём у числа с большим модулем. '+b+' больше '+a+', знак плюс: '+b+' − '+a+' = '+(b-a)+'.');}
+  if(t===1){a=ri(2,12);b=ri(a+1,20);
+    return mk('m2','Вычислите: '+EX(a+' − '+b),F(a-b),[TR(F(b-a),'Знак результата','Вычитаемое больше уменьшаемого, результат отрицательный.')],a+' − '+b+' = −('+b+' − '+a+') = −'+(b-a)+'. Если из меньшего вычитаем большее, получается отрицательное число.');}
+  if(t===2){a=ri(2,12);b=ri(2,12);
+    return mk('m2','Вычислите: '+EX('−'+a+' − '+b),F(-(a+b)),[TR(F(a+b),'Знак результата','Оба числа отрицательные, значит и результат отрицательный.'),TR(F(a-b),'Складывают модули вместо вычитания','Если знаки одинаковые, модули складывают.')],'−'+a+' − '+b+' = −'+a+' + (−'+b+'). Знаки одинаковые: складываем модули ('+a+' + '+b+' = '+(a+b)+') и ставим общий минус.');}
+  if(t===3){a=ri(2,12);b=ri(2,12);
+    return mk('m2','Вычислите: '+EX(a+' − (−'+b+')'),F(a+b),[TR(F(a-b),'Двойной минус','Вычитание отрицательного числа — это прибавление: − (−'+b+') = + '+b+'.')],'Вычесть число — значит прибавить противоположное. '+a+' − (−'+b+') = '+a+' + '+b+' = '+(a+b)+'.');}
+  if(t===4){a=ri(2,12);b=ri(2,12);
+    return mk('m2','Вычислите: '+EX('−'+a+' − (−'+b+')'),F(b-a),[TR(F(-a-b),'Двойной минус','Вычитание отрицательного числа — это прибавление: − (−'+b+') = + '+b+'.'),TR(F(a-b),'Знак результата','Запишите шаги: −'+a+' + '+b+' и сравните модули.')],'−'+a+' − (−'+b+') = −'+a+' + '+b+' = '+(b-a)+'.');}
+  a=ri(2,12);b=ri(2,12);
+  return mk('m2','Вычислите: '+EX('−'+a+' + (−'+b+')'),F(-(a+b)),[TR(F(a+b),'Знак результата','Складываем два отрицательных числа: результат отрицательный.'),TR(F(a-b),'Складывают модули вместо вычитания','При одинаковых знаках модули складывают.')],'Знаки одинаковые: складываем модули ('+a+' + '+b+' = '+(a+b)+') и пишем общий знак минус: −'+(a+b)+'.');
+}
+
+/* --- m3: умножение и деление целых --- */
+function gM3(){
+  var t=ri(0,2),a,b,sa,sb;
+  if(t===0){a=ri(2,9);b=ri(2,12);sa=sgn();sb=sgn();
+    var r=sa*a*sb*b;
+    return mk('m3','Вычислите: '+EX(I(sa*a)+' · '+Ip(sb*b)),F(r),[TR(F(-r),'Знак результата','Одинаковые знаки — плюс, разные — минус.')],'Умножаем модули: '+a+' · '+b+' = '+(a*b)+'. Знаки '+(sa===sb?'одинаковые, результат положительный':'разные, результат отрицательный')+': '+I(r)+'.');}
+  if(t===1){b=ri(2,9);var k=ri(2,12);a=b*k;sa=sgn();sb=sgn();
+    var r2=sa*k*sb;
+    return mk('m3','Вычислите: '+EX(I(sa*a)+' : '+Ip(sb*b)),F(r2),[TR(F(-r2),'Знак результата','Одинаковые знаки — плюс, разные — минус.')],'Делим модули: '+a+' : '+b+' = '+k+'. Знаки '+(sa===sb?'одинаковые, результат положительный':'разные, результат отрицательный')+': '+I(r2)+'.');}
+  var f=[ri(2,5),ri(2,5),ri(2,5)],sg=[sgn(),sgn(),sgn()],cnt=sg.filter(function(s){return s<0}).length;
+  if(cnt===0)sg[ri(0,2)]=-1,cnt=1;
+  var vals=f.map(function(x,i){return sg[i]*x}),pr=vals[0]*vals[1]*vals[2];
+  return mk('m3','Вычислите: '+EX(I(vals[0])+' · '+Ip(vals[1])+' · '+Ip(vals[2])),F(pr),[TR(F(-pr),'Знак результата','Считайте минусы: чётное число минусов даёт плюс, нечётное — минус.')],'Минусов в записи: '+cnt+'. '+(cnt%2?'Число нечётное, знак минус.':'Число чётное, знак плюс.')+' Модули: '+f[0]+' · '+f[1]+' · '+f[2]+' = '+(f[0]*f[1]*f[2])+'. Ответ: '+I(pr)+'.');
+}
+
+/* --- m4: порядок действий и скобки --- */
+function gM4(){
+  var t=ri(0,3),a,b,c,d;
+  if(t===0){a=sgn()*ri(2,9);b=sgn()*ri(2,6);c=sgn()*ri(2,6);
+    var r=a+b*c,w=(a+b)*c;
+    return mk('m4','Вычислите: '+EX(I(a)+' + '+Ip(b)+' · '+Ip(c)),F(r),[TR(F(w),'Порядок действий','Умножение выполняется раньше сложения.')],'Сначала умножение: '+Ip(b)+' · '+Ip(c)+' = '+I(b*c)+'. Затем '+I(a)+' + '+Ip(b*c)+' = '+I(r)+'.');}
+  if(t===1){a=sgn()*ri(2,9);b=sgn()*ri(2,9);c=sgn()*ri(2,6);
+    var r1=(a+b)*c,w1=a+b*c;
+    return mk('m4','Вычислите: '+EX('('+I(a)+' + '+Ip(b)+') · '+Ip(c)),F(r1),[TR(F(w1),'Порядок действий','Скобки считают первыми.')],'Сначала скобки: '+I(a)+' + '+Ip(b)+' = '+I(a+b)+'. Затем '+I(a+b)+' · '+Ip(c)+' = '+I(r1)+'.');}
+  if(t===2){a=ri(2,12);b=ri(2,12);c=ri(2,12);
+    var r2=a-(b-c),w2=a-b-c;
+    return mk('m4','Вычислите: '+EX(a+' − ('+b+' − '+c+')'),F(r2),[TR(F(w2),'Минус перед скобкой','Минус перед скобкой меняет знаки внутри: '+a+' − ('+b+' − '+c+') = '+a+' − '+b+' + '+c+'.')],'Сначала скобки: '+b+' − '+c+' = '+(b-c)+'. Затем '+a+' − '+Ip(b-c)+' = '+r2+'. Другой способ: раскрыть скобки со сменой знаков, '+a+' − '+b+' + '+c+' = '+r2+'.');}
+  d=ri(2,6);b=sgn()*ri(2,6);a=b*ri(2,8)*sgn();c=sgn()*ri(2,5);
+  var q=a/b,r3=q+c*d,w3=(q+c)*d;
+  return mk('m4','Вычислите: '+EX(I(a)+' : '+Ip(b)+' + '+Ip(c)+' · '+Ip(d)),F(r3),[TR(F(w3),'Порядок действий','Сначала деление и умножение, потом сложение.')],'Деление и умножение выполняем первыми: '+I(a)+' : '+Ip(b)+' = '+I(q)+', '+Ip(c)+' · '+d+' = '+I(c*d)+'. Затем '+I(q)+' + '+Ip(c*d)+' = '+I(r3)+'.');
+}
+
+/* --- m5: основное свойство, смешанные числа, сравнение --- */
+function coprime(){var p,q;do{q=ri(2,9);p=ri(1,q-1)}while(gcd(p,q)!==1);return [p,q]}
+function gM5(){
+  var t=ri(0,4),pq,p,q;
+  if(t===0){pq=coprime();p=pq[0];q=pq[1];var k=pick([2,3,4,5,6]);
+    return mk('m5','Сократите дробь: '+EX(fr(p*k,q*k)),F(p,q),[],'Находим общий делитель числителя и знаменателя: '+gcd(p*k,q*k)+'. Делим обе части: '+fr(p*k,q*k)+' = '+fr(p,q)+'. Сократить нужно до конца.');}
+  if(t===1){var w=ri(1,5);do{q=ri(3,9);p=ri(1,q-1)}while(gcd(p,q)!==1);
+    var ans=F(w*q+p,q);
+    return mk('m5','Запишите смешанное число '+EX(Hmx(w,p,q))+' в виде неправильной дроби.',ans,[TR(F(w+p,q),'Перевод смешанных чисел','Целую часть умножают на знаменатель и прибавляют числитель.'),TR(F(w*p+q,q),'Перевод смешанных чисел','Целую часть умножают на знаменатель, а не на числитель.')],'Целую часть умножаем на знаменатель и прибавляем числитель: '+w+' · '+q+' + '+p+' = '+(w*q+p)+'. Знаменатель не меняется: '+fr(w*q+p,q)+'.','improper');}
+  if(t===2){var w2=ri(1,5);do{q=ri(3,9);p=ri(1,q-1)}while(gcd(p,q)!==1);
+    return mk('m5','Выделите целую часть: запишите '+EX(fr(w2*q+p,q))+' в виде смешанного числа.',F(w2*q+p,q),[],(w2*q+p)+' : '+q+' = '+w2+' (остаток '+p+'). Целая часть '+w2+', в числителе остаток: '+Hmx(w2,p,q)+'.','mixed');}
+  if(t===3){var f1,f2;do{f1=coprime();f2=coprime()}while(f1[1]===f2[1]||eqF(F(f1[0],f1[1]),F(f2[0],f2[1])));
+    var x=F(f1[0],f1[1]),y=F(f2[0],f2[1]),big=x.n*y.d>y.n*x.d?x:y,sm=big===x?y:x,L=lcm(x.d,y.d);
+    return mk('m5','Какая из дробей больше: '+EX(H(x))+' или '+EX(H(y))+'? Введите её.',big,[TR(sm,'Сравнение дробей','Дроби сравнивают после приведения к общему знаменателю.')],'Общий знаменатель '+L+': '+H(x)+' = '+Hr(x.n*L/x.d,L)+', '+H(y)+' = '+Hr(y.n*L/y.d,L)+'. Больше та, у которой числитель больше: '+H(big)+'.');}
+  q=ri(2,6);p=ri(1,q-1);var m=ri(2,6);
+  return mk('m5','Найдите число вместо знака вопроса: '+EX(fr(p,q)+' = '+fr('?',q*m)),F(p*m),[TR(F(p+q*m-q),'Основное свойство дроби','Знаменатель умножили на '+m+', значит и числитель умножается на '+m+', а не увеличивается на сумму.')],'Знаменатель умножили на '+m+' ('+q+' · '+m+' = '+(q*m)+'). Значит, и числитель умножаем на '+m+': '+p+' · '+m+' = '+(p*m)+'.');
+}
+
+/* --- m6: сложение и вычитание дробей --- */
+function pf(maxD){var q=ri(2,maxD),p=ri(1,q-1);return F(p,q)}
+function gM6(){
+  var t=ri(0,3),x,y,L,res;
+  if(t===0){var d=ri(4,12),n1=ri(1,d-2),n2=ri(1,d-1-n1+1);if(n1+n2>=d)n2=d-n1-1||1;
+    x=F(n1,d);y=F(n2,d);res=add(x,y);
+    return mk('m6','Вычислите: '+EX(Hr(n1,d)+' + '+Hr(n2,d)),res,[TR(F(n1+n2,2*d),'Складывают знаменатели','Знаменатели при сложении не складывают: он остаётся прежним.')],stAdd(F(n1,d),F(n2,d),false).replace(/^Складываем/,'Знаменатель один, складываем'));}
+  if(t===1){do{x=pf(9);y=pf(9)}while(x.d===y.d||lcm(x.d,y.d)>36);
+    res=add(x,y);
+    return mk('m6','Вычислите: '+EX(H(x)+' + '+H(y)),res,[TR(F(x.n+y.n,x.d+y.d),'Складывают числители и знаменатели','Нужен общий знаменатель. Дроби с разными знаменателями так не складывают.')],stAdd(x,y,false));}
+  if(t===2){do{x=pf(9);y=pf(9)}while(x.d===y.d||lcm(x.d,y.d)>36||x.n*y.d<=y.n*x.d);
+    res=sub(x,y);
+    return mk('m6','Вычислите: '+EX(H(x)+' − '+H(y)),res,[TR(F(x.n-y.n,x.d-y.d),'Вычитают числители и знаменатели','Нужен общий знаменатель, знаменатели не вычитают.')],stAdd(x,y,true));}
+  var w1=ri(1,4),w2=ri(1,4),a,b;
+  do{a=pf(6);b=pf(6)}while(a.d===b.d||lcm(a.d,b.d)>24);
+  var xx=toImp(w1,a.n,a.d),yy=toImp(w2,b.n,b.d);res=add(xx,yy);
+  var wrong=F((w1+w2)*(a.d+b.d)+a.n+b.n,a.d+b.d);
+  return mk('m6','Вычислите: '+EX(Hmx(w1,a.n,a.d)+' + '+Hmx(w2,b.n,b.d))+'. Ответ запишите смешанным числом.',res,[TR(wrong,'Складывают числители и знаменатели','Дробные части складывают через общий знаменатель.')],'Целые части складываем отдельно: '+w1+' + '+w2+' = '+(w1+w2)+'. Дробные части: '+stAdd(a,b,false)+' Итого '+Hm(res)+'.',res.d===1?null:(Math.abs(res.n)>res.d?'mixed':null));
+}
+
+/* --- m7: умножение дробей --- */
+function gM7(){
+  var t=ri(0,3),x,y,res;
+  if(t<=1){do{x=pf(9);y=pf(9)}while(x.d===y.d);
+    res=mul(x,y);var L=lcm(x.d,y.d);
+    return mk('m7','Вычислите: '+EX(H(x)+' · '+H(y)),res,[TR(F(x.n*y.n,L),'Общий знаменатель при умножении','Общий знаменатель нужен только для сложения и вычитания. При умножении знаменатели перемножают.'),TR(dvd(x,y),'Перепутали с делением','Это умножение: числитель на числитель, знаменатель на знаменатель.')],stMul(x,y));}
+  if(t===2){var a=ri(2,9),b=pf(9);var first=Math.random()<.5;
+    res=mul(F(a),b);
+    return mk('m7','Вычислите: '+EX(first?a+' · '+H(b):H(b)+' · '+a),res,[TR(F(b.n,b.d*a),'Целое умножают на знаменатель','Целое число умножают на числитель, знаменатель остаётся прежним.'),TR(F(a*b.n,a*b.d),'Целое умножают на знаменатель','Целое число умножают только на числитель.')],'Целое число — это дробь со знаменателем 1: '+a+' = '+fr(a,1)+'. '+stMul(F(a),b));}
+  var w1=ri(1,3),w2=ri(1,3),p,q;
+  do{p=pf(6);q=pf(6)}while(p.d===q.d);
+  var x1=toImp(w1,p.n,p.d),y1=toImp(w2,q.n,q.d);res=mul(x1,y1);
+  var sepWrong=add(F(w1*w2),mul(p,q));
+  return mk('m7','Вычислите: '+EX(Hmx(w1,p.n,p.d)+' · '+Hmx(w2,q.n,q.d)),res,[TR(sepWrong,'Смешанные числа умножают по частям','Сначала запишите смешанные числа неправильными дробями, потом перемножайте.')],'Переводим в неправильные дроби: '+Hmx(w1,p.n,p.d)+' = '+H(x1)+', '+Hmx(w2,q.n,q.d)+' = '+H(y1)+'. '+stMul(x1,y1),res.d===1?null:null);
+}
+
+/* --- m8: деление дробей --- */
+function gM8(){
+  var t=ri(0,3),x,y,res;
+  if(t===0||t===1){do{x=pf(9);y=pf(9)}while(x.d===y.d&&Math.random()<.7);
+    res=dvd(x,y);
+    return mk('m8','Вычислите: '+EX(H(x)+' : '+H(y)),res,[TR(mul(x,y),'Деление дробей: нет переворота','Деление заменяют умножением на перевёрнутую вторую дробь.'),TR(mul(F(x.d,x.n),y),'Деление дробей: перевернули не ту','Переворачивают только делитель, то есть вторую дробь.')],stDiv(x,y));}
+  if(t===2){var a=ri(2,9),b=pf(9);res=dvd(F(a),b);
+    return mk('m8','Вычислите: '+EX(a+' : '+H(b)),res,[TR(mul(F(a),b),'Деление дробей: нет переворота','Делитель — дробь. Её переворачивают и умножают.')],'Делим на дробь: умножаем на перевёрнутую. '+a+' : '+H(b)+' = '+a+' · '+H(F(b.d,b.n))+' = '+H(res)+'.'+(res.d!==1&&Math.abs(res.n)>res.d?' Смешанным числом: '+Hm(res)+'.':''));}
+  var c=pf(9),k=ri(2,6);res=dvd(c,F(k));
+  return mk('m8','Вычислите: '+EX(H(c)+' : '+k),res,[TR(F(c.n*k,c.d),'Деление дробей: перевернули не ту','Число k — делитель, его заменяют на 1/'+k+'. Дробь-делимое не переворачивают.')],'Делить на '+k+' — значит умножать на '+fr(1,k)+': '+H(c)+' · '+fr(1,k)+' = '+H(res)+'.');
+}
+
+/* --- m9: отрицательные дроби --- */
+function gM9(){
+  var t=ri(0,4),x,y,res,s1,s2;
+  if(t===0){do{x=pf(8);y=pf(8)}while(x.d===y.d||lcm(x.d,y.d)>24);
+    var nx=neg(x);res=add(nx,y);
+    return mk('m9','Вычислите: '+EX('−'+H(x)+' + '+H(y)),res,[TR(neg(res),'Знак результата','Знак берут у слагаемого с большим модулем.'),TR(add(x,y),'Складывают модули вместо вычитания','Знаки разные, модули вычитают.')],'Знаки разные: ищем большее по модулю. '+stAdd(nx,y,false));}
+  if(t===1){do{x=pf(8);y=pf(8)}while(x.d===y.d&&Math.random()<.6);
+    s1=sgn();s2=-s1;var A=F(s1*x.n,x.d),B=F(s2*y.n,y.d);res=mul(A,B);
+    return mk('m9','Вычислите: '+EX(H(A)+' · '+Pp(B,H(B))),res,[TR(neg(res),'Знак результата','Знаки разные, результат отрицательный. Сначала определите знак, затем перемножайте модули.')],'Знаки разные, результат отрицательный. '+stMul(A,B));}
+  if(t===2){do{x=pf(8);y=pf(8)}while(x.d===y.d&&Math.random()<.6);
+    var A2=neg(x),B2=neg(y);res=dvd(A2,B2);
+    return mk('m9','Вычислите: '+EX(H(A2)+' : '+Pp(B2,H(B2))),res,[TR(neg(res),'Знак результата','Минус на минус даёт плюс, и при делении тоже.'),TR(mul(A2,B2),'Деление дробей: нет переворота','Делитель переворачивают и умножают.')],'Знаки одинаковые, результат положительный. '+stDiv(A2,B2));}
+  if(t===3){do{x=pf(8);y=pf(8)}while(x.d===y.d||lcm(x.d,y.d)>24||x.n*y.d>=y.n*x.d);
+    res=sub(x,y);
+    return mk('m9','Вычислите: '+EX(H(x)+' − '+H(y)),res,[TR(neg(res),'Знак результата','Из меньшего вычитаем большее, результат отрицательный.')],'Вычитаемое больше уменьшаемого, ответ отрицательный. '+stAdd(x,y,true));}
+  var a=pf(6),b=pf(6),c=pf(6);
+  do{a=pf(6);b=pf(6);c=pf(6)}while(a.d===b.d||add(neg(a),b).n===0);
+  var inner=add(neg(a),b);res=mul(inner,neg(c));
+  return mk('m9','Вычислите: '+EX('(−'+H(a)+' + '+H(b)+') · (−'+H(c)+')'),res,[TR(neg(res),'Знак результата','Определите знак: сначала скобку, потом умножение на отрицательное число.')],'Сначала скобки: '+stAdd(neg(a),b,false)+' Затем умножаем: '+stMul(inner,neg(c)));
+}
+function gSign(){
+  var cnt=ri(3,6),f=[];
+  for(var i=0;i<cnt;i++)f.push(ri(1,5)*sgn());
+  var neg=f.filter(function(x){return x<0}).length;
+  var q=f.map(function(x,i){return i?'· '+Ip(x):I(x)}).join(' ');
+  var plus=neg%2===0;
+  return {mod:'m3',q:'Каков знак произведения '+EX(q)+'? Считать само число не нужно.',
+    choice:{opts:['плюс','минус'],correct:plus?0:1,vals:[null,null],msgs:['','']},
+    ans:F(plus?1:-1),traps:[],
+    steps:'Минусов в записи: '+neg+'. '+(plus?'Число чётное, знак плюс.':'Число нечётное, знак минус.')};
+}
+
+/* ================= Программа 7 класса ================= */
+function pwr(a,n){var r=F(1),k=Math.abs(n),i;for(i=0;i<k;i++)r=mul(r,a);return n<0?dvd(F(1),r):r}
+function sp(e){return '<sup>'+I(e)+'</sup>'}
+function rep(a,n){var s=[],i;for(i=0;i<n;i++)s.push(a);return s.join(' · ')}
+function zn(n){var a=n%100,b=n%10;return (a>=11&&a<=14)?'знаков':b===1?'знак':(b>=2&&b<=4)?'знака':'знаков'}
+function grp(s){return s.replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
+function bq(x){return (x.n<0||x.d!==1)?'('+H(x)+')':String(x.n)}
+
+/* --- m10: степень с натуральным показателем --- */
+function gM10(){
+  var t=ri(0,3),a,n,r;
+  if(t===0){a=ri(2,6);n=ri(2,4);while(Math.pow(a,n)>800)n--;r=Math.pow(a,n);
+    return mk('m10','Вычислите: '+EX(a+sp(n)),F(r),[TR(F(a*n),'Степень заменяют умножением','Степень — произведение n одинаковых множителей: '+a+sp(n)+' = '+rep(a,n)+'. Умножать основание на показатель не нужно.'),TR(pwr(F(n),a),'Основание и показатель перепутаны','Основание — число, которое умножают само на себя. Показатель говорит, сколько раз.')],a+sp(n)+' = '+rep(a,n)+' = '+r+'.');
+  }
+  if(t===1){a=ri(2,5);n=ri(2,4);r=pwr(F(-a),n);
+    return mk('m10','Вычислите: '+EX('(−'+a+')'+sp(n)),r,[TR(neg(r),'Знак степени отрицательного числа','Отрицательное число в чётной степени даёт плюс, в нечётной — минус. Здесь показатель '+n+(n%2?' нечётный.':' чётный.'))],'(−'+a+')'+sp(n)+' = '+rep('(−'+a+')',n)+' = '+H(r)+'. Минусов '+n+(n%2?', нечётное число: результат отрицательный.':', чётное число: результат положительный.'));
+  }
+  if(t===2){a=ri(2,5);n=pick([2,4]);r=F(-Math.pow(a,n));
+    return mk('m10','Вычислите: '+EX('−'+a+sp(n)),r,[TR(F(Math.pow(a,n)),'Минус перед степенью','Сначала вычисляют степень, потом ставят минус: −'+a+sp(n)+' = −('+rep(a,n)+'). Без скобок минус в степень не входит.')],'Степень считаем раньше минуса: '+a+sp(n)+' = '+Math.pow(a,n)+'. Затем минус: '+H(r)+'.');
+  }
+  var pq=coprime(),p=pq[0],q=pq[1];n=pick([2,3]);r=F(Math.pow(p,n),Math.pow(q,n));
+  return mk('m10','Вычислите: '+EX('('+fr(p,q)+')'+sp(n)),r,[TR(F(Math.pow(p,n),q),'В степень возвели только числитель','В степень возводят и числитель, и знаменатель.'),TR(F(p*n,q*n),'Степень заменяют умножением','Степень — повторное умножение: '+rep('('+H(F(p,q))+')',n)+'.')],'Возводим числитель и знаменатель: '+Hr(Math.pow(p,n),Math.pow(q,n))+'.');
+}
+
+/* --- m11: свойства степеней --- */
+function gM11(){
+  var t=ri(0,4),b=pick([2,3,5,7,10]),m,n,k,bs=function(e){return b+sp(e)};
+  if(t===0){m=ri(2,7);n=ri(2,7);
+    return mk('m11','Запишите в виде степени числа '+b+': '+EX(bs(m)+' · '+bs(n)+' = '+b+'<sup>k</sup>')+'. Чему равно k?',F(m+n),[TR(F(m*n),'Показатели умножают вместо сложения','При умножении степеней с одним основанием показатели складывают.'),TR(F(Math.max(m,n)),'Показатели не складывают','Основание остаётся, показатели складываются: '+m+' + '+n+'.')],bs(m)+' · '+bs(n)+' = '+b+sp(m+n)+'. Показатели складываем: '+m+' + '+n+' = '+(m+n)+'.');}
+  if(t===1){n=ri(2,5);m=n+ri(2,5);
+    return mk('m11','Запишите в виде степени числа '+b+': '+EX(bs(m)+' : '+bs(n)+' = '+b+'<sup>k</sup>')+'. Чему равно k?',F(m-n),[TR(F(m+n),'При делении показатели складывают','При делении степеней с одним основанием показатели вычитают.'),TR(F(n-m),'Порядок вычитания показателей','Из показателя делимого вычитают показатель делителя: '+m+' − '+n+'.')],bs(m)+' : '+bs(n)+' = '+b+sp(m-n)+'. Показатели вычитаем: '+m+' − '+n+' = '+(m-n)+'.');}
+  if(t===2){m=ri(2,5);n=ri(2,5);
+    return mk('m11','Запишите в виде степени числа '+b+': '+EX('('+bs(m)+')<sup>'+n+'</sup> = '+b+'<sup>k</sup>')+'. Чему равно k?',F(m*n),[TR(F(m+n),'Степень степени: показатели складывают','При возведении степени в степень показатели перемножают.')],'('+bs(m)+')'+sp(n)+' = '+b+sp(m*n)+'. Показатели перемножаем: '+m+' · '+n+' = '+(m*n)+'.');}
+  if(t===3){m=ri(2,5);k=m+ri(2,6);
+    return mk('m11','Найдите показатель x: '+EX(bs(m)+' · '+b+'<sup>x</sup> = '+bs(k)),F(k-m),[TR(F(k+m),'Показатели не вычли','Показатели при умножении складываются, поэтому '+m+' + x = '+k+'.'),TR(F(k,m),'Показатели не вычли','Из уравнения '+m+' + x = '+k+' находят x вычитанием.')],'При умножении показатели складываются: '+m+' + x = '+k+'. Отсюда x = '+k+' − '+m+' = '+(k-m)+'.');}
+  m=ri(2,6);n=ri(2,6);var p=ri(1,m+n-1);
+  return mk('m11','Запишите в виде степени числа '+b+': '+EX('('+bs(m)+' · '+bs(n)+') : '+bs(p)+' = '+b+'<sup>k</sup>')+'. Чему равно k?',F(m+n-p),[TR(F(m+n+p),'При делении показатели складывают','Сначала умножение: показатели складывают, затем деление: показатель делителя вычитают.'),TR(F(m*n-p),'Показатели умножают вместо сложения','При умножении степеней показатели складывают.')],'Умножение: '+m+' + '+n+' = '+(m+n)+'. Деление: '+(m+n)+' − '+p+' = '+(m+n-p)+'.');
+}
+
+/* --- m12: степень с целым показателем --- */
+function gM12(){
+  var t=ri(0,3),a,n,r;
+  if(t===0){a=pick([3,5,7,9,12,25,100]);
+    if(Math.random()<.5){var c=ri(2,9);
+      return mk('m12','Вычислите: '+EX(c+' · '+a+'<sup>0</sup>'),F(c),[TR(F(0),'Нулевая степень','Любое число, кроме нуля, в нулевой степени равно 1.'),TR(F(c*a),'Нулевая степень','a⁰ = 1, а не a.')],a+'⁰ = 1. Затем '+c+' · 1 = '+c+'.');}
+    return mk('m12','Вычислите: '+EX(a+'<sup>0</sup>'),F(1),[TR(F(0),'Нулевая степень','Любое число, кроме нуля, в нулевой степени равно 1.'),TR(F(a),'Нулевая степень','a⁰ = 1, а не a.')],a+'⁰ = 1.');}
+  if(t===1){a=ri(2,5);n=ri(1,3);r=F(1,Math.pow(a,n));
+    return mk('m12','Вычислите: '+EX(a+sp(-n)),r,[TR(neg(r),'Минус в показателе принимают за минус числа','Знак минус в показателе не делает число отрицательным. Он означает деление: a⁻ⁿ = 1/aⁿ.'),TR(F(1,a*n),'Степень заменяют умножением','a⁻ⁿ = 1/aⁿ, степень надо вычислить.'),TR(F(Math.pow(a,n)),'Отрицательный показатель не перевернули','Отрицательный показатель переворачивает: a⁻ⁿ = 1/aⁿ.')],a+sp(-n)+' = 1/'+a+sp(n)+' = '+H(r)+'.');}
+  if(t===2){var pq=coprime(),p=pq[0],q=pq[1];n=ri(1,2);r=F(Math.pow(q,n),Math.pow(p,n));
+    return mk('m12','Вычислите: '+EX('('+fr(p,q)+')'+sp(-n)),r,[TR(F(Math.pow(p,n),Math.pow(q,n)),'Отрицательный показатель не перевернули','Отрицательный показатель переворачивает дробь: числитель и знаменатель меняются местами.'),TR(neg(r),'Минус в показателе принимают за минус числа','Минус в показателе не меняет знак числа.')],'Переворачиваем дробь и меняем знак показателя: ('+H(F(p,q))+')'+sp(-n)+' = ('+H(F(q,p))+')'+sp(n)+' = '+H(r)+'.');}
+  var m=ri(1,3);n=m+ri(1,4);a=pick([2,3]);r=pwr(F(a),n-m);
+  return mk('m12','Вычислите: '+EX(a+sp(-m)+' · '+a+sp(n)),r,[TR(pwr(F(a),n+m),'Показатели сложили без учёта знака','Показатели складывают с учётом знака: −'+m+' + '+n+' = '+(n-m)+'.'),TR(pwr(F(a),m-n),'Показатели сложили без учёта знака','Складываем −'+m+' и '+n+': из большего вычитаем меньшее, знак у большего.')],'Показатели складываем: −'+m+' + '+n+' = '+(n-m)+'. Получаем '+a+sp(n-m)+' = '+H(r)+'.');
+}
+
+/* --- m13: стандартный вид числа --- */
+function gM13(){
+  var t=ri(0,2),d1=ri(1,9),d2=Math.random()<.3?-1:ri(1,9),n;
+  var mant=d2<0?String(d1):d1+','+d2;
+  if(t===0){n=ri(3,8);
+    var digits=String(d1)+(d2<0?'':String(d2)),zeros=n-(d2<0?0:1),num=digits+'0'.repeat(zeros);
+    return mk('m13','Число '+EX(grp(num))+' записали в стандартном виде '+EX('a · 10<sup>n</sup>')+', где 1 ≤ a < 10. Чему равно n?',F(n),[TR(F(n+1),'Показатель считают по числу цифр','Показатель n равен числу цифр минус 1: столько раз запятую сдвигают влево.'),TR(F(n-1),'Показатель считают по числу цифр','Запятая стоит после первой цифры: '+mant+'. Её сдвигали на '+n+' '+zn(n)+'.')],grp(num)+' = '+mant+' · 10'+sp(n)+'. Запятую сдвигаем на '+n+' '+zn(n)+'.');}
+  if(t===1){n=ri(2,6);
+    var dd=String(d1)+(d2<0?'':String(d2)),small='0,'+'0'.repeat(n-1)+dd;
+    return mk('m13','Число '+EX(small)+' записали в стандартном виде '+EX('a · 10<sup>n</sup>')+', где 1 ≤ a < 10. Чему равно n?',F(-n),[TR(F(n),'Знак показателя у малого числа','Число меньше 1: запятую сдвигали вправо, показатель отрицательный.'),TR(F(-(n+1)),'Показатель считают по числу нулей','Показатель равен числу сдвигов запятой до первой ненулевой цифры.'),TR(F(-(n-1)),'Показатель считают по числу нулей','Считайте и нуль до запятой: запятую сдвигают до первой ненулевой цифры.')],small+' = '+mant+' · 10'+sp(-n)+'. Запятую сдвинули на '+n+' '+zn(n)+' вправо, показатель −'+n+'.');}
+  n=ri(2,5);var val=d2<0?d1*Math.pow(10,n):(d1*10+d2)*Math.pow(10,n-1);
+  return mk('m13','Запишите в обычном виде: '+EX(mant+' · 10<sup>'+n+'</sup>'),F(val),[TR(F(val*10),'Лишний нуль','Запятую сдвигают вправо ровно на '+n+' '+zn(n)+'.'),TR(F(val/10),'Не хватает нуля','Запятую сдвигают вправо ровно на '+n+' '+zn(n)+'.')],mant+' · 10'+sp(n)+' = '+grp(String(val))+'. Запятую сдвигаем на '+n+' '+zn(n)+' вправо.');
+}
+
+/* --- m14: значение выражения --- */
+function gM14(){
+  var t=ri(0,4),a,b,c,d,e,x,y,r;
+  var V=function(n,v){return n+' = '+(v.d===1?I(v.n):'−'.repeat(v.n<0?1:0)+fr(Math.abs(v.n),v.d))};
+  if(t===0){c=ri(2,5);a=-ri(1,5);b=ri(1,6)*sgn();r=c*a-b;
+    return mk('m14','Найдите значение выражения '+EX(c+'a − b')+' при '+EX('a = '+I(a)+', b = '+I(b))+'.',F(r),[TR(F(c*(-a)-b),'Число подставили без знака','Число подставляют вместе со знаком: a = '+I(a)+', значит '+c+' · '+Ip(a)+'.'),TR(F(c*a+b),'Знак при вычитании отрицательного числа','Вычитание числа '+I(b)+' — это '+(b<0?'прибавление '+(-b):'вычитание '+b)+': '+c+'a − b = '+I(c*a)+' − '+Ip(b)+' = '+I(r)+'.')],c+' · '+Ip(a)+' − '+Ip(b)+' = '+I(c*a)+' − '+Ip(b)+' = '+I(r)+'.');}
+  if(t===1){a=-ri(2,5);b=ri(1,5)*sgn();r=a*a-2*b;
+    return mk('m14','Найдите значение выражения '+EX('a<sup>2</sup> − 2b')+' при '+EX('a = '+I(a)+', b = '+I(b))+'.',F(r),[TR(F(-a*a-2*b),'Квадрат отрицательного числа','(−'+(-a)+')² = '+(a*a)+': квадрат числа не бывает отрицательным.'),TR(F(2*a-2*b),'Степень заменяют умножением','a² = a · a, а не 2a.')],Ip(a)+sp(2)+' − 2 · '+Ip(b)+' = '+(a*a)+' − '+Ip(2*b)+' = '+I(r)+'.');}
+  if(t===2){x=F(-ri(1,3),ri(2,4));if(x.n>=0)x=neg(x);var pq=coprime();y=F(pq[0],pq[1]);r=mul(x,y);
+    return mk('m14','Найдите значение выражения '+EX('xy')+' при '+EX('x = '+H(x)+', y = '+H(y))+'.',r,[TR(add(x,y),'Путают действия','Запись xy — это произведение: x · y.'),TR(neg(r),'Знак результата','Знаки разные, результат отрицательный.')],H(x)+' · '+H(y)+' = '+H(r)+'.');}
+  if(t===3){var pq2=coprime();x=F(pq2[0],pq2[1]);x=Math.random()<.5?x:neg(x);y=Math.random()<.5?F(ri(1,3),ri(2,5)):F(-ri(1,3),ri(2,5));r=sub(mul(x,x),y);
+    return mk('m14','Найдите значение выражения '+EX('x<sup>2</sup> − y')+' при '+EX('x = '+H(x)+', y = '+H(y))+'.',r,[TR(sub(mul(x,F(2)),y),'Степень заменяют умножением','x² = x · x, а не 2x.'),TR(add(mul(x,x),y),'Знак при вычитании отрицательного числа','Вычитание y — это − ('+H(y)+')'+(y.n<0?', то есть прибавление.':'.')),TR(sub(neg(mul(x,x)),y),'Квадрат отрицательного числа','Квадрат любого числа положителен: ('+H(x)+')² = '+H(mul(x,x))+'.')],'x² = '+H(mul(x,x))+'. Затем '+H(mul(x,x))+' − '+Pp(y,H(y))+' = '+H(r)+'.');}
+  c=ri(3,9);d=ri(2,4);e=ri(2,5);a=-ri(1,4);r=c-d*(a-e);
+  return mk('m14','Найдите значение выражения '+EX(c+' − '+d+'(a − '+e+')')+' при '+EX('a = '+I(a))+'.',F(r),[TR(F(c-d*a-e),'Умножили на скобку только первое слагаемое','Множитель '+d+' умножают на оба слагаемых в скобке.'),TR(F(c-d*a-d*e),'Минус перед скобкой','Минус перед скобкой меняет знаки внутри: −'+d+'(a − '+e+') = −'+d+'a + '+(d*e)+'.')],'Сначала скобка: '+Ip(a)+' − '+e+' = '+I(a-e)+'. Затем '+c+' − '+d+' · '+Ip(a-e)+' = '+c+' − '+Ip(d*(a-e))+' = '+I(r)+'.');
+}
+
+/* --- m15: одночлены --- */
+function gM15(){
+  var t=ri(0,5),c1,c2,p,q,r,n;
+  if(t===0){c1=-ri(2,6);c2=ri(2,6);if(Math.random()<.4)c2=-c2;p=ri(2,3);r=c1*c2;
+    return mk('m15','Одночлен '+EX(I(c1)+'x'+sp(p)+' · '+Ip(c2)+'y')+' приведите к стандартному виду. Чему равен коэффициент?',F(r),[TR(F(c1+c2),'Коэффициенты складывают','Числовые множители перемножают.'),TR(F(-r),'Знак коэффициента','Коэффициенты перемножают вместе со знаками.')],'Перемножаем числовые множители: '+I(c1)+' · '+Ip(c2)+' = '+I(r)+'. Получаем '+I(r)+'x'+sp(p)+'y.');}
+  if(t===1){p=ri(2,4);q=ri(2,4);c1=-ri(2,7);
+    if(Math.random()<.5)return mk('m15','Чему равна степень одночлена '+EX(I(c1)+'x'+sp(p)+'y'+sp(q))+'?',F(p+q),[TR(F(p*q),'Степень одночлена перемножают','Степень одночлена — сумма показателей всех переменных: '+p+' + '+q+'.'),TR(F(Math.max(p,q)),'Степень одночлена — наибольший показатель','Складывают показатели всех переменных.')],'Показатели складываем: '+p+' + '+q+' = '+(p+q)+'.');
+    return mk('m15','Чему равна степень одночлена '+EX(I(c1)+'x'+sp(p)+'yz')+'?',F(p+2),[TR(F(p+1),'Не учли переменную без показателя','y = y¹ и z = z¹: у них показатель 1.'),TR(F(p),'Не учли переменную без показателя','Показатели всех переменных складывают, у y и z они равны 1.')],'Показатели: '+p+', 1, 1. Сумма: '+(p+2)+'.');}
+  if(t===2){c1=-ri(2,5);c2=ri(2,5);p=ri(2,4);q=ri(2,4);
+    if(Math.random()<.5)return mk('m15','Найдите коэффициент произведения '+EX('('+I(c1)+'x'+sp(p)+') · ('+c2+'x'+sp(q)+')')+'.',F(c1*c2),[TR(F(c1+c2),'Коэффициенты складывают','Числовые множители перемножают.'),TR(F(-c1*c2),'Знак коэффициента','Минус на плюс даёт минус.')],I(c1)+' · '+c2+' = '+I(c1*c2)+'. Произведение: '+I(c1*c2)+'x'+sp(p+q)+'.');
+    return mk('m15','Какой показатель у x в произведении '+EX('('+I(c1)+'x'+sp(p)+') · ('+c2+'x'+sp(q)+')')+'?',F(p+q),[TR(F(p*q),'Показатели умножают вместо сложения','При умножении степеней с одним основанием показатели складывают.')],'x'+sp(p)+' · x'+sp(q)+' = x'+sp(p+q)+'.');}
+  if(t===3){c1=-ri(2,4);var xv=-ri(2,3),yd=ri(2,3),y=F(1,yd);r=mul(F(c1*xv*xv),y);
+    return mk('m15','Найдите значение одночлена '+EX(I(c1)+'x'+sp(2)+'y')+' при '+EX('x = '+I(xv)+', y = '+H(y))+'.',r,[TR(mul(F(c1*(-xv*xv)),y),'Квадрат отрицательного числа','Квадрат отрицательного числа положителен: ('+I(xv)+')² = '+(xv*xv)+'.'),TR(mul(F(c1*xv*2),y),'Степень заменяют умножением','x² = x · x, а не 2x.')],I(c1)+' · '+Ip(xv)+sp(2)+' · '+H(y)+' = '+I(c1)+' · '+(xv*xv)+' · '+H(y)+' = '+H(r)+'.');}
+  c1=ri(2,3);p=ri(2,3);n=ri(2,3);
+  if(Math.random()<.5)return mk('m15','Одночлен '+EX('('+c1+'x'+sp(p)+')'+sp(n))+' приведите к стандартному виду. Чему равен коэффициент?',F(Math.pow(c1,n)),[TR(F(c1*n),'В степень возвели не весь одночлен','В степень возводят и число, и переменную: '+c1+sp(n)+'.'),TR(F(c1),'В степень возвели не весь одночлен','Коэффициент тоже возводят в степень.')],'('+c1+'x'+sp(p)+')'+sp(n)+' = '+c1+sp(n)+' · x'+sp(p*n)+' = '+Math.pow(c1,n)+'x'+sp(p*n)+'.');
+  return mk('m15','Чему равна степень одночлена '+EX('('+c1+'x'+sp(p)+'y)'+sp(n))+'?',F((p+1)*n),[TR(F(p+1+n),'Показатели сложили вместо умножения','Каждый показатель умножают на '+n+': ('+'x'+sp(p)+')'+sp(n)+' = x'+sp(p*n)+'.'),TR(F(p*n+1),'Не учли показатель у y','y тоже возводят в степень '+n+': y'+sp(n)+'.')],'('+c1+'x'+sp(p)+'y)'+sp(n)+' = '+Math.pow(c1,n)+'x'+sp(p*n)+'y'+sp(n)+'. Степень: '+(p*n)+' + '+n+' = '+((p+1)*n)+'.');
+}
+
+var MODS=[
+ {id:'m1',title:'Числовая прямая и модуль',sub:'Противоположные числа, модуль, сравнение отрицательных',gen:gM1},
+ {id:'m2',title:'Сложение и вычитание со знаками',sub:'Двойной минус, числа с разными знаками',gen:gM2},
+ {id:'m3',title:'Умножение и деление со знаками',sub:'Правило знаков',gen:function(){return Math.random()<.2?gSign():gM3()}},
+ {id:'m4',title:'Скобки и порядок действий',sub:'Минус перед скобкой',gen:gM4},
+ {id:'m5',title:'Дроби: сокращение и смешанные числа',sub:'Основное свойство, неправильные дроби, сравнение',gen:gM5},
+ {id:'m6',title:'Сложение и вычитание дробей',sub:'Общий знаменатель',gen:gM6},
+ {id:'m7',title:'Умножение дробей',sub:'Главная тема, где чаще всего ошибки',gen:gM7,key:true},
+ {id:'m8',title:'Деление дробей',sub:'Главная тема: переворачиваем делитель',gen:gM8,key:true},
+ {id:'m9',title:'Отрицательные дроби',sub:'Знаки и дроби вместе',gen:gM9,key:true},
+ {id:'m10',title:'Степень числа',sub:'§1: степень с натуральным показателем, знаки, дроби в степени',gen:gM10},
+ {id:'m11',title:'Свойства степеней',sub:'§1: умножение, деление, степень степени',gen:gM11},
+ {id:'m12',title:'Целый показатель',sub:'§2: нулевая и отрицательная степень, степень дроби',gen:gM12,key:true},
+ {id:'m13',title:'Стандартный вид числа',sub:'§3: число в виде a · 10ⁿ',gen:gM13},
+ {id:'m14',title:'Значение выражения',sub:'§4: подстановка чисел со знаками и дробей',gen:gM14,key:true},
+ {id:'m15',title:'Одночлены',sub:'§6–7: коэффициент, степень, действия с одночленами',gen:gM15}
+];
+MODS.forEach(function(m){m.grade=/^m1[0-5]$/.test(m.id)?7:6});
+MODS.sort(function(a,b){return b.grade-a.grade});
+function modOf(id){for(var i=0;i<MODS.length;i++)if(MODS[i].id===id)return MODS[i]}
+
+/* Выбор ответа из заданий с вводом */
+function asChoice(t){
+  if(t.choice)return t;
+  var vals=[t.ans].concat(t.traps.map(function(x){return x.v}));
+  var fill=[neg(t.ans),add(t.ans,F(1,t.ans.d)),sub(t.ans,F(1,t.ans.d)),mul(t.ans,F(2)),dvd(t.ans,F(2)),add(t.ans,F(1))];
+  fill.forEach(function(v){
+    if(vals.length>=4||!v)return;
+    for(var i=0;i<vals.length;i++)if(eqF(vals[i],v))return;
+    vals.push(v);
+  });
+  vals=vals.slice(0,4);
+  var sh=shuffle(vals.map(function(v,i){return {v:v,ok:i===0}}));
+  var useMixed=t.form==='mixed';
+  var c={opts:sh.map(function(o){return useMixed?Hm(o.v):H(o.v)}),correct:sh.findIndex(function(o){return o.ok}),vals:sh.map(function(o){return o.v})};
+  var n=Object.assign({},t);n.choice=c;return n;
+}
+
+
+/* Множественный выбор: утверждения об ответе */
+function absF(v){return F(Math.abs(v.n),v.d)}
+function multiOf(t){
+  if(t.choice||t.multi)return t;
+  var a=t.ans,T=[],Fs=[],i,tv;
+  function repr(v){return (v.d!==1&&Math.abs(v.n)>v.d&&Math.random()<.5)?Hm(v):H(v)}
+  var vt=[{h:'Ответ равен '+H(a)}];
+  if(a.d!==1&&Math.abs(a.n)>a.d)vt.push({h:'Ответ равен '+Hm(a)});
+  vt=shuffle(vt);
+  var trueV=[vt[0]];if(vt[1]&&Math.random()<.5)trueV.push(vt[1]);
+  var props=[];
+  function P(h,truth,type){for(var j=0;j<props.length;j++)if(props[j].h===h)return;props.push({h:h,ok:truth,type:type||'Свойства результата'})}
+  P('Ответ положительный',a.n>0,'Знак результата');
+  P('Ответ отрицательный',a.n<0,'Знак результата');
+  if(a.d===1&&a.n!==0){P('Ответ — чётное число',a.n%2===0);P('Ответ — нечётное число',a.n%2!==0)}
+  var ab=Math.abs(a.n)/a.d;
+  P('Ответ по модулю меньше 1',ab<1);
+  P('Ответ по модулю больше 1',ab>1);
+  P('Модуль ответа равен '+H(absF(a)),true);
+  t.traps.forEach(function(x){P('Модуль ответа равен '+H(absF(x.v)),eqF(absF(x.v),absF(a)),x.type)});
+  props.forEach(function(x){(x.ok?T:Fs).push(x)});
+  T=shuffle(T);Fs=shuffle(Fs);
+  var nTrue=Math.min(trueV.length+T.length,Math.random()<.5?2:3);
+  var trues=trueV.slice(0,1);
+  if(trueV[1]&&nTrue>2)trues.push(trueV[1]);
+  var k=0;while(trues.length<nTrue&&k<T.length)trues.push(T[k++]);
+  trues=trues.map(function(x){return {h:x.h,ok:true,type:null}});
+  var falses=[];
+  t.traps.forEach(function(x){if(falses.length<2)falses.push({h:'Ответ равен '+repr(x.v),ok:false,type:x.type})});
+  Fs.forEach(function(x){if(falses.length<5-trues.length)falses.push({h:x.h,ok:false,type:x.type})});
+  var fill=[neg(a),add(a,F(1,a.d)),sub(a,F(1,a.d)),mul(a,F(2)),dvd(a,F(2)),add(a,F(1))];
+  fill.forEach(function(v){
+    if(falses.length>=5-trues.length||!v||eqF(v,a))return;
+    var h='Ответ равен '+repr(v);
+    for(i=0;i<falses.length;i++)if(falses[i].h===h)return;
+    falses.push({h:h,ok:false,type:T_OTHER});
+  });
+  falses=falses.slice(0,5-trues.length);
+  var q=t.q.replace(/\s*Введите[^.?!]*[.?!]\s*$/,'').replace(/\s*Ответ запишите смешанным числом\./,'');
+  var n=Object.assign({},t);n.q=q;n.multi=shuffle(trues.concat(falses));return n;
+}
+
+/* ================= Уроки ================= */
+function numberLine(from,to,marks){
+  var w=520,pad=24,step=(w-2*pad)/(to-from),s='<svg viewBox="0 0 '+w+' 64" width="100%" style="max-width:520px;color:var(--ink)" role="img" aria-label="Числовая прямая">';
+  s+='<line x1="'+pad+'" y1="30" x2="'+(w-pad)+'" y2="30" stroke="currentColor" stroke-width="1.5"/>';
+  for(var v=from;v<=to;v++){var x=pad+(v-from)*step;
+    s+='<line x1="'+x+'" y1="25" x2="'+x+'" y2="35" stroke="currentColor"/>'+'<text x="'+x+'" y="54" font-size="12" text-anchor="middle">'+(v<0?'−'+(-v):v)+'</text>';}
+  (marks||[]).forEach(function(m){var x=pad+(m.v-from)*step;
+    s+='<circle cx="'+x+'" cy="30" r="6" fill="'+(m.c||'var(--pen)')+'"/><text x="'+x+'" y="16" font-size="13" text-anchor="middle" style="fill:var(--pen)">'+m.l+'</text>';});
+  return s+'</svg>';
+}
+function areaModel(){
+  /* 2/3 · 3/4: 4 столбца, 3 строки, закрашено пересечение 3×2 из 12 */
+  var W=240,Hh=150,cw=W/4,rh=Hh/3,s='<svg viewBox="0 0 '+(W+4)+' '+(Hh+4)+'" width="260" style="color:var(--ink)" role="img" aria-label="Площадь: две трети от трёх четвертей">';
+  for(var r=0;r<3;r++)for(var c=0;c<4;c++){
+    var inA=c<3,inB=r<2,fill=inA&&inB?'var(--pen)':inA?'color-mix(in srgb,var(--ink) 14%,transparent)':inB?'color-mix(in srgb,var(--part) 28%,transparent)':'none';
+    s+='<rect x="'+(2+c*cw)+'" y="'+(2+r*rh)+'" width="'+cw+'" height="'+rh+'" fill="'+fill+'" stroke="currentColor" stroke-width="1"/>';
+  }
+  return s+'</svg>';
+}
+var LESSONS={
+ m10:{rule:'Степень aⁿ — произведение n одинаковых множителей, каждый равен a: 2⁴ = 2 · 2 · 2 · 2 = 16. Число a — основание, n — показатель.<br>Знак: отрицательное число в чётной степени даёт плюс, в нечётной минус. (−2)³ = −8, (−2)⁴ = 16. Минус без скобок в степень не входит: −2⁴ = −(2 · 2 · 2 · 2) = −16.<br>Дробь возводят в степень целиком: (2/3)³ = 8/27.',
+  ex:[['3⁴','3 · 3 · 3 · 3 = 81.'],['(−2)³','Три множителя −2, минусов три: −8.'],['−3²','Сначала степень: 3² = 9, затем минус: −9.'],['(2/5)²','4/25: числитель и знаменатель возводим в степень.']],
+  trap:'Ошибка: умножать основание на показатель. 2⁴ равно 16, а не 8.'},
+ m11:{rule:'Свойства при одинаковом основании a:<br>aᵐ · aⁿ = aᵐ⁺ⁿ (показатели складывают);<br>aᵐ : aⁿ = aᵐ⁻ⁿ (показатели вычитают);<br>(aᵐ)ⁿ = aᵐⁿ (показатели перемножают).<br>Свойства работают, только когда основания одинаковы.',
+  ex:[['2³ · 2⁴','Основание 2, показатели складываем: 2⁷.'],['5⁸ : 5³','Показатели вычитаем: 5⁵.'],['(3²)⁴','Показатели перемножаем: 3⁸.']],
+  trap:'Ошибка: при возведении степени в степень показатели складывать. (3²)⁴ = 3⁸, а не 3⁶.'},
+ m12:{rule:'Нулевая степень: a⁰ = 1 для любого a, кроме нуля.<br>Отрицательный показатель переворачивает: a⁻ⁿ = 1/aⁿ. Например, 2⁻³ = 1/8.<br>Дробь с отрицательным показателем переворачивается: (2/3)⁻² = (3/2)² = 9/4.<br>Знак минус в показателе не делает число отрицательным.',
+  ex:[['7⁰','Любое число (кроме 0) в нулевой степени равно 1.'],['2⁻⁴','1/2⁴ = 1/16.'],['(3/4)⁻¹','Переворачиваем дробь: 4/3.']],
+  trap:'Ошибка: считать, что 2⁻³ = −8. Минус в показателе означает деление: 1/8.'},
+ m13:{rule:'Стандартный вид числа: a · 10ⁿ, где 1 ≤ a < 10, n — целое. Число 4 500 000 = 4,5 · 10⁶: запятую сдвинули на 6 знаков влево.<br>Для числа меньше 1 показатель отрицательный: 0,0032 = 3,2 · 10⁻³. Запятую сдвинули вправо на 3 знака.',
+  ex:[['32 000','3,2 · 10⁴: запятая сдвинута на 4 знака.'],['0,0007','7 · 10⁻⁴: запятая сдвинута вправо на 4 знака.'],['6 · 10³','6 000: запятую сдвигаем на 3 знака вправо.']],
+  trap:'Ошибка: считать показатель по числу всех цифр. В 32 000 пять цифр, но показатель 4.'},
+ m14:{rule:'Чтобы найти значение выражения с переменными, подставьте числа вместо букв вместе со знаками и выполните действия по порядку.<br>Отрицательное число подставляют в скобках: при a = −2 выражение 3a равно 3 · (−2) = −6, а a² равно (−2)² = 4.',
+  ex:[['3a − b при a = −2, b = 5','3 · (−2) − 5 = −6 − 5 = −11.'],['a² − 2b при a = −3, b = 1','(−3)² − 2 · 1 = 9 − 2 = 7.'],['xy при x = −2/3, y = 3/4','−2/3 · 3/4 = −1/2.']],
+  trap:'Ошибка: подставить отрицательное число без скобок и потерять знак: −2² даёт −4, а (−2)² равно 4.'},
+ m15:{rule:'Одночлен — произведение чисел, переменных и их степеней. Стандартный вид: числовой множитель (коэффициент) стоит первым, у каждой переменной одна степень: −6x³y.<br>Степень одночлена — сумма показателей всех переменных: у −6x³y она равна 3 + 1 = 4.<br>При умножении одночленов коэффициенты перемножают, показатели одинаковых переменных складывают. При возведении в степень возводят коэффициент и умножают показатели: (2x²)³ = 8x⁶.',
+  ex:[['3x² · (−2x³)','Коэффициенты: 3 · (−2) = −6. Показатели: 2 + 3 = 5. Итог: −6x⁵.'],['(2x²)³','2³ = 8, показатели 2 · 3 = 6. Итог: 8x⁶.'],['Степень 5x²yz','2 + 1 + 1 = 4.']],
+  trap:'Ошибка: при умножении перемножать показатели. x² · x³ = x⁵, а не x⁶.'},
+ m1:{rule:'Модуль числа — расстояние от нуля до числа на числовой прямой. Он не бывает отрицательным: |−5| = 5 и |5| = 5.<br>Противоположные числа стоят по разные стороны от нуля на одном расстоянии: 3 и −3. Из двух отрицательных чисел больше то, что правее, то есть ближе к нулю.',
+  pic:numberLine(-8,8,[{v:-7,l:'−7'},{v:-3,l:'−3',c:'var(--ok)'}]),picNote:'Число −3 стоит правее, чем −7, значит −3 > −7.',
+  ex:[['−(−4)','Минус и минус дают плюс: −(−4) = 4.'],['|−9| − |2|','Раскрываем модули: 9 − 2 = 7.']],
+  trap:'Ошибка: считать, что −7 больше −3, потому что 7 больше 3. Для отрицательных чисел всё наоборот.'},
+ m2:{rule:'Алгоритм: 1) определите знаки слагаемых и найдите их модули; 2) знаки одинаковые — модули складываем, знаки разные — из большего модуля вычитаем меньший; 3) знак результата: общий, а при разных знаках — у слагаемого с большим модулем.<br>Вычитание заменяем сложением: a − b = a + (−b). Например, 5 − (−3) = 5 + 3.',
+  pic:numberLine(-6,6,[{v:-4,l:'старт'},{v:3,l:'−4 + 7'}]),picNote:'Прибавить 7 — сдвинуться на 7 вправо: −4 + 7 = 3.',
+  ex:[['−7 + 12','Знаки разные. 12 больше 7, знак плюс: 12 − 7 = 5.'],['−2 − 6','−2 + (−6): знаки одинаковые, модули складываем: −8.'],['4 − (−7)','Вычитаем отрицательное — прибавляем: 4 + 7 = 11.']],
+  trap:'Ошибка: оставить − (−3) как −3. Два минуса подряд дают плюс.'},
+ m3:{rule:'Алгоритм: 1) определите знаки множителей и найдите модули; 2) перемножьте (или разделите) модули; 3) поставьте знак: одинаковые знаки дают плюс, разные — минус.<br>Если множителей несколько, считаем минусы: чётное число минусов даёт плюс, нечётное — минус.',
+  ex:[['−6 · 7','Знаки разные, минус: −42.'],['−6 · (−7)','Знаки одинаковые, плюс: 42.'],['−48 : (−6)','Знаки одинаковые: 8.'],['(−2) · (−3) · (−4)','Три минуса, нечётное число: −24.']],
+  trap:'Ошибка: путать с сложением. −3 + (−4) = −7, но −3 · (−4) = 12.'},
+ m4:{rule:'Порядок: сначала скобки, затем умножение и деление слева направо, затем сложение и вычитание.<br>Если перед скобкой стоит минус, знаки внутри скобки меняются: 10 − (3 − 8) = 10 − 3 + 8.',
+  ex:[['−3 + 4 · (−2)','Сначала умножение: 4 · (−2) = −8. Затем −3 + (−8) = −11.'],['(−3 + 4) · (−2)','Сначала скобки: 1. Затем 1 · (−2) = −2.'],['10 − (3 − 8)','Скобки: 3 − 8 = −5. Затем 10 − (−5) = 15.']],
+  trap:'Ошибка: считать слева направо, не глядя на приоритеты.'},
+ m5:{rule:'Числитель и знаменатель можно умножать или делить на одно число: дробь не изменится. Ответ записывают в сокращённом виде.<br>Смешанное число в неправильную дробь: целая часть · знаменатель + числитель. Обратно: делим числитель на знаменатель, остаток идёт в числитель.<br>Чтобы сравнить дроби, приводим их к общему знаменателю.',
+  ex:[['18/24','Делим на 6: 3/4.'],['2 3/5','2 · 5 + 3 = 13, получаем 13/5.'],['17/5','17 : 5 = 3, остаток 2: 3 2/5.'],['3/4 и 5/6','9/12 и 10/12: больше 5/6.']],
+  trap:'Ошибка: прибавлять вместо умножения. 3/4 = ?/20: знаменатель умножили на 5, значит и числитель на 5, получится 15.'},
+ m6:{rule:'Знаменатель общий: складываем числители, знаменатель оставляем: 3/8 + 2/8 = 5/8.<br>Знаменатели разные: находим общий (наименьшее общее кратное), приводим дроби, затем складываем числители.',
+  ex:[['1/6 + 3/4','Общий знаменатель 12: 2/12 + 9/12 = 11/12.'],['5/6 − 1/4','10/12 − 3/12 = 7/12.'],['1 1/2 + 2 3/4','Целые: 1 + 2 = 3. Дроби: 2/4 + 3/4 = 5/4 = 1 1/4. Итого 4 1/4.']],
+  trap:'Ошибка: складывать и знаменатели. 1/2 + 1/3 не равно 2/5.'},
+ m7:{rule:'Числитель умножаем на числитель, знаменатель на знаменатель. Общий знаменатель не нужен.<br>Сокращать можно до умножения: если числитель одной дроби и знаменатель другой делятся на одно число, сократите их.<br>Целое число — это дробь со знаменателем 1: умножаем его только на числитель. Смешанные числа сначала записываем неправильными дробями.',
+  pic:areaModel(),picNote:'Берём 3/4 прямоугольника (серые столбцы), от них 2/3 (верхние две строки). Красных клеток 6 из 12, то есть 1/2: 2/3 · 3/4 = 6/12 = 1/2.',
+  ex:[['2/3 · 3/4','2 · 3 и 3 · 4: 6/12 = 1/2. Тройки можно сократить сразу.'],['6 · 5/9','Целое умножаем на числитель: 30/9 = 10/3 = 3 1/3.'],['1 1/2 · 2 2/3','3/2 · 8/3 = 24/6 = 4.']],
+  trap:'Ошибка: искать общий знаменатель, как при сложении. При умножении он не нужен.'},
+ m8:{rule:'Делить на дробь — значит умножать на перевёрнутую дробь. Переворачиваем только вторую дробь, то есть делитель.<br>3/4 : 5/8 = 3/4 · 8/5 = 24/20 = 6/5 = 1 1/5.<br>Почему так: в 6 помещается 9 раз по 2/3. 6 = 18/3, 18 третей делим на 2 трети: 9. По правилу: 6 · 3/2 = 9.',
+  ex:[['3/4 : 5/8','3/4 · 8/5 = 6/5.'],['6 : 2/3','6 · 3/2 = 9.'],['2/5 : 4','Делитель 4 — это 4/1, перевёрнутая 1/4: 2/5 · 1/4 = 1/10.'],['1 1/2 : 3/4','3/2 · 4/3 = 2.']],
+  trap:'Две частые ошибки: не перевернуть вообще или перевернуть первую дробь вместо второй.'},
+ m9:{rule:'Знаки работают так же, как у целых чисел, а действия с дробями идут по правилам модулей 6 – 8. Порядок: сначала определите знак результата, затем считайте модули.',
+  ex:[['−2/3 + 1/2','Общий знаменатель 6: −4/6 + 3/6 = −1/6.'],['−3/4 · 2/9','Знаки разные, минус. 6/36 = 1/6, ответ −1/6.'],['−5/6 : (−10/9)','Знаки одинаковые, плюс. 5/6 · 9/10 = 45/60 = 3/4.']],
+  trap:'Ошибка: потерять знак на последнем шаге. Запишите знак первым.'}
+};
+
+/* ================= Состояние ================= */
+/* Настройка отправки результата: адрес прокси (Cloudflare Worker). Пусто — только кнопки Telegram и «Скопировать». */
+var CFG={endpoint:''};
+var st={view:'home',tab:'play',db:null,user:null,uid:null,isOwner:/(^|[#&])parent($|&)/.test(location.hash),canWrite:null,
+  events:[],allEvents:[],run:null,mod:null,saveMsg:''};
+var LS='znaki_events_v1';
+function lsRead(){try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){return []}}
+function lsWrite(a){try{localStorage.setItem(LS,JSON.stringify(a.slice(-300)))}catch(e){}}
+var app=document.getElementById('app');
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+
+/* Прогресс из событий */
+function progress(){
+  var ev=st.events,p={diag:null,passed:{},best:{},final:null};
+  ev.forEach(function(e){
+    if(e.kind==='diag'&&(!p.diag||e.ts>p.diag.ts))p.diag=e;
+    if(e.kind==='module'){p.best[e.mod]=Math.max(p.best[e.mod]||0,e.score);if(e.passed)p.passed[e.mod]=true}
+    if(e.kind==='final'&&(!p.final||e.score>p.final.score))p.final=e;
+  });
+  return p;
+}
+function modStatus(id,p){
+  if(p.passed[id])return 'ok';
+  if(p.diag)return (p.diag.need||[]).indexOf(id)>=0?'need':'fine';
+  return '';
+}
+function nextStep(p){
+  if(!p.diag)return {text:'Начните с диагностики: 14 заданий, около 7 минут. По ней приложение покажет, какие темы повторять.',btn:'Пройти диагностику',act:'diag'};
+  var order=['m7','m8','m9','m6','m5','m4','m3','m2','m1'];
+  var need=(p.diag.need||[]).filter(function(id){return !p.passed[id]});
+  need.sort(function(a,b){return MODS.findIndex(function(m){return m.id===a})-MODS.findIndex(function(m){return m.id===b})});
+  if(need.length)return {text:'Следующая тема: '+modOf(need[0]).title+'. В диагностике здесь были ошибки.',btn:'Открыть тему',act:'mod',mod:need[0]};
+  return {text:'Все нужные темы пройдены. Можно сдавать итоговый тест.',btn:'Итоговый тест',act:'final'};
+}
+
+/* ================= Запись событий ================= */
+async function saveEvent(ev){
+  ev.uid='local';ev.ts=Date.now();
+  st.events.push(ev);
+  lsWrite(lsRead().concat([ev]));
+  st.saveMsg='';
+  if(!CFG.endpoint){st.saveMsg='local';return}
+  try{
+    var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},10000);
+    var r=await fetch(CFG.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:reportText(ev)}),signal:ac.signal});
+    clearTimeout(tm);
+    st.saveMsg=r.ok?'sent':'fail';
+  }catch(e){st.saveMsg='fail'}
+}
+
+/* ================= Ранеры заданий ================= */
+function buildTasks(kind,modId){
+  var tasks=[],i;
+  if(kind==='check'){for(i=0;i<5;i++)tasks.push(modOf(modId).gen());}
+  if(kind==='diag'){
+    ['m10','m11','m12','m13','m14','m14','m15','m15','m2','m6','m7','m8','m9','m4'].forEach(function(id){tasks.push(modOf(id).gen())});
+  }
+  if(kind==='final'){
+    var plan={m10:2,m11:2,m12:2,m13:1,m14:3,m15:3,m3:1,m6:1,m7:2,m8:2,m9:1};
+    Object.keys(plan).forEach(function(id){for(var k=0;k<plan[id];k++)tasks.push(modOf(id).gen())});
+    tasks=shuffle(tasks);
+  }
+  if(kind!=='check'&&kind!=='train'){
+  }
+  if(kind!=='train')tasks=tasks.map(function(t,k){return k%4===3?t:multiOf(t)});
+  return tasks;
+}
+function startRun(kind,modId){
+  var tasks=kind==='train'?[multiOf(modOf(modId).gen())]:buildTasks(kind,modId);
+  st.run={kind:kind,mod:modId||null,tasks:tasks,i:0,results:[],phase:'ask',fb:null,input:'',picked:null,sel:[]};
+  st.view='run';render();window.scrollTo(0,0);
+}
+function runTitle(r){
+  return r.kind==='diag'?'Диагностика':r.kind==='final'?'Итоговый тест':r.kind==='check'?'Проверка: '+modOf(r.mod).title:'Тренажёр: '+modOf(r.mod).title;
+}
+
+/* ================= Отрисовка ================= */
+function render(){
+  if(st.view==='home')return st.tab==='parent'?renderParent():renderHome();
+  if(st.view==='lesson')return renderLesson();
+  if(st.view==='run')return renderRun();
+  if(st.view==='summary')return renderSummary();
+}
+function header(){
+  var h='<div class="top"><div class="brand">Знаки и дроби<small>повторение</small></div>';
+  if(st.isOwner&&st.view==='home')h+='<div class="tabs"><button class="tab" data-tab="play" aria-current="'+(st.tab==='play')+'">Занятия</button><button class="tab" data-tab="parent" aria-current="'+(st.tab==='parent')+'">Результаты</button></div>';
+  return h+'</div>';
+}
+function bindHeader(){
+  app.querySelectorAll('[data-tab]').forEach(function(b){b.onclick=function(){st.tab=b.dataset.tab;render()}});
+}
+
+function renderHome(){
+  var p=progress(),ns=nextStep(p);
+  var h=header();
+  h+='<section class="sheet"><div class="next"><div class="meta">Следующий шаг</div><p>'+ns.text+'</p><div><button class="btn pen" id="nx">'+ns.btn+'</button></div></div>';
+  h+='<div class="row between"><div><h3>Диагностика</h3><p class="note">14 заданий. Показывает, какие темы повторять.'+(p.diag?' Последний раз: '+p.diag.score+' из '+p.diag.max+'.':'')+'</p></div><button class="btn" id="dg">'+(p.diag?'Пройти ещё раз':'Начать')+'</button></div></section>';
+  function modList(g){
+    var arr=MODS.filter(function(m){return m.grade===g}),o='<div class="mods">';
+    arr.forEach(function(m,i){
+      var s=modStatus(m.id,p),chip=s==='ok'?'<span class="chip ok">пройдено</span>':s==='need'?'<span class="chip need">повторить</span>':s==='fine'?'<span class="chip">ок в диагностике</span>':'';
+      if(m.key)chip='<span class="chip key">главное</span> '+chip;
+      o+='<button class="mod" data-mod="'+m.id+'"><span class="n">'+(i+1)+'</span><span class="t"><b>'+m.title+'</b><span>'+m.sub+'</span></span><span>'+chip+'</span></button>';
+    });
+    return o+'</div>';
+  }
+  h+='<section class="sheet"><h3>Программа 7 класса</h3><p class="note">Темы из учебника «Алгебра 7»: степени, выражения, одночлены.</p>'+modList(7)+'</section>';
+  h+='<section class="sheet"><h3>Опора: знаки и дроби</h3><p class="note">Материал 6 класса. Нужен, чтобы решать задания 7 класса без ошибок в знаках и дробях.</p>'+modList(6)+'</section>';
+  h+='<section class="sheet"><div class="row between"><div><h3>Итоговый тест</h3><p class="note">20 заданий: ввод ответа и выбор.'+(p.final?' Лучший результат: '+p.final.score+' из '+p.final.max+'.':'')+'</p></div><button class="btn main" id="fn">Сдать тест</button></div></section>';
+  app.innerHTML=h;bindHeader();
+  document.getElementById('nx').onclick=function(){
+    if(ns.act==='diag')startRun('diag');else if(ns.act==='final')startRun('final');else{st.mod=ns.mod;st.view='lesson';render();window.scrollTo(0,0)}};
+  document.getElementById('dg').onclick=function(){startRun('diag')};
+  document.getElementById('fn').onclick=function(){startRun('final')};
+  app.querySelectorAll('[data-mod]').forEach(function(b){b.onclick=function(){st.mod=b.dataset.mod;st.view='lesson';render();window.scrollTo(0,0)}});
+}
+
+function renderLesson(){
+  var m=modOf(st.mod),L=LESSONS[m.id],grp0=MODS.filter(function(x){return x.grade===m.grade}),i=grp0.indexOf(m);
+  var h='<div class="top"><div class="brand">'+(m.grade===7?'Программа 7 класса':'Опора: 6 класс')+'<small>тема '+(i+1)+' из '+grp0.length+'</small></div><button class="btn sm" id="back">К темам</button></div>';
+  h+='<section class="sheet"><div class="steps"><span class="step" aria-current="true">1 Объяснение</span><span class="step">2 Тренажёр</span><span class="step">3 Проверка</span></div><h2>'+m.title+'</h2>';
+  h+='<div class="box rule"><div class="h">Правило</div><p class="math">'+fmtEx(L.rule)+'</p></div>';
+  if(L.pic)h+='<div class="box">'+L.pic+(L.picNote?'<p class="note">'+L.picNote+'</p>':'')+'</div>';
+  h+='<div class="box"><div class="h">Разобранные примеры</div>';
+  L.ex.forEach(function(e){h+='<p class="math"><b>'+fmtEx(e[0])+'</b> — '+fmtEx(e[1])+'</p>'});
+  h+='</div><div class="box warn"><div class="h">Частая ошибка</div><p>'+fmtEx(L.trap)+'</p></div>';
+  h+='<div class="row"><button class="btn" id="tr">Тренажёр</button><button class="btn main" id="ck">Проверка: 5 заданий</button></div>';
+  h+='<p class="note">В проверке нужно решить верно 4 из 5. Результат увидит родитель.</p></section>';
+  app.innerHTML=h;
+  document.getElementById('back').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
+  document.getElementById('tr').onclick=function(){startRun('train',m.id)};
+  document.getElementById('ck').onclick=function(){startRun('check',m.id)};
+}
+/* Дроби вида 3/4 и смешанные 2 3/5 в текстах уроков показываем стопкой */
+function fmtEx(s){
+  return s.replace(/(\d+) (\d+)\/(\d+)/g,function(_,w,n,d){return w+fr(n,d)})
+          .replace(/(\d+)\/(\d+)/g,function(_,n,d){return fr(n,d)})
+          .replace(/(\d)([а-яa-z])/g,'$1$2');
+}
+
+function renderRun(){
+  var r=st.run,t=r.tasks[r.i],total=r.kind==='train'?null:r.tasks.length;
+  var h='<div class="top"><div class="brand">'+runTitle(r)+'</div><button class="btn sm" id="quit">'+(r.kind==='train'?'Закончить':'Выйти')+'</button></div>';
+  h+='<section class="sheet">';
+  if(total)h+='<div class="row between"><span class="meta">Задание '+(r.i+1)+' из '+total+'</span></div><div class="bar" role="progressbar" aria-valuenow="'+r.i+'" aria-valuemax="'+total+'"><i style="width:'+Math.round(r.i/total*100)+'%"></i></div>';
+  else h+='<span class="meta">Решено верно: '+r.results.filter(function(x){return x.ok}).length+' из '+r.results.length+'</span>';
+  h+='<div class="q">'+t.q+'</div>';
+  var locked=r.phase==='fb';
+  if(t.multi){
+    h+='<p class="hint">Отметьте все верные утверждения. Верных несколько.</p><div class="opts multi">';
+    t.multi.forEach(function(o,k){
+      var on=!!r.sel[k],cls='opt chk',tag='';
+      if(locked){
+        if(o.ok&&on)cls+=' right';else if(!o.ok&&on)cls+=' wrong';else if(o.ok&&!on){cls+=' miss';tag='<span class="tag">пропущено</span>'}
+      }
+      h+='<button class="'+cls+'" data-m="'+k+'" aria-pressed="'+(on?'true':'false')+'"'+(locked?' disabled':'')+'><span class="bx">'+(on?'✓':'')+'</span><span class="lb">'+o.h+tag+'</span></button>';
+    });
+    h+='</div>';
+  }else if(t.choice){
+    h+='<div class="opts">';
+    t.choice.opts.forEach(function(o,k){
+      var cls='opt';if(locked){if(k===t.choice.correct)cls+=' right';else if(k===r.picked)cls+=' wrong'}
+      h+='<button class="'+cls+'" data-opt="'+k+'"'+(locked?' disabled':'')+'>'+o+'</button>';
+    });
+    h+='</div>';
+  }else{
+    var cls=locked?(r.fb.res==='ok'?' ok':' bad'):'';
+    h+='<div class="ans"><input id="in" class="'+cls.trim()+'" type="text" inputmode="'+(COARSE?'none':'text')+'" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="'+esc(r.input)+'"'+(locked?' disabled':'')+'>';
+    if(!locked){
+      if(COARSE){
+        var keys=['1','2','3','⌫','4','5','6','−','7','8','9','/','0',',',' '];
+        h+='<div class="pad">';
+        keys.forEach(function(k){
+          if(k===' ')h+='<button class="wide" data-k=" " aria-label="Пробел">пробел</button>';
+          else h+='<button'+(k==='⌫'||k==='−'||k==='/'?' class="fn"':'')+' data-k="'+k+'"'+(k==='⌫'?' aria-label="Стереть"':'')+'>'+k+'</button>';
+        });
+        h+='</div>';
+      }else h+='<div class="keys"><button data-k="−" aria-label="Минус">−</button><button data-k="/" aria-label="Дробная черта">/</button><button data-k=" " aria-label="Пробел">␣</button></div>';
+    }
+    h+='</div>';
+    if(!locked)h+='<div class="prev" id="pv" aria-live="polite">'+previewHTML(parseAns(r.input))+'</div>';
+  }
+  if(r.fb&&r.phase==='fb'){
+    var f=r.fb;
+    if(f.res==='ok')h+='<div class="fb ok"><b>Верно</b></div>';
+    else h+='<div class="fb bad"><b>Неверно. '+(t.multi?'Верные утверждения: '+t.multi.filter(function(o){return o.ok}).map(function(o){return o.h}).join('; ')+'.':'Ответ: '+(t.choice?t.choice.opts[t.choice.correct]:showAns(t)))+'</b>'+(f.msg?'<p>'+f.msg+'</p>':'')+'<div class="sol">'+t.steps+'</div></div>';
+  }else if(r.fb&&r.fb.res==='form')h+='<div class="fb form"><b>Почти</b><p>'+r.fb.msg+'</p></div>';
+  else if(r.fb&&r.fb.res==='invalid')h+='<div class="fb form"><b>Ответ не удалось разобрать</b><p>Примеры записи: −3, 3/4, −1 1/2.</p></div>';
+  h+='<div class="row">';
+  if(!locked)h+='<button class="btn main" id="go"'+(t.multi&&!r.sel.some(Boolean)?' disabled':'')+'>Ответить</button>';
+  else h+='<button class="btn main" id="nxt">'+(total&&r.i===total-1?'Завершить':'Дальше')+'</button>';
+  h+='</div>';
+  if(!locked&&!t.choice&&!t.multi)h+='<p class="note">Дробь вводите как 3/4, смешанное число как 1 1/2, отрицательное с минусом: −2/5.</p>';
+  h+='</section>';
+  app.innerHTML=h;
+  document.getElementById('quit').onclick=function(){
+    if(r.kind==='train'||confirmQuit()){st.view=r.kind==='train'?'lesson':'home';render()}
+  };
+  bindRun();
+  var inp=document.getElementById('in');if(inp&&!locked&&!t.multi)inp.focus({preventScroll:true});
+}
+var COARSE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+var quitArm=0;
+function confirmQuit(){
+  /* окна подтверждения в странице не работают: нужен второй клик */
+  var now=Date.now();
+  if(now-quitArm<4000)return true;
+  quitArm=now;
+  var b=document.getElementById('quit');if(b)b.textContent='Нажмите ещё раз: результаты не сохранятся';
+  return false;
+}
+function submit(){
+  var r=st.run,t=r.tasks[r.i],fb;
+  if(t.multi){
+    if(!r.sel.some(Boolean))return;
+    var bad=null,miss=false;
+    t.multi.forEach(function(o,k){var on=!!r.sel[k];if(on&&!o.ok&&!bad)bad=o;if(!on&&o.ok)miss=true});
+    if(!bad&&!miss)fb={res:'ok'};
+    else fb={res:'wrong',type:bad?(bad.type||T_OTHER):'Пропущено верное утверждение',msg:bad?'Отмечено неверное утверждение.':'Верных утверждений больше, чем отмечено.'};
+  }else if(t.choice){
+    if(r.picked===null)return;
+    var ok=r.picked===t.choice.correct;
+    if(ok)fb={res:'ok'};
+    else{var v=t.choice.vals[r.picked];fb=v?wrongOf(t,v):{res:'wrong',type:'Знак результата',msg:''};fb.res='wrong'}
+  }else{
+    fb=judge(t,r.input);
+    if(fb.res==='invalid'||fb.res==='form'){r.fb=fb;r.phase='ask';render();return}
+  }
+  r.fb=fb;r.phase='fb';
+  r.results.push({ok:fb.res==='ok',mod:t.mod,type:fb.res==='ok'?null:(fb.type||T_OTHER)});
+  render();
+}
+function bindRun(){
+  var r=st.run;
+  var inp=document.getElementById('in');
+  if(inp){
+    inp.oninput=function(){r.input=inp.value;r.fb=null;var pv=document.getElementById('pv');if(pv)pv.innerHTML=previewHTML(parseAns(r.input));
+      var old=app.querySelector('.fb');if(old)old.remove()};
+    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();submit()}};
+  }
+  app.querySelectorAll('[data-k]').forEach(function(b){
+    b.onmousedown=function(e){e.preventDefault()};
+    b.onpointerdown=function(e){e.preventDefault()};
+    b.onclick=function(){if(!inp)return;
+      var s=inp.selectionStart==null?inp.value.length:inp.selectionStart,e2=inp.selectionEnd==null?s:inp.selectionEnd,k=b.dataset.k,pos;
+      if(k==='⌫'){
+        if(s===e2&&s>0){inp.value=inp.value.slice(0,s-1)+inp.value.slice(e2);pos=s-1}
+        else{inp.value=inp.value.slice(0,s)+inp.value.slice(e2);pos=s}
+      }else{inp.value=inp.value.slice(0,s)+k+inp.value.slice(e2);pos=s+k.length}
+      inp.focus({preventScroll:true});inp.setSelectionRange(pos,pos);inp.dispatchEvent(new Event('input'))};
+  });
+  app.querySelectorAll('[data-opt]').forEach(function(b){b.onclick=function(){r.picked=Number(b.dataset.opt);submit()}});
+  app.querySelectorAll('[data-m]').forEach(function(b){b.onclick=function(){
+    var k=Number(b.dataset.m);r.sel[k]=!r.sel[k];
+    b.setAttribute('aria-pressed',r.sel[k]?'true':'false');b.firstChild.textContent=r.sel[k]?'✓':'';
+    var g=document.getElementById('go');if(g)g.disabled=!r.sel.some(Boolean)}});
+  var go=document.getElementById('go');if(go)go.onclick=submit;
+  var nx=document.getElementById('nxt');
+  if(nx)nx.onclick=function(){
+    var total=r.kind==='train'?null:r.tasks.length;
+    if(total&&r.i===total-1)return finishRun();
+    r.i++;
+    if(r.kind==='train'){var g=modOf(r.mod).gen();r.tasks.push(r.i%3===2?g:multiOf(g))}
+    r.phase='ask';r.fb=null;r.input='';r.picked=null;r.sel=[];render();window.scrollTo(0,0);
+  };
+}
+
+async function finishRun(){
+  var r=st.run,score=r.results.filter(function(x){return x.ok}).length,max=r.tasks.length,errors={},badMods={};
+  r.results.forEach(function(x){if(!x.ok){errors[x.type]=(errors[x.type]||0)+1;badMods[x.mod]=true}});
+  var ev={kind:r.kind==='check'?'module':r.kind,mod:r.mod||'',title:runTitle(r),score:score,max:max,errors:errors};
+  if(r.kind==='check')ev.passed=score>=4;
+  if(r.kind==='diag')ev.need=Object.keys(badMods);
+  if(r.kind==='final'){ev.mark=markOf(score/max);ev.need=Object.keys(badMods)}
+  r.ev=ev;r.badMods=Object.keys(badMods);
+  st.view='summary';render();window.scrollTo(0,0);
+  await saveEvent(ev);
+  if(st.view==='summary')render();
+}
+function markOf(f){
+  return f>=.95?10:f>=.85?9:f>=.75?8:f>=.65?7:f>=.55?6:f>=.45?5:f>=.35?4:f>=.25?3:f>=.15?2:1;
+}
+
+
+function reportText(ev){
+  var d=new Date(ev.ts||Date.now()),pad=function(n){return (n<10?'0':'')+n};
+  var l=['Результат: '+ev.title+'.','Баллы: '+ev.score+' из '+ev.max+(ev.mark?', отметка '+ev.mark+' по десятибалльной шкале':'')+'.'];
+  if(ev.kind==='module')l.push(ev.passed?'Тема пройдена.':'Тема не пройдена: нужно 4 из 5.');
+  var need=(ev.need||[]).map(function(id){return modOf(id).title});
+  if(need.length)l.push('Слабые темы: '+need.join('; ')+'.');
+  var er=Object.keys(ev.errors||{}).sort(function(a,b){return ev.errors[b]-ev.errors[a]});
+  if(er.length)l.push('Ошибки: '+er.map(function(k){return k+(ev.errors[k]>1?' ×'+ev.errors[k]:'')}).join('; ')+'.');
+  l.push('Время: '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes())+'.');
+  return l.join('\n');
+}
+function renderSummary(){
+  var r=st.run,ev=r.ev;
+  var h='<div class="top"><div class="brand">'+esc(ev.title)+'</div></div><section class="sheet"><div class="meta">Результат</div>';
+  h+='<div class="score"><span class="big">'+ev.score+'<span style="font-size:.45em;color:var(--ink-soft)"> / '+ev.max+'</span></span>'+(ev.mark?'<span class="mark" title="Ориентировочная отметка">'+ev.mark+'</span>':'')+'</div>';
+  if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно 4 верных ответа из 5. Перечитайте объяснение и попробуйте ещё раз: числа будут другие.')+'</p>';
+  if(r.kind==='diag')h+='<p>'+(ev.need.length?'Темы для повторения: '+ev.need.map(function(id){return modOf(id).title}).join('; ')+'.':'Ошибок нет: можно переходить к итоговому тесту.')+'</p>';
+  if(r.kind==='final')h+='<p class="note">Отметка по десятибалльной шкале ориентировочная.</p>';
+  var errs=Object.keys(ev.errors);
+  if(errs.length){h+='<div class="box"><div class="h">Где были ошибки</div><div class="tags">'+errs.map(function(k){return '<span class="tag">'+esc(k)+(ev.errors[k]>1?' × '+ev.errors[k]:'')+'</span>'}).join('')+'</div></div>'}
+  if(r.kind!=='check'&&r.badMods.length){h+='<div class="box"><div class="h">Что повторить</div><div class="row">'+r.badMods.map(function(id){return '<button class="btn sm" data-open="'+id+'">'+modOf(id).title+'</button>'}).join('')+'</div></div>'}
+  var msg=st.saveMsg;
+  h+='<p class="note" id="sv">'+(msg==='sent'?'Результат отправлен родителю.':msg==='fail'?'Результат не отправлен, сохранён на этом устройстве.':msg==='local'?'Результат сохранён на этом устройстве.':'Сохраняю результат…')+'</p>';
+  if(msg!=='sent')h+='<div class="box"><div class="h">Результат для папы</div><p class="note">Отправьте результат папе: нажмите «Отправить в Telegram».</p><pre class="rp" id="rp">'+esc(reportText(ev))+'</pre><div class="row"><a class="btn main lnk" id="tg" target="_blank" rel="noopener noreferrer" href="https://t.me/share/url?url='+encodeURIComponent(location.href.split('#')[0])+'&text='+encodeURIComponent(reportText(ev))+'">Отправить в Telegram</a><button class="btn sm" id="cp">Скопировать</button><span class="note" id="cpn"></span></div><p class="note">В Telegram выберите контакт папы и нажмите «Отправить». Если Telegram не открылся, скопируйте текст и отправьте вручную.</p></div>';
+  h+='<div class="row">';
+  if(r.kind==='check'){h+='<button class="btn" id="again">Ещё раз</button><button class="btn main" id="home">К темам</button>'}
+  else h+='<button class="btn main" id="home">К темам</button>';
+  h+='</div></section>';
+  app.innerHTML=h;
+  document.getElementById('home').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
+  var ag=document.getElementById('again');if(ag)ag.onclick=function(){startRun('check',r.mod)};
+  var cp=document.getElementById('cp');
+  if(cp)cp.onclick=function(){
+    var tx=reportText(ev),n=document.getElementById('cpn'),el=document.getElementById('rp');
+    function sel(){var rg=document.createRange();rg.selectNodeContents(el);var sl=getSelection();sl.removeAllRanges();sl.addRange(rg);n.textContent='Текст выделен: нажмите «Копировать» в меню.'}
+    try{navigator.clipboard.writeText(tx).then(function(){n.textContent='Скопировано.'},sel)}catch(e){sel()}};
+  app.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){st.mod=b.dataset.open;st.view='lesson';render();window.scrollTo(0,0)}});
+}
+
+/* ================= Родитель ================= */
+function renderParent(){
+  var mine=null,evs=lsRead().sort(function(a,b){return b.ts-a.ts});
+  var kid=evs.filter(function(e){return e.uid!==mine});
+  var ids=[];evs.forEach(function(e){if(e.uid!==mine&&ids.indexOf(e.uid)<0)ids.push(e.uid)});
+  function who(uid){return uid===mine?'вы':ids.length>1?'ученик '+(ids.indexOf(uid)+1):'ученик'}
+  var agg={};kid.forEach(function(e){Object.keys(e.errors||{}).forEach(function(k){agg[k]=(agg[k]||0)+e.errors[k]})});
+  var aggKeys=Object.keys(agg).sort(function(a,b){return agg[b]-agg[a]});
+  var h=header()+'<section class="sheet"><h3>Результаты</h3>';
+  h+='<p class="note">Здесь только записи с этого устройства. Остальные приходят в Telegram.</p>';
+  h+='<div class="box"><div class="h">Чаще всего ошибки</div>'+(aggKeys.length?'<div class="tags">'+aggKeys.slice(0,8).map(function(k){return '<span class="tag">'+esc(k)+' × '+agg[k]+'</span>'}).join('')+'</div>':'<p class="note">Пока нет данных от ученика.</p>')+'</div>';
+  h+='<div class="row between"><div class="meta">Этапы</div><button class="btn sm" id="cp">Скопировать сводку</button></div><div class="list">';
+  if(!evs.length)h+='<p class="note">Результатов пока нет. Они появятся здесь после первого пройденного этапа.</p>';
+  evs.slice(0,60).forEach(function(e){
+    var d=new Date(e.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var st2=e.kind==='module'?(e.passed?'пройдено':'не пройдено'):e.kind==='final'?'отметка '+e.mark:'';
+    var errs=Object.keys(e.errors||{});
+    h+='<div class="ev"><div class="head"><b>'+esc(e.title)+'</b><span class="note">'+d+', '+who(e.uid)+'</span></div><div>'+e.score+' из '+e.max+(st2?', '+st2:'')+'</div>'+(errs.length?'<div class="tags">'+errs.map(function(k){return '<span class="tag">'+esc(k)+(e.errors[k]>1?' × '+e.errors[k]:'')+'</span>'}).join('')+'</div>':'')+'</div>';
+  });
+  h+='</div><p class="note">Записи с пометкой «вы» — ваши пробные прохождения.</p></section>';
+  app.innerHTML=h;bindHeader();
+  document.getElementById('cp').onclick=function(){
+    var txt=kid.slice(0,15).map(function(e){return new Date(e.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' — '+e.title+': '+e.score+' из '+e.max+(Object.keys(e.errors||{}).length?'. Ошибки: '+Object.keys(e.errors).join(', '):'')}).join('\n')||'Результатов нет';
+    var b=document.getElementById('cp');
+    try{navigator.clipboard.writeText(txt).then(function(){b.textContent='Скопировано'},function(){b.textContent='Не удалось скопировать'})}catch(e){b.textContent='Не удалось скопировать'}
+  };
+}
+
+/* ================= Запуск ================= */
+st.events=lsRead();st.allEvents=st.events.slice();
+render();
+window.addEventListener('hashchange',function(){st.isOwner=/(^|[#&])parent($|&)/.test(location.hash);if(!st.isOwner)st.tab='play';if(st.view==='home')render()});
+</script>
+</body></html>
