@@ -908,13 +908,22 @@ function submit(){
   r.results.push({ok:fb.res==='ok',mod:t.mod,type:fb.res==='ok'?null:(fb.type||T_OTHER)});
   render();
 }
+/* Enter: первое нажатие проверяет ответ, второе открывает следующее задание */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'||e.repeat||st.view!=='run'||e.isComposing)return;
+  var t=e.target;
+  if(t&&t.tagName==='BUTTON'&&!t.hasAttribute('data-m'))return;
+  var nx=document.getElementById('nxt'),g=document.getElementById('go');
+  if(nx){e.preventDefault();nx.click()}
+  else if(g&&!g.disabled){e.preventDefault();g.click()}
+});
 function bindRun(){
   var r=st.run;
   var inp=document.getElementById('in');
   if(inp){
     inp.oninput=function(){r.input=inp.value;r.fb=null;var pv=document.getElementById('pv');if(pv)pv.innerHTML=previewHTML(parseAns(r.input));
       var old=app.querySelector('.fb');if(old)old.remove()};
-    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();submit()}
+    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();e.stopPropagation();if(!e.repeat)submit()}
       else if(r.pow&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[0-9-]$/.test(e.key)){e.preventDefault();putPow(e.key)}};
   }
   function putPow(c){
