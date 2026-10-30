@@ -566,6 +566,7 @@ function asChoice(t){
 function absF(v){return F(Math.abs(v.n),v.d)}
 function multiOf(t){
   if(t.choice||t.multi)return t;
+  if(t.form)return asChoice(t); /* форма записи важна: мультивыбор по значению здесь вводит в заблуждение */
   var a=t.ans,T=[],Fs=[],i,tv;
   function repr(v){return (v.d!==1&&Math.abs(v.n)>v.d&&Math.random()<.5)?Hm(v):H(v)}
   var vt=[{h:'Ответ равен '+H(a)}];
