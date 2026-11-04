@@ -422,6 +422,7 @@ function poolTask(id){
 }
 function nonZero(id){var t,i=0;do{t=modOf(id).gen()}while(t.ans.n===0&&++i<30);return t}
 function trainTask(id){var d=Math.random()<.3?drawGen(id):null;if(d)return d;if(THEORY[id]&&Math.random()<.4)return poolTask(id);return numChoice(nonZero(id))}
+function trainTasks(id,n){var out=[],i;for(i=0;i<n;i++){var d=(i%4===3)?drawGen(id):null;if(d){out.push(d);continue}out.push(THEORY[id]&&Math.random()<.3?poolTask(id):numChoice(nonZero(id)))}return out}
 function typedGen(id){var t,i=0;do{t=nonZero(id)}while((t.choice||t.multi||t.draw)&&++i<30);return t}
 
 /* ================= Глава 1. Начальные понятия геометрии ================= */
@@ -1281,14 +1282,18 @@ function fmtEx(s){return s}
 
 /* ================= Прохождение ================= */
 function progress(){
-  var p={diag:{},final:{},passed:{},best:{}};
+  var p={diag:{},final:{},passed:{},best:{},lastCheck:{},train:{}};
   st.events.forEach(function(e){
     if(e.kind==='diag'){var c=e.mod||'c1';if(!p.diag[c]||e.ts>p.diag[c].ts)p.diag[c]=e}
-    if(e.kind==='module'){p.best[e.mod]=Math.max(p.best[e.mod]||0,e.score);if(e.passed)p.passed[e.mod]=true}
+    if(e.kind==='module'){p.best[e.mod]=Math.max(p.best[e.mod]||0,e.score);if(e.passed)p.passed[e.mod]=true;if(!p.lastCheck[e.mod]||e.ts>p.lastCheck[e.mod].ts)p.lastCheck[e.mod]=e}
+    if(e.kind==='train'){if(!p.train[e.mod]||e.ts>p.train[e.mod])p.train[e.mod]=e.ts}
     if(e.kind==='final'){var c2=e.mod||'c1';if(!p.final[c2]||e.score>p.final[c2].score)p.final[c2]=e}
   });
   return p;
 }
+var TRAIN_N=12;
+/* после проваленной проверки пересдача закрыта, пока не пройден тренажёр */
+function checkLocked(id,p){var lc=p.lastCheck[id];return !!lc&&!lc.passed&&!(p.train[id]&&p.train[id]>lc.ts)}
 function modStatus(id,p){
   if(p.passed[id])return 'ok';
   var d=p.diag['c'+modOf(id).ch];
@@ -1323,7 +1328,7 @@ function buildTasks(kind,modId){
   return items.map(function(x){return x[1]});
 }
 function startRun(kind,modId){
-  var tasks=kind==='train'?[trainTask(modId)]:buildTasks(kind,modId);
+  var tasks=kind==='train'?trainTasks(modId,TRAIN_N):buildTasks(kind,modId);
   st.run={kind:kind,mod:modId||null,tasks:tasks,i:0,results:[],phase:'ask',fb:null,input:'',picked:null,sel:[]};
   st.view='run';render();window.scrollTo(0,0);
 }
@@ -1406,7 +1411,7 @@ function renderHome(){
 }
 
 function renderLesson(){
-  var m=modOf(st.mod),L=LESSONS[m.id],arr=MODS.filter(function(x){return x.ch===m.ch}),i=arr.indexOf(m);
+  var lock=checkLocked(st.mod,progress()),m=modOf(st.mod),L=LESSONS[m.id],arr=MODS.filter(function(x){return x.ch===m.ch}),i=arr.indexOf(m);
   var h='<div class="top"><div class="brand">Глава '+m.ch+'<small>'+m.par+', тема '+(i+1)+' из '+arr.length+'</small></div><button class="btn sm" id="back">К темам</button></div>';
   h+='<section class="sheet"><div class="steps"><span class="step" aria-current="true">1 Объяснение</span><span class="step">2 Тренажёр</span><span class="step">3 Проверка</span></div><h2>'+m.title+'</h2>';
   h+='<div class="box rule"><div class="h">Правило</div><p class="math">'+L.rule+'</p></div>';
@@ -1414,8 +1419,8 @@ function renderLesson(){
   h+='<div class="box"><div class="h">Разобранные примеры</div>';
   L.ex.forEach(function(e){h+='<p class="math"><b>'+e[0]+'</b> — '+e[1]+'</p>'});
   h+='</div><div class="box warn"><div class="h">Частая ошибка</div><p>'+L.trap+'</p></div>';
-  h+='<div class="row"><button class="btn" id="tr">Тренажёр</button><button class="btn main" id="ck">Проверка: '+CHECK_N+' заданий</button></div>';
-  h+='<p class="note">В проверке нужно решить верно '+CHECK_PASS+' из '+CHECK_N+'. Результат увидит родитель.</p></section>';
+  h+='<div class="row"><button class="btn'+(lock?' main':'')+'" id="tr">Тренажёр: '+TRAIN_N+' заданий</button><button class="btn'+(lock?'':' main')+'" id="ck"'+(lock?' disabled':'')+'>Проверка: '+CHECK_N+' заданий</button></div>';
+  h+='<p class="note">'+(lock?'Прошлая проверка не засчитана. Чтобы пересдать, сначала пройдите тренажёр до конца.':'В проверке нужно решить верно '+CHECK_PASS+' из '+CHECK_N+'. Результат увидит родитель.')+'</p></section>';
   app.innerHTML=h;
   document.getElementById('back').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
   document.getElementById('tr').onclick=function(){startRun('train',m.id)};
@@ -1423,8 +1428,8 @@ function renderLesson(){
 }
 
 function renderRun(){
-  var r=st.run,t=r.tasks[r.i],total=r.kind==='train'?null:r.tasks.length;
-  var h='<div class="top"><div class="brand">'+runTitle(r)+'</div><button class="btn sm" id="quit">'+(r.kind==='train'?'Закончить':'Выйти')+'</button></div>';
+  var r=st.run,t=r.tasks[r.i],total=r.tasks.length;
+  var h='<div class="top"><div class="brand">'+runTitle(r)+'</div><button class="btn sm" id="quit">Выйти</button></div>';
   h+='<section class="sheet">';
   if(total)h+='<div class="row between"><span class="meta">Задание '+(r.i+1)+' из '+total+'</span></div><div class="bar" role="progressbar" aria-valuenow="'+r.i+'" aria-valuemax="'+total+'"><i style="width:'+Math.round(r.i/total*100)+'%"></i></div>';
   else h+='<span class="meta">Решено верно: '+r.results.filter(function(x){return x.ok}).length+' из '+r.results.length+'</span>';
@@ -1482,7 +1487,7 @@ function renderRun(){
   h+='</section>';
   app.innerHTML=h;
   document.getElementById('quit').onclick=function(){
-    if(r.kind==='train'||confirmQuit()){st.view=r.kind==='train'?'lesson':'home';render()}
+    if(confirmQuit()){st.view=r.kind==='train'?'lesson':'home';render()}
   };
   bindRun();
   var inp=document.getElementById('in');if(inp&&!locked&&!t.multi)inp.focus({preventScroll:true});
@@ -1581,10 +1586,9 @@ function bindRun(){
   var go=document.getElementById('go');if(go)go.onclick=submit;
   var nx=document.getElementById('nxt');
   if(nx)nx.onclick=function(){
-    var total=r.kind==='train'?null:r.tasks.length;
+    var total=r.tasks.length;
     if(total&&r.i===total-1)return finishRun();
     r.i++;
-    if(r.kind==='train'){var g=modOf(r.mod).gen();r.tasks.push(multiOf(g))}
     r.phase='ask';r.fb=null;r.input='';r.segs=[];r.pow=false;r.picked=null;r.sel=[];render();window.scrollTo(0,0);
   };
 }
@@ -1621,22 +1625,25 @@ function renderSummary(){
   var r=st.run,ev=r.ev;
   var h='<div class="top"><div class="brand">'+esc(ev.title)+'</div></div><section class="sheet"><div class="meta">Результат</div>';
   h+='<div class="score"><span class="big">'+ev.score+'<span style="font-size:.45em;color:var(--ink-soft)"> / '+ev.max+'</span></span>'+(ev.mark?'<span class="mark" title="Ориентировочная отметка">'+ev.mark+'</span>':'')+'</div>';
-  if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно '+CHECK_PASS+' верных ответов из '+CHECK_N+'. Перечитайте объяснение и попробуйте ещё раз: числа будут другие.')+'</p>';
+  if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно '+CHECK_PASS+' верных ответов из '+CHECK_N+'. Чтобы пересдать, сначала пройдите тренажёр: '+TRAIN_N+' заданий.')+'</p>';
+  if(r.kind==='train')h+='<p>Тренажёр пройден. Теперь можно пересдавать проверку темы.</p>';
   if(r.kind==='diag')h+='<p>'+(ev.need.length?'Темы для повторения: '+ev.need.map(function(id){return modOf(id).title}).join('; ')+'.':'Ошибок нет: можно переходить к итоговому тесту.')+'</p>';
   if(r.kind==='final')h+='<p class="note">Отметка по десятибалльной шкале ориентировочная.</p>';
   var errs=Object.keys(ev.errors);
   if(errs.length){h+='<div class="box"><div class="h">Где были ошибки</div><div class="tags">'+errs.map(function(k){return '<span class="tag">'+esc(k)+(ev.errors[k]>1?' × '+ev.errors[k]:'')+'</span>'}).join('')+'</div></div>'}
-  if(r.kind!=='check'&&r.badMods.length){h+='<div class="box"><div class="h">Что повторить</div><div class="row">'+r.badMods.map(function(id){return '<button class="btn sm" data-open="'+id+'">'+modOf(id).title+'</button>'}).join('')+'</div></div>'}
+  if(r.kind!=='check'&&r.kind!=='train'&&r.badMods.length){h+='<div class="box"><div class="h">Что повторить</div><div class="row">'+r.badMods.map(function(id){return '<button class="btn sm" data-open="'+id+'">'+modOf(id).title+'</button>'}).join('')+'</div></div>'}
   var msg=st.saveMsg;
   h+='<p class="note" id="sv">'+(msg==='sent'?'Результат отправлен родителю.':msg==='fail'?'Результат не отправлен, сохранён на этом устройстве.':msg==='local'?'Результат сохранён на этом устройстве.':'Сохраняю результат…')+'</p>';
   if(msg!=='sent')h+='<div class="box"><div class="h">Результат для папы</div><p class="note">Отправьте результат папе: нажмите «Отправить в Telegram».</p><pre class="rp" id="rp">'+esc(reportText(ev))+'</pre><div class="row"><a class="btn main lnk" id="tg" target="_blank" rel="noopener noreferrer" href="https://t.me/share/url?url='+encodeURIComponent(location.href.split('#')[0])+'&text='+encodeURIComponent(reportText(ev))+'">Отправить в Telegram</a><button class="btn sm" id="cp">Скопировать</button><span class="note" id="cpn"></span></div><p class="note">В Telegram выберите контакт папы и нажмите «Отправить». Если Telegram не открылся, скопируйте текст и отправьте вручную.</p></div>';
   h+='<div class="row">';
-  if(r.kind==='check'){h+='<button class="btn" id="again">Ещё раз</button><button class="btn main" id="home">К темам</button>'}
+  if(r.kind==='check'&&!ev.passed){h+='<button class="btn main" id="totrain">Пройти тренажёр</button><button class="btn" id="home">К темам</button>'}
+  else if(r.kind==='train'){h+='<button class="btn main" id="tolesson">К теме и проверке</button><button class="btn" id="home">К темам</button>'}
   else h+='<button class="btn main" id="home">К темам</button>';
   h+='</div></section>';
   app.innerHTML=h;
   document.getElementById('home').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
-  var ag=document.getElementById('again');if(ag)ag.onclick=function(){startRun('check',r.mod)};
+  var tt=document.getElementById('totrain');if(tt)tt.onclick=function(){startRun('train',r.mod)};
+  var tl=document.getElementById('tolesson');if(tl)tl.onclick=function(){st.mod=r.mod;st.view='lesson';render();window.scrollTo(0,0)};
   var cp=document.getElementById('cp');
   if(cp)cp.onclick=function(){
     var tx=reportText(ev),n=document.getElementById('cpn'),el=document.getElementById('rp');
