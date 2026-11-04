@@ -726,10 +726,11 @@ async function saveEvent(ev){
 }
 
 /* ================= Ранеры заданий ================= */
+var CHECK_N=8,CHECK_PASS=6; /* проверка темы: заданий и сколько верных нужно для зачёта */
 function typedGen(id){var t,i=0;do{t=modOf(id).gen()}while(t.choice&&++i<30);return t}
 function buildTasks(kind,modId){
   var tasks=[],i;
-  if(kind==='check'){for(i=0;i<5;i++)tasks.push(typedGen(modId));}
+  if(kind==='check'){for(i=0;i<CHECK_N;i++)tasks.push(typedGen(modId));}
   if(kind==='diag'){
     ['m10','m11','m12','m13','m14','m14','m15','m15','m2','m6','m7','m8','m9','m4'].forEach(function(id){tasks.push(typedGen(id))});
   }
@@ -801,8 +802,8 @@ function renderLesson(){
   h+='<div class="box"><div class="h">Разобранные примеры</div>';
   L.ex.forEach(function(e){h+='<p class="math"><b>'+fmtEx(e[0])+'</b> — '+fmtEx(e[1])+'</p>'});
   h+='</div><div class="box warn"><div class="h">Частая ошибка</div><p>'+fmtEx(L.trap)+'</p></div>';
-  h+='<div class="row"><button class="btn" id="tr">Тренажёр</button><button class="btn main" id="ck">Проверка: 5 заданий</button></div>';
-  h+='<p class="note">В проверке нужно решить верно 4 из 5. Результат увидит родитель.</p></section>';
+  h+='<div class="row"><button class="btn" id="tr">Тренажёр</button><button class="btn main" id="ck">Проверка: '+CHECK_N+' заданий</button></div>';
+  h+='<p class="note">В проверке нужно решить верно '+CHECK_PASS+' из '+CHECK_N+'. Результат увидит родитель.</p></section>';
   app.innerHTML=h;
   document.getElementById('back').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
   document.getElementById('tr').onclick=function(){startRun('train',m.id)};
@@ -967,7 +968,7 @@ async function finishRun(){
   var r=st.run,score=r.results.filter(function(x){return x.ok}).length,max=r.tasks.length,errors={},badMods={};
   r.results.forEach(function(x){if(!x.ok){errors[x.type]=(errors[x.type]||0)+1;badMods[x.mod]=true}});
   var ev={kind:r.kind==='check'?'module':r.kind,mod:r.mod||'',title:runTitle(r),score:score,max:max,errors:errors};
-  if(r.kind==='check')ev.passed=score>=4;
+  if(r.kind==='check')ev.passed=score>=CHECK_PASS;
   if(r.kind==='diag')ev.need=Object.keys(badMods);
   if(r.kind==='final'){ev.mark=markOf(score/max);ev.need=Object.keys(badMods)}
   r.ev=ev;r.badMods=Object.keys(badMods);
@@ -983,7 +984,7 @@ function markOf(f){
 function reportText(ev){
   var d=new Date(ev.ts||Date.now()),pad=function(n){return (n<10?'0':'')+n};
   var l=['Результат: '+ev.title+'.','Баллы: '+ev.score+' из '+ev.max+(ev.mark?', отметка '+ev.mark+' по десятибалльной шкале':'')+'.'];
-  if(ev.kind==='module')l.push(ev.passed?'Тема пройдена.':'Тема не пройдена: нужно 4 из 5.');
+  if(ev.kind==='module')l.push(ev.passed?'Тема пройдена.':'Тема не пройдена: нужно '+CHECK_PASS+' из '+CHECK_N+'.');
   var need=(ev.need||[]).map(function(id){return modOf(id).title});
   if(need.length)l.push('Слабые темы: '+need.join('; ')+'.');
   var er=Object.keys(ev.errors||{}).sort(function(a,b){return ev.errors[b]-ev.errors[a]});
@@ -995,7 +996,7 @@ function renderSummary(){
   var r=st.run,ev=r.ev;
   var h='<div class="top"><div class="brand">'+esc(ev.title)+'</div></div><section class="sheet"><div class="meta">Результат</div>';
   h+='<div class="score"><span class="big">'+ev.score+'<span style="font-size:.45em;color:var(--ink-soft)"> / '+ev.max+'</span></span>'+(ev.mark?'<span class="mark" title="Ориентировочная отметка">'+ev.mark+'</span>':'')+'</div>';
-  if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно 4 верных ответа из 5. Перечитайте объяснение и попробуйте ещё раз: числа будут другие.')+'</p>';
+  if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно '+CHECK_PASS+' верных ответов из '+CHECK_N+'. Перечитайте объяснение и попробуйте ещё раз: числа будут другие.')+'</p>';
   if(r.kind==='diag')h+='<p>'+(ev.need.length?'Темы для повторения: '+ev.need.map(function(id){return modOf(id).title}).join('; ')+'.':'Ошибок нет: можно переходить к итоговому тесту.')+'</p>';
   if(r.kind==='final')h+='<p class="note">Отметка по десятибалльной шкале ориентировочная.</p>';
   var errs=Object.keys(ev.errors);
