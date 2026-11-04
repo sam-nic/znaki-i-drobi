@@ -1,0 +1,1681 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Геометрия 7</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Neucha&family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&display=swap">
+<style>
+/* Layout: одна колонка на листе в клетку. Главная: план занятий, затем экраны урока, заданий и итога. */
+:root{
+  --paper:#fbfcfe; --grid:#dfe7f2; --ground:#f0f4fa;
+  --ink:#1c2a55; --ink-soft:#56628a; --line:#c9d3e6;
+  --pen:#c4372b; --pen-bg:#fbe9e6;
+  --ok:#2c7a4b; --ok-bg:#e3f3e9; --part:#9a6a12; --part-bg:#fbf0d6;
+  --f-display:'Neucha','Comic Sans MS',cursive;
+  --f-body:'PT Sans',system-ui,sans-serif;
+  --f-math:'PT Serif',Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#192142; --grid:#222c52; --ground:#131a36;
+  --ink:#e4e9fa; --ink-soft:#9aa6cc; --line:#34406b;
+  --pen:#ff8173; --pen-bg:#3b2430;
+  --ok:#6fd49a; --ok-bg:#1d3a31; --part:#f0c46a; --part-bg:#3a3320;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#192142; --grid:#222c52; --ground:#131a36;
+  --ink:#e4e9fa; --ink-soft:#9aa6cc; --line:#34406b;
+  --pen:#ff8173; --pen-bg:#3b2430;
+  --ok:#6fd49a; --ok-bg:#1d3a31; --part:#f0c46a; --part-bg:#3a3320;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{
+  background-color:var(--ground);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink);font:17px/1.55 var(--f-body);
+  padding-block:20px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+#app{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance}
+h2{font-size:28px;line-height:1.1}
+h3{font-size:20px}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid var(--pen);outline-offset:2px}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-size:22px}
+.brand small{font-family:var(--f-body);font-size:13px;color:var(--ink-soft);margin-left:8px}
+.tabs{display:flex;gap:6px}
+.tab{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 16px;min-height:44px;font-size:16px}
+.tab[aria-current="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.meta{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.soft{color:var(--ink-soft)}
+.btn{border:1px solid var(--ink);background:transparent;border-radius:8px;padding:12px 20px;min-height:48px;font-size:17px;font-weight:700}
+.btn.main{background:var(--ink);color:var(--paper)}
+.btn.pen{background:var(--pen);border-color:var(--pen);color:#fff}
+.btn.sm{padding:8px 14px;min-height:44px;font-size:16px;font-weight:400}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
+.next{border:1px solid var(--pen);background:var(--pen-bg);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.mods{display:flex;flex-direction:column;gap:8px}
+.mod{display:flex;gap:12px;align-items:center;text-align:left;width:100%;min-height:64px;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:12px 14px}
+.mod .n{font-family:var(--f-display);font-size:24px;width:28px;flex:none;color:var(--ink-soft)}
+.mod .t{flex:1;min-width:0}
+.mod .t b{display:block}
+.mod .t span{font-size:15px;color:var(--ink-soft)}
+.lnk{display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+.rp{margin:0;white-space:pre-wrap;font:16px/1.5 var(--f-body);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 12px;user-select:all}
+sup{font-size:.7em;line-height:0}
+.chip{font-size:13px;border-radius:999px;padding:2px 10px;border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.chip.need{background:var(--pen-bg);border-color:var(--pen);color:var(--pen)}
+.chip.key{background:var(--part-bg);border-color:var(--part);color:var(--part)}
+.box{border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.box.rule{background:color-mix(in srgb,var(--ink) 6%,var(--paper));border-color:var(--ink)}
+.box.warn{background:var(--pen-bg);border-color:var(--pen)}
+.box .h{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.math{font-family:var(--f-math);font-size:19px;line-height:1.7}
+.ex{font-family:var(--f-math);font-size:24px;white-space:nowrap}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 2px;font-size:.9em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px}
+.fr>span:last-child{padding:0 4px}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.step{font-size:15px;border:1px solid var(--line);border-radius:999px;padding:3px 12px;color:var(--ink-soft)}
+.step[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ink)}
+.q{font-family:var(--f-math);font-size:20px;line-height:1.6}
+.ans{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ans input{font:24px var(--f-math);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:9px 12px;width:min(100%,240px)}
+.ans input.ok{border-color:var(--ok);background:var(--ok-bg)}
+.ans input.bad{border-color:var(--pen);background:var(--pen-bg)}
+.keys{display:flex;gap:6px}
+.keys button{min-width:44px;height:44px;border:1px solid var(--line);background:var(--paper);border-radius:8px;font:22px var(--f-math)}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:360px}
+.pad button{height:56px;border:1px solid var(--line);background:var(--paper);border-radius:10px;font:26px var(--f-math);touch-action:manipulation}
+.pad button:active{background:color-mix(in srgb,var(--ink) 12%,var(--paper))}
+.pad .wide{grid-column:span 2;font:17px var(--f-body)}
+.pad button.on,.keys button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pad .fn{background:color-mix(in srgb,var(--ink) 8%,var(--paper))}
+.prev{min-height:44px;display:flex;align-items:center;font-family:var(--f-math);font-size:20px;color:var(--ink-soft)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.opt{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:10px;font-family:var(--f-math);font-size:22px;min-height:60px}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--pen);background:var(--pen-bg)}
+.opts.multi{grid-template-columns:1fr}
+.opt.chk{display:flex;align-items:center;gap:12px;text-align:left;font-size:20px;min-height:56px;line-height:1.5}
+.opt.chk .bx{flex:none;width:26px;height:26px;border:2px solid var(--ink);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font:700 18px var(--f-body);line-height:1}
+.opt.chk[aria-pressed="true"]{border-color:var(--ink);background:var(--grid)}
+.opt.chk[aria-pressed="true"] .bx{background:var(--ink);color:var(--paper)}
+.opt.miss{border-style:dashed;border-color:var(--ok)}
+.hint{font-size:15px;color:var(--ink-soft)}
+.opt.chk .lb{flex:1;min-width:0}
+.tag{display:block;font:14px var(--f-body);color:var(--ink-soft)}
+.fb{border:1px solid;border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok)}
+.fb.bad{background:var(--pen-bg);border-color:var(--pen)}
+.fig{margin:4px 0 10px}.fig svg{display:block;margin:0 auto}
+.soon{opacity:.75}
+#board{display:block;width:100%;height:auto;aspect-ratio:960/660;border:1px solid var(--line);border-radius:6px;background:var(--paper);touch-action:none;cursor:crosshair}
+.confetti{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:50}
+.confetti i{position:absolute;left:0;top:0;width:9px;height:14px;border-radius:2px;opacity:0}
+@media (prefers-reduced-motion:no-preference){
+  .fb.ok{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+  .fb.ok b::before{content:'\2605';display:inline-block;margin-right:8px;color:#f2b01e;animation:spin .7s ease-out}
+  .fb.bad{animation:shake .45s ease-in-out}
+  .confetti i{animation:cf 1.2s cubic-bezier(.2,.7,.4,1) forwards}
+  @keyframes pop{0%{transform:scale(.88);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes spin{from{transform:rotate(-200deg) scale(.2)}to{transform:rotate(0) scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(3px)}}
+  @keyframes cf{0%{opacity:1;transform:translate(0,0) rotate(0)}40%{opacity:1;transform:translate(var(--x1),var(--y1)) rotate(var(--r))}100%{opacity:0;transform:translate(var(--x2),var(--y2)) rotate(calc(var(--r)*2))}}
+}
+.fb.form{background:var(--part-bg);border-color:var(--part)}
+.fb .sol{font-family:var(--f-math);font-size:18px;line-height:1.8}
+.score{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+.score .big{font-family:var(--f-display);font-size:60px;line-height:1}
+.score .mark{font-family:var(--f-display);font-size:60px;line-height:1;color:var(--pen)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:13px;border:1px solid var(--pen);color:var(--pen);background:var(--pen-bg);border-radius:999px;padding:2px 10px}
+.list{display:flex;flex-direction:column;gap:8px}
+.ev{border:1px solid var(--line);border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:4px}
+.ev .head{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.note{font-size:15px;color:var(--ink-soft)}
+svg text{fill:currentColor;font-family:var(--f-math)}
+@media (max-width:480px){.sheet{padding:16px 14px}.q{font-size:22px;line-height:1.7}.ex{font-size:26px}.math{font-size:20px}.row .btn{flex:1 1 150px}.opts{grid-template-columns:1fr 1fr}.opt{font-size:24px;min-height:64px}.ans input{width:100%;font-size:26px;height:56px}.prev{font-size:22px}.score .big,.score .mark{font-size:52px}h2{font-size:30px}}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(3px)}}}
+</style>
+</head><body>
+<div id="app"></div>
+<script>
+/* ================= Математика ================= */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=a%b;a=b;b=t}return a}
+function lcm(a,b){return a/gcd(a,b)*b}
+function F(n,d){if(d===undefined)d=1;if(!d)return null;if(d<0){n=-n;d=-d}var g=gcd(n,d)||1;return {n:n/g,d:d/g}}
+function add(a,b){return F(a.n*b.d+b.n*a.d,a.d*b.d)}
+function sub(a,b){return F(a.n*b.d-b.n*a.d,a.d*b.d)}
+function mul(a,b){return F(a.n*b.n,a.d*b.d)}
+function dvd(a,b){return b.n?F(a.n*b.d,a.d*b.n):null}
+function neg(a){return F(-a.n,a.d)}
+function eqF(a,b){return !!a&&!!b&&a.n===b.n&&a.d===b.d}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function sgn(){return Math.random()<.5?-1:1}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function mixedOf(x){var n=Math.abs(x.n),w=Math.floor(n/x.d);return {s:x.n<0?-1:1,w:w,n:n-w*x.d,d:x.d}}
+
+/* ---------- Запись чисел (HTML) ---------- */
+function fr(n,d){return '<span class="fr"><span>'+n+'</span><span>'+d+'</span></span>'}
+function Hr(n,d){return (n<0?'−':'')+(d===1?Math.abs(n):fr(Math.abs(n),d))}
+function H(x){return Hr(x.n,x.d)}
+function Hm(x){if(x.d===1||Math.abs(x.n)<x.d)return H(x);var m=mixedOf(x);return (m.s<0?'−':'')+m.w+(m.n?fr(m.n,m.d):'')}
+function Hmx(w,n,d){return w+fr(n,d)} // положительное смешанное число
+function I(x){return x<0?'−'+(-x):String(x)}
+function Ip(x){return x<0?'('+I(x)+')':String(x)}
+function Pp(x,h){return x.n<0?'('+h+')':h}
+function EX(h){return '<span class="ex">'+h+'</span>'}
+/* ---------- Разбор введённого ответа ---------- */
+var SUPD='⁰¹²³⁴⁵⁶⁷⁸⁹';
+function parseAns(str){
+  var s=String(str||'').replace(/[\u00a0\u202f\u2009\u2007]/g,' ').trim().replace(/[−–—]/g,'-').replace(/,/g,'.');
+  /* терпимость к записи: «x = 5», «+5», «5.», «.5», разряды через пробел «70 000» */
+  s=s.replace(/^[A-Za-zА-Яа-я]\s*=\s*/,'').replace(/^\+\s*/,'').replace(/[.\s]+$/,'').replace(/^(-?)\s*\./,function(_,m){return m+'0.'});
+  if(/^-?\s*\d{1,3}(\s\d{3})+(\.\d+)?$/.test(s))s=s.replace(/\s/g,'');
+  s=s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g,function(x){return '^'+x.replace(/./g,function(c){return c==='⁻'?'-':SUPD.indexOf(c)})});
+  var m;
+  if((m=s.match(/^(-?)\s*(\d+)\s*\^\s*(-?\d+)$/))){
+    var bs0=+m[2],ex0=+m[3];if(Math.abs(ex0)>12||(bs0===0&&ex0<0))return null;
+    return {kind:'pow',s:m[1]?-1:1,b:bs0,e:ex0,v:mul(F(m[1]?-1:1),pwr(F(bs0),ex0))};
+  }
+  if((m=s.match(/^(-?)\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/))){
+    var w=+m[2],n=+m[3],d=+m[4];if(!d)return null;
+    return {kind:'mixed',s:m[1]?-1:1,w:w,n:n,d:d,v:F((m[1]?-1:1)*(w*d+n),d)};
+  }
+  if((m=s.match(/^(-?)\s*(\d+)\s*\/\s*(\d+)$/))){
+    var n2=+m[2],d2=+m[3];if(!d2)return null;
+    return {kind:'frac',s:m[1]?-1:1,n:n2,d:d2,v:F((m[1]?-1:1)*n2,d2)};
+  }
+  if((m=s.match(/^(-?)\s*(\d+)(?:\.(\d+))?$/))){
+    var dec=m[3]||'',den=Math.pow(10,dec.length),num=+(m[2]+dec);
+    return {kind:dec?'dec':'int',s:m[1]?-1:1,v:F((m[1]?-1:1)*num,den),raw:s};
+  }
+  return null;
+}
+function previewHTML(p){
+  if(!p)return '';
+  var sg=p.s<0?'−':'';
+  if(p.kind==='mixed')return sg+p.w+fr(p.n,p.d);
+  if(p.kind==='frac')return sg+fr(p.n,p.d);
+  if(p.kind==='pow')return sg+p.b+'<sup>'+(p.e<0?'−'+(-p.e):p.e)+'</sup>';
+  return sg+(p.kind==='dec'?p.raw.replace('-','').replace('.',','):Math.abs(p.v.n));
+}
+var T_OTHER='Другая ошибка';
+function judge(t,input){
+  var p=parseAns(input);
+  if(!p)return {res:'invalid'};
+  if(!eqF(p.v,t.ans))return wrongOf(t,p.v);
+  if(p.kind==='frac'&&(gcd(p.n,p.d)!==1))return {res:'form',msg:'Значение верное, но дробь можно сократить. Сократите её до конца и введите ещё раз.'};
+  if(p.kind==='frac'&&p.d===1)return {res:'form',msg:'Целое число запишите без знаменателя.'};
+  if(p.kind==='mixed'){
+    if(p.n>=p.d||gcd(p.n,p.d)!==1)return {res:'form',msg:'Дробная часть записана неверно: она должна быть правильной и сокращённой.'};
+  }
+  if(t.form==='improper'&&p.kind==='mixed')return {res:'form',msg:'Здесь нужна неправильная дробь, а не смешанное число.'};
+  if(t.form==='mixed'&&p.kind!=='mixed')return {res:'form',msg:'Здесь нужно смешанное число: целая часть и правильная дробь, например 3 2/5.'};
+  return {res:'ok'};
+}
+function wrongOf(t,v){
+  for(var i=0;i<t.traps.length;i++)if(eqF(v,t.traps[i].v))return {res:'wrong',type:t.traps[i].type,msg:t.traps[i].msg};
+  return {res:'wrong',type:T_OTHER,msg:''};
+}
+
+/* ================= Задания ================= */
+function TR(v,type,msg){return {v:v,type:type,msg:msg}}
+function mk(mod,q,ans,traps,steps,form){
+  var seen=[ans];
+  var tr=(traps||[]).filter(function(t){
+    if(!t.v)return false;
+    for(var i=0;i<seen.length;i++)if(eqF(seen[i],t.v))return false;
+    seen.push(t.v);return true;
+  });
+  return {mod:mod,q:q,ans:ans,traps:tr,steps:steps,form:form||null};
+}
+/* показ дробей как числитель/знаменатель с знаком */
+/* ================= Геометрия: чертежи (SVG) ================= */
+function pwr(a,n){var r=F(1),k=Math.abs(n),i;for(i=0;i<k;i++)r=mul(r,a);return n<0?dvd(F(1),r):r}
+function r1(x){return Math.round(x*10)/10}
+function sv(w,h,body,label){return '<div class="fig"><svg viewBox="0 0 '+w+' '+h+'" width="100%" style="max-width:'+w+'px;color:var(--ink)" role="img" aria-label="'+(label||'Чертёж')+'" font-family="PT Serif,Georgia,serif" font-size="16">'+body+'</svg></div>'}
+function tx(x,y,s,o){o=o||{};return '<text x="'+r1(x)+'" y="'+r1(y)+'" text-anchor="'+(o.a||'middle')+'"'+(o.s?' font-size="'+o.s+'"':'')+(o.b?' font-weight="700"':'')+(o.c||o.halo?' style="'+(o.c?'fill:'+o.c+';':'')+(o.halo?'paint-order:stroke;stroke:var(--paper);stroke-width:6px;stroke-linejoin:round':'')+'"':'')+'>'+s+'</text>'}
+function ln(x1,y1,x2,y2,o){o=o||{};return '<line x1="'+r1(x1)+'" y1="'+r1(y1)+'" x2="'+r1(x2)+'" y2="'+r1(y2)+'" stroke="'+(o.c||'currentColor')+'" stroke-width="'+(o.w||2)+'"'+(o.d?' stroke-dasharray="'+o.d+'"':'')+' stroke-linecap="round"/>'}
+function dt(x,y,c){return '<circle cx="'+r1(x)+'" cy="'+r1(y)+'" r="4" fill="'+(c||'currentColor')+'"/>'}
+function qm(s){return s==='?'?{c:'var(--pen)',b:1}:{}}
+
+/* отрезок с точками: names, lens (пропорции), labels над промежутками, total — скобка снизу */
+function lineFig(names,lens,labels,total,o){
+  o=o||{};var x0=28,x1=332,S=lens.reduce(function(a,b){return a+b},0),k=(x1-x0)/S,y=50,x=[x0],i,b='';
+  for(i=0;i<lens.length;i++)x.push(x[i]+lens[i]*k);
+  b+=ln(x0-16,y,x1+16,y,{w:2});
+  for(i=0;i<x.length;i++)b+=dt(x[i],y)+tx(x[i],y+24,names[i]||'',{b:1});
+  (o.eq||[]).forEach(function(j){var c=(x[j]+x[j+1])/2;b+=ln(c,y-8,c,y+8,{w:2.5,c:'var(--pen)'})});
+  (labels||[]).forEach(function(l,j){if(l!=null)b+=tx((x[j]+x[j+1])/2,y-16,l,qm(l))});
+  if(total!=null){var t=o.tr||[0,x.length-1],a=x[t[0]],e=x[t[1]],yy=y+40;
+    b+=ln(a,yy,e,yy,{w:1.5})+ln(a,yy-5,a,yy+5,{w:1.5})+ln(e,yy-5,e,yy+5,{w:1.5})+tx((a+e)/2,yy+22,total,qm(total))}
+  return sv(360,total!=null?y+80:y+38,b,'Отрезок с отмеченными точками');
+}
+
+/* ломаная (closed=false) или многоугольник (closed=true) с подписанными сторонами */
+function polyFig(names,labels,closed){
+  var n=names.length,P=[],i,b='',cx=180,cy=88;
+  if(closed){for(i=0;i<n;i++){var a=-Math.PI/2+2*Math.PI*i/n+(i%2?.14:-.1);P.push([cx+120*Math.cos(a)*(1+((i*7)%3-1)*.07),cy+60*Math.sin(a)*(1+((i*5)%3-1)*.08)])}}
+  else{for(i=0;i<n;i++)P.push([36+i*(288/(n-1)),i%2?44:126])}
+  var m=closed?n:n-1;
+  for(i=0;i<m;i++){var p=P[i],q=P[(i+1)%n];b+=ln(p[0],p[1],q[0],q[1],{w:2.5})}
+  for(i=0;i<m;i++){
+    var p2=P[i],q2=P[(i+1)%n],mx=(p2[0]+q2[0])/2,my=(p2[1]+q2[1])/2,dx=q2[0]-p2[0],dy=q2[1]-p2[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+    if(closed){if((mx-cx)*nx+(my-cy)*ny<0){nx=-nx;ny=-ny}}else if(ny>0){nx=-nx;ny=-ny}
+    if(labels[i]!=null){if(closed)b+=tx(mx+nx*17,my+ny*17+5,labels[i],qm(labels[i]));else b+=tx(mx,my+5,labels[i],{halo:1,c:labels[i]==='?'?'var(--pen)':null,b:labels[i]==='?'})}
+  }
+  for(i=0;i<n;i++){var pp=P[i],vx=pp[0]-cx,vy=pp[1]-cy,vl=Math.hypot(vx,vy)||1;
+    b+=dt(pp[0],pp[1]);
+    if(closed)b+=tx(pp[0]+vx/vl*15,pp[1]+vy/vl*15+5,names[i],{b:1});
+    else b+=tx(pp[0],pp[1]+(i%2?-12:25),names[i],{b:1})}
+  return sv(360,176,b,closed?'Многоугольник':'Ломаная');
+}
+
+/* окружность: pts [{n,a}] — точки на окружности (угол против часовой), segs [[от,до,подпись]] */
+function circFig(pts,segs,o){
+  o=o||{};var cx=180,cy=88,R=66,P={O:[cx,cy]},b='';
+  pts.forEach(function(p){P[p.n]=[cx+R*Math.cos(p.a*Math.PI/180),cy-R*Math.sin(p.a*Math.PI/180)]});
+  b+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="color-mix(in srgb,var(--ink) 6%,transparent)" stroke="currentColor" stroke-width="2"/>';
+  segs.forEach(function(s){var p=P[s[0]],q=P[s[1]];b+=ln(p[0],p[1],q[0],q[1],{w:2.5,c:'var(--pen)'})});
+  segs.forEach(function(s){
+    if(s[2]==null)return;var p=P[s[0]],q=P[s[1]],mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,d=nx*(mx-cx)+ny*(my-cy);
+    if(Math.abs(d)<1){d=nx*(mx-cx)||ny*(my-cy);if(Math.abs(mx-cx)<2&&Math.abs(my-cy)<2)d=ny}
+    if(d<0){nx=-nx;ny=-ny}
+    b+=tx(mx+nx*17,my+ny*17+5,s[2],qm(s[2]));
+  });
+  b+=dt(cx,cy)+tx(cx-12,cy+19,'O',{b:1});
+  pts.forEach(function(p){var q=P[p.n];b+=dt(q[0],q[1])+tx(cx+(R+16)*Math.cos(p.a*Math.PI/180),cy-(R+16)*Math.sin(p.a*Math.PI/180)+5,p.n,{b:1})});
+  return sv(360,180,b,'Окружность');
+}
+
+/* две касающиеся окружности: kind 'ext' или 'int'; d — подпись расстояния между центрами */
+function tcFig(r1v,r2v,kind,d){
+  var b='',y=88,s,c1,c2,R1,R2;
+  if(kind==='ext'){s=Math.min(160/(r1v+r2v),64/Math.max(r1v,r2v));R1=r1v*s;R2=r2v*s;c1=(360-2*(R1+R2))/2+R1;c2=c1+R1+R2}
+  else{var big=Math.max(r1v,r2v),sm=Math.min(r1v,r2v);s=64/big;R1=big*s;R2=sm*s;c1=(360-2*R1)/2+R1;c2=c1+(R1-R2)}
+  var fillc='color-mix(in srgb,var(--ink) 6%,transparent)';
+  b+='<circle cx="'+r1(c1)+'" cy="'+y+'" r="'+r1(R1)+'" fill="'+fillc+'" stroke="currentColor" stroke-width="2"/>';
+  b+='<circle cx="'+r1(c2)+'" cy="'+y+'" r="'+r1(R2)+'" fill="'+fillc+'" stroke="currentColor" stroke-width="2"/>';
+  b+=ln(c1,y,c2,y,{w:2.5,c:'var(--pen)'})+dt(c1,y)+dt(c2,y)+(kind==='int'?tx(c1-10,y+22,'O₁',{b:1,a:'end'})+tx(c2+10,y+22,'O₂',{b:1,a:'start'}):tx(c1,y+22,'O₁',{b:1})+tx(c2,y+22,'O₂',{b:1}));
+  var big2=kind==='ext'?r1v:Math.max(r1v,r2v),small2=kind==='ext'?r2v:Math.min(r1v,r2v);
+  b+=tx(c1,y-R1+18,'R = '+big2,{s:14});
+  if(kind==='int'){b+=tx(c2,y-R2-8,'r = '+small2,{s:14});b+=tx((c1+c2)/2,y+44,d,qm(d))}
+  else{b+=tx(c2,y-R2/2-2,'r = '+small2,{s:14});b+=tx((c1+c2)/2,y-10,d,qm(d))}
+  return sv(360,176,b,'Две касающиеся окружности');
+}
+
+/* лучи из точки O: rays [{d,n,ext,len,c}], arcs [{a,b,r,l,right,eq}] */
+function angFig(rays,arcs,o){
+  o=o||{};var L=o.L||150,b='',minx=0,maxx=0,miny=0,maxy=0;
+  rays.forEach(function(r){var a=r.d*Math.PI/180,l=L*(r.len||1);minx=Math.min(minx,l*Math.cos(a));maxx=Math.max(maxx,l*Math.cos(a));miny=Math.min(miny,-l*Math.sin(a));maxy=Math.max(maxy,-l*Math.sin(a));
+    if(r.ext){var l2=L*(r.len2||.55);minx=Math.min(minx,-l2*Math.cos(a));maxx=Math.max(maxx,-l2*Math.cos(a));miny=Math.min(miny,l2*Math.sin(a));maxy=Math.max(maxy,l2*Math.sin(a))}});
+  var ox=0,oy=0;
+  function pt(d,r){var a=d*Math.PI/180;return [ox+r*Math.cos(a),oy-r*Math.sin(a)]}
+  (arcs||[]).forEach(function(a){
+    if(a.right){var s=a.r||20,A=pt(a.a,s),B=pt(a.b,s),C=[A[0]+B[0]-ox,A[1]+B[1]-oy];
+      b+='<path d="M'+r1(A[0])+' '+r1(A[1])+' L'+r1(C[0])+' '+r1(C[1])+' L'+r1(B[0])+' '+r1(B[1])+'" fill="none" stroke="var(--pen)" stroke-width="2"/>';
+      if(a.l){var T=pt((a.a+a.b)/2,s+22);b+=tx(T[0],T[1]+5,a.l,qm(a.l))}
+      return}
+    var r=a.r||40,A2=pt(a.a,r),B2=pt(a.b,r),big=(a.b-a.a)>180?1:0;
+    b+='<path d="M'+r1(A2[0])+' '+r1(A2[1])+' A'+r+' '+r+' 0 '+big+' 0 '+r1(B2[0])+' '+r1(B2[1])+'" fill="none" stroke="var(--pen)" stroke-width="2.5"/>';
+    if(a.eq){var m=(a.a+a.b)/2;for(var k=0;k<a.eq;k++){var mm=m+(k-(a.eq-1)/2)*7,p1=pt(mm,r-6),p2=pt(mm,r+6);b+=ln(p1[0],p1[1],p2[0],p2[1],{w:2,c:'var(--pen)'})}}
+    if(a.l){var T2=pt((a.a+a.b)/2,r+((a.b-a.a)<45?24:17));b+=tx(T2[0],T2[1]+5,a.l,qm(a.l))}
+  });
+  rays.forEach(function(r){
+    var e=pt(r.d,L*(r.len||1));
+    if(r.ext){var e2=pt(r.d+180,L*(r.len2||.55));b+=ln(e2[0],e2[1],e[0],e[1],{w:2.5,c:r.c})}else b+=ln(ox,oy,e[0],e[1],{w:2.5,c:r.c});
+    if(r.n){var t=pt(r.d,L*(r.len||1)+15);b+=tx(t[0],t[1]+5,r.n,{b:1})}
+    if(r.n2){var t2=pt(r.d+180,L*(r.len2||.55)+15);b+=tx(t2[0],t2[1]+5,r.n2,{b:1})}
+  });
+  b+=dt(ox,oy)+tx(ox-4,oy+21,'O',{b:1,a:'end'});
+  var x0=minx-34,y0=miny-30,w=maxx-minx+68,h=maxy-miny+66;
+  return '<div class="fig"><svg viewBox="'+r1(x0)+' '+r1(y0)+' '+r1(w)+' '+r1(h)+'" width="100%" style="max-width:'+Math.round(Math.min(420,Math.max(220,w*1.15)))+'px;color:var(--ink)" role="img" aria-label="Углы" font-family="PT Serif,Georgia,serif" font-size="16">'+b+'</svg></div>';
+}
+
+/* две пересекающиеся прямые, сектора пронумерованы 1–4 против часовой стрелки */
+function crossFig(alpha){
+  var a0=18,d2=a0+alpha;
+  return angFig([{d:a0,ext:1,len:.95,len2:.95},{d:d2,ext:1,len:.95,len2:.95}],
+    [{a:a0,b:d2,r:34,l:'1'},{a:d2,b:a0+180,r:34,l:'2'},{a:a0+180,b:d2+180,r:34,l:'3'},{a:d2+180,b:a0+360,r:34,l:'4'}],
+    {L:105});
+}
+
+/* часы: стрелки на h:00 */
+function clockFig(h){
+  var cx=90,cy=90,R=72,b='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="color-mix(in srgb,var(--ink) 5%,transparent)" stroke="currentColor" stroke-width="2.5"/>',i;
+  for(i=0;i<12;i++){var a=i*Math.PI/6,x1=cx+(R-8)*Math.sin(a),y1=cy-(R-8)*Math.cos(a),x2=cx+R*Math.sin(a),y2=cy-R*Math.cos(a);b+=ln(x1,y1,x2,y2,{w:i%3?1.5:2.5})}
+  [[12,cx,cy-R+24],[3,cx+R-22,cy+5],[6,cx,cy+R-14],[9,cx-R+22,cy+5]].forEach(function(t){b+=tx(t[1],t[2],t[0],{s:15,b:1})});
+  var ha=(h%12)*Math.PI/6;
+  b+=ln(cx,cy,cx,cy-56,{w:3})+ln(cx,cy,cx+38*Math.sin(ha),cy-38*Math.cos(ha),{w:5,c:'var(--pen)'})+dt(cx,cy);
+  return sv(180,180,b,'Часы, показывающие '+h+' часов');
+}
+
+/* объёмные фигуры: cube, box, pyr */
+function solidFig(kind){
+  var b='',S=2.4;
+  function E(x1,y1,x2,y2,hid){return ln(x1,y1,x2,y2,{w:2.5,d:hid?'6 5':null})}
+  if(kind==='pyr'){
+    b+=E(40,128,150,128)+E(150,128,112,96)+E(40,128,112,96,1)+E(95,22,40,128)+E(95,22,150,128)+E(95,22,112,96);
+  }else{
+    var w=kind==='box'?100:72,h=kind==='box'?62:72,dx=34,dy=28,x=34,y=146-h;
+    b+=E(x,y,x+w,y)+E(x+w,y,x+w,y+h)+E(x+w,y+h,x,y+h)+E(x,y+h,x,y);
+    b+=E(x+dx,y-dy,x+w+dx,y-dy)+E(x+w+dx,y-dy,x+w+dx,y+h-dy)+E(x+dx,y-dy,x+dx,y+h-dy,1)+E(x+dx,y+h-dy,x+w+dx,y+h-dy,1);
+    b+=E(x,y,x+dx,y-dy)+E(x+w,y,x+w+dx,y-dy)+E(x+w,y+h,x+w+dx,y+h-dy)+E(x,y+h,x+dx,y+h-dy,1);
+  }
+  return sv(200,160,b,kind==='cube'?'Куб':kind==='box'?'Прямоугольный параллелепипед':'Треугольная пирамида');
+}
+/* ================= Геометрия: помощники заданий ================= */
+function toF(v){return F(Math.round(v*100),100)}
+function Nn(v){return String(Math.round(v*100)/100).replace('.',',')}
+function Nf(x){return x.d===1?String(x.n):Nn(x.n/x.d)}
+var UNIT={'см':'сантиметрах','дм':'дециметрах','м':'метрах','°':'градусах','′':'минутах'};
+function GT(mod,q,val,unit,traps,steps){
+  var tr=[];(traps||[]).forEach(function(x){if(x[0]>0&&Math.abs(x[0]-val)>1e-9)tr.push(TR(toF(x[0]),x[1],x[2]||''))});
+  var t=mk(mod,q,toF(val),tr,steps);t.unit=unit||'';return t;
+}
+function ansHint(t){
+  var a=t.ans,h=a.d===1?'Ответ — целое число':'Ответ — число';
+  if(t.unit&&UNIT[t.unit])h+=' (в '+UNIT[t.unit]+', без единиц измерения)';
+  h+='.';
+  if(a.d!==1)h+=' Десятичную дробь пишите через запятую, например 4,5.';
+  return h;
+}
+function showAns(t){if(t.draw)return t.draw.text;return Nf(t.ans)+(t.unit?(t.unit==='°'||t.unit==='′'?'':' ')+t.unit:'')}
+var LET='ABCDEFGHKLMNPQRSTUVWXYZ';
+function letters(n){var s=LET.split('').slice(0,n);return s}
+function pickL(n){var a=shuffle(LET.split('')).slice(0,n);return a}
+
+/* единичный выбор для числовых заданий (тренажёр) */
+function numChoice(t){
+  if(t.choice||t.multi)return t;
+  var a=t.ans,v=a.n/a.d,vals=[a],seen={};seen[Nf(a)]=1;
+  function put(x){if(vals.length>=4||!(x>0))return;var f=toF(x);if(seen[Nf(f)])return;seen[Nf(f)]=1;vals.push(f)}
+  t.traps.forEach(function(x){put(x.v.n/x.v.d)});
+  [v+1,v-1,v*2,v/2,v+10,v-10,v+5,180-v,v+2,v-2,v+3].forEach(put);
+  var sh=shuffle(vals.map(function(f,i){return {v:f,ok:i===0}}));
+  var u=t.unit?(t.unit==='°'||t.unit==='′'?'':' ')+t.unit:'';
+  var n=Object.assign({},t);
+  n.choice={opts:sh.map(function(o){return Nf(o.v)+u}),correct:sh.findIndex(function(o){return o.ok}),vals:sh.map(function(o){return o.v})};
+  return n;
+}
+/* мультивыбор: верные и неверные утверждения темы */
+var THEORY={};
+function poolTask(id){
+  var P=THEORY[id],T=shuffle(P.T),Fl=shuffle(P.F),nT=ri(2,3),items=[];
+  T.slice(0,nT).forEach(function(s){items.push({h:s,ok:true,type:null})});
+  Fl.slice(0,5-nT).forEach(function(s){items.push({h:s[0],ok:false,type:s[1]||'Путают понятия'})});
+  return {mod:id,q:P.q,ans:F(0),traps:[],steps:P.steps,multi:shuffle(items),theory:true};
+}
+function nonZero(id){var t,i=0;do{t=modOf(id).gen()}while(t.ans.n===0&&++i<30);return t}
+function trainTask(id){var d=Math.random()<.3?drawGen(id):null;if(d)return d;if(THEORY[id]&&Math.random()<.4)return poolTask(id);return numChoice(nonZero(id))}
+function typedGen(id){var t,i=0;do{t=nonZero(id)}while((t.choice||t.multi||t.draw)&&++i<30);return t}
+
+/* ================= Глава 1. Начальные понятия геометрии ================= */
+
+/* g1: повторение (§1) */
+function gG1(){
+  var t=ri(0,4),a,b,P,c,s,k;
+  if(t===0){a=ri(3,12);b=ri(2,10);P=2*(a+b);
+    return GT('g1','Периметр прямоугольника равен '+P+' см, одна его сторона — '+a+' см. Найдите соседнюю сторону.',b,'см',
+      [[P-a,'Сторон четыре, а не две','Периметр — сумма четырёх сторон: две по '+a+' см и две неизвестные.'],[P/2,'Нашли полупериметр','P : 2 = '+(P/2)+' — это сумма двух соседних сторон, а не одна сторона.'],[P-2*a,'Не разделили на 2','Две неизвестные стороны вместе дают '+(P-2*a)+' см. На одну приходится вдвое меньше.']],
+      'P = 2 · (a + b), поэтому a + b = '+P+' : 2 = '+(P/2)+'. Вторая сторона: '+(P/2)+' − '+a+' = '+b+' см.');}
+  if(t===1){s=ri(2,15);P=4*s;
+    return GT('g1','Периметр квадрата равен '+P+' см. Найдите его сторону.',s,'см',
+      [[P/2,'Делили не на 4','У квадрата четыре равные стороны, делить нужно на 4.'],[P/3,'Делили не на 4','Сторон четыре, а не три.'],[P-s*2,'Не тот способ','Сторона квадрата равна P : 4.']],
+      'Стороны квадрата равны, их четыре: '+P+' : 4 = '+s+' см.');}
+  if(t===2){a=ri(4,12);b=ri(4,12);c=ri(Math.abs(a-b)+1,a+b-1);P=a+b+c;
+    return GT('g1','Периметр треугольника равен '+P+' см, две его стороны — '+a+' см и '+b+' см. Найдите третью сторону.',c,'см',
+      [[P-a,'Вычли только одну сторону','Нужно вычесть обе известные стороны.'],[a+b,'Сложили стороны','Третья сторона — это P минус сумма двух известных.']],
+      'Сумма двух сторон: '+a+' + '+b+' = '+(a+b)+'. Третья сторона: '+P+' − '+(a+b)+' = '+c+' см.');}
+  if(t===3){k=pick([2,3,4,5,6,9,10,12,18]);
+    return GT('g1','Развёрнутый угол равен 180°. Чему равна '+fr(1,k)+' развёрнутого угла?',180/k,'°',
+      [[90/k,'Взяли прямой угол вместо развёрнутого','Развёрнутый угол — 180°, а не 90°.'],[360/k,'Взяли полный угол','Полный угол — 360°, а развёрнутый — 180°.']],
+      '180° : '+k+' = '+(180/k)+'°.');}
+  a=ri(3,9);do{b=ri(2,8)}while(b===a);var S=a*b;
+  return GT('g1','Площадь прямоугольника равна '+S+' см², одна сторона — '+a+' см. Найдите периметр прямоугольника.',2*(a+b),'см',
+    [[a+b,'Нашли полупериметр','Периметр — удвоенная сумма соседних сторон.'],[b,'Нашли только сторону','Сначала сторона, потом периметр.'],[S+a,'Смешали площадь и периметр','Периметр считают по сторонам, а не по площади.']],
+    'Вторая сторона: '+S+' : '+a+' = '+b+' см. Периметр: 2 · ('+a+' + '+b+') = '+(2*(a+b))+' см.');
+}
+
+/* g2: предмет геометрии (§2) */
+function gG2(){
+  var t=ri(0,4),a,b,c,n;
+  if(t===0){
+    var SOL=[['куб',8,12,6,'cube'],['прямоугольный параллелепипед',8,12,6,'box'],['треугольная пирамида',4,6,4,'pyr']],S=pick(SOL),w=ri(0,2),W=['вершин','рёбер','граней'],v=S[1+w];
+    var tr=[];[0,1,2].forEach(function(j){if(j!==w)tr.push([S[1+j],'Перепутали вершины, рёбра и грани','У фигуры «'+S[0]+'»: '+S[1]+' вершин, '+S[2]+' рёбер, '+S[3]+' граней.'])});
+    return GT('g2',solidFig(S[4])+'Сколько у фигуры «'+S[0]+'» '+W[w]+'?',v,'',tr,
+      'Считаем по чертежу, включая невидимые штриховые рёбра. Вершин '+S[1]+', рёбер '+S[2]+', граней '+S[3]+'.');}
+  if(t===1){n=ri(4,7);var nm=letters(n),lens=[];for(var i=0;i<n-1;i++)lens.push(ri(2,4));var tot=n*(n-1)/2;
+    return GT('g2',lineFig(nm,lens,[],null)+'На прямой отмечены '+n+' точек. Сколько всего отрезков с концами в этих точках?',tot,'',
+      [[n-1,'Посчитали только соседние точки','Отрезком является и пара несоседних точек, например '+nm[0]+nm[2]+'.'],[n*(n-1),'Посчитали AB и BA как разные','Отрезок AB и отрезок BA — один и тот же.'],[n,'Посчитали точки','Нужно считать отрезки, а не точки.']],
+      'От первой точки '+(n-1)+' отрезков, от второй ещё '+(n-2)+', и так далее: '+Array.apply(null,Array(n-1)).map(function(_,j){return n-1-j}).join(' + ')+' = '+tot+'.');}
+  if(t===2){n=ri(4,6);var tot2=n*(n-1)/2;
+    return GT('g2','Отмечено '+n+' точек, никакие три из них не лежат на одной прямой. Сколько различных прямых можно провести через пары этих точек?',tot2,'',
+      [[n*(n-1),'Посчитали каждую пару дважды','Через две точки проходит только одна прямая.'],[n,'Посчитали точки','Прямых больше, чем точек.'],[n-1,'Посчитали только из одной точки','Из каждой точки идёт '+(n-1)+' прямых, но каждая прямая посчитана дважды.']],
+      'Через две точки проходит ровно одна прямая. Пар точек: '+n+' · '+(n-1)+' : 2 = '+tot2+'.');}
+  if(t===3){
+    if(Math.random()<.5){a=ri(2,9);var Sx=12*a;
+      return GT('g2','Сумма длин всех рёбер куба равна '+Sx+' см. Найдите длину одного ребра.',a,'см',
+        [[Sx/6,'Рёбер не 6','У куба 12 рёбер, а 6 — это число граней.'],[Sx/8,'Рёбер не 8','У куба 12 рёбер, а 8 — это число вершин.'],[Sx/4,'Рёбер не 4','Рёбер 12, все равны.']],
+        'У куба 12 равных рёбер: '+Sx+' : 12 = '+a+' см.');}
+    a=ri(2,7);
+    return GT('g2','Найдите площадь поверхности куба с ребром '+a+' см (в квадратных сантиметрах).',6*a*a,'см²',
+      [[a*a,'Нашли площадь одной грани','У куба 6 граней, нужна сумма их площадей.'],[4*a*a,'Взяли 4 грани','Граней у куба шесть.'],[6*a,'Умножили ребро на 6','Площадь грани — a · a, а не a.'],[a*a*a,'Нашли объём','Здесь нужна площадь, а не объём.']],
+      'Каждая грань — квадрат площадью '+a+' · '+a+' = '+(a*a)+'. Граней 6: 6 · '+(a*a)+' = '+(6*a*a)+'.');}
+  a=ri(2,6);b=ri(3,7);c=ri(2,8);
+  return GT('g2','Длина, ширина и высота прямоугольного параллелепипеда равны '+a+' см, '+b+' см и '+c+' см. Найдите площадь его поверхности (в квадратных сантиметрах).',2*(a*b+b*c+a*c),'см²',
+    [[a*b+b*c+a*c,'Взяли только половину граней','Граней шесть: три пары одинаковых.'],[a*b*c,'Нашли объём','Здесь нужна площадь поверхности.']],
+    'Три пары одинаковых граней: '+a+' · '+b+' = '+(a*b)+', '+b+' · '+c+' = '+(b*c)+', '+a+' · '+c+' = '+(a*c)+'. Сумма '+(a*b+b*c+a*c)+', удваиваем: '+(2*(a*b+b*c+a*c))+'.');
+}
+
+/* g3: прямая, луч, отрезок, ломаная (§3) */
+function gG3(){
+  var t=ri(0,4),a,b,n,T,N;
+  if(t===0){a=ri(3,14);b=ri(3,14);N=pickL(3);var C=N[1];
+    if(Math.random()<.5)
+      return GT('g3',lineFig([N[0],C,N[2]],[a,b],[a+' см',b+' см'],'?')+'Точка '+C+' лежит на отрезке '+N[0]+N[2]+'. '+N[0]+C+' = '+a+' см, '+C+N[2]+' = '+b+' см. Найдите '+N[0]+N[2]+'.',a+b,'см',
+        [[Math.abs(a-b),'Вычли вместо сложения','Длина всего отрезка равна сумме длин его частей.']],
+        N[0]+N[2]+' = '+N[0]+C+' + '+C+N[2]+' = '+a+' + '+b+' = '+(a+b)+' см.');
+    T=a+b;
+    return GT('g3',lineFig([N[0],C,N[2]],[a,b],[a+' см','?'],T+' см')+'Точка '+C+' лежит на отрезке '+N[0]+N[2]+'. '+N[0]+N[2]+' = '+T+' см, '+N[0]+C+' = '+a+' см. Найдите '+C+N[2]+'.',b,'см',
+      [[T+a,'Сложили вместо вычитания','Часть отрезка меньше всего отрезка: вычитаем.']],
+      C+N[2]+' = '+N[0]+N[2]+' − '+N[0]+C+' = '+T+' − '+a+' = '+b+' см.');}
+  if(t===1){N=pickL(3);var M=N[1];
+    if(Math.random()<.5){a=ri(2,19);
+      return GT('g3',lineFig([N[0],M,N[2]],[1,1],[a+' см',null],'?',{eq:[0,1]})+M+' — середина отрезка '+N[0]+N[2]+'. '+N[0]+M+' = '+a+' см. Найдите '+N[0]+N[2]+'.',2*a,'см',
+        [[a,'Не удвоили','Середина делит отрезок на две равные части, всего отрезок вдвое длиннее.'],[a/2,'Разделили вместо умножения','Весь отрезок больше своей половины.'],[a+2,'Прибавили 2','Нужно умножить на 2.']],
+        M+N[2]+' = '+N[0]+M+' = '+a+' см, поэтому '+N[0]+N[2]+' = 2 · '+a+' = '+(2*a)+' см.');}
+    T=ri(5,40);
+    return GT('g3',lineFig([N[0],M,N[2]],[1,1],['?',null],T+' см',{eq:[0,1]})+M+' — середина отрезка '+N[0]+N[2]+'. '+N[0]+N[2]+' = '+T+' см. Найдите '+N[0]+M+'.',T/2,'см',
+      [[T*2,'Умножили вместо деления','Половина отрезка меньше всего отрезка.'],[T,'Взяли весь отрезок','Нужна только половина.']],
+      N[0]+M+' = '+N[0]+N[2]+' : 2 = '+T+' : 2 = '+Nn(T/2)+' см.');}
+  if(t===2){a=2*ri(2,9);b=2*ri(2,9);N=pickL(5);
+    return GT('g3',lineFig([N[0],N[1],N[2],N[3],N[4]],[a/2,a/2,b/2,b/2],[null,null,null,null],'?',{eq:[0,1,2,3],tr:[1,3]})+'Точка '+N[2]+' лежит на отрезке '+N[0]+N[4]+'. '+N[1]+' — середина '+N[0]+N[2]+', '+N[3]+' — середина '+N[2]+N[4]+'. '+N[0]+N[2]+' = '+a+' см, '+N[2]+N[4]+' = '+b+' см. Найдите '+N[1]+N[3]+'.',(a+b)/2,'см',
+      [[a+b,'Не взяли половины','Расстояние между серединами — половина всего отрезка '+N[0]+N[4]+'.'],[Math.abs(a-b)/2,'Вычли вместо сложения','Части лежат рядом, их длины складываются.']],
+      N[1]+N[2]+' = '+(a/2)+' см, '+N[2]+N[3]+' = '+(b/2)+' см. '+N[1]+N[3]+' = '+(a/2)+' + '+(b/2)+' = '+((a+b)/2)+' см.');}
+  if(t===3){var sub=ri(0,2);
+    if(sub===0){n=ri(3,5);var ls=[];for(var i=0;i<n;i++)ls.push(ri(2,9));var nm=letters(n+1),sum=ls.reduce(function(x,y){return x+y},0);
+      return GT('g3',polyFig(nm,ls.map(function(x){return x+' см'}),false)+'Найдите длину ломаной '+nm.join('')+'.',sum,'см',
+        [[sum-ls[0],'Пропустили одно звено','Длина ломаной — сумма длин всех её звеньев.'],[ls.reduce(function(x,y){return Math.max(x,y)},0),'Взяли самое длинное звено','Нужна сумма всех звеньев.']],
+        'Длина ломаной — сумма звеньев: '+ls.join(' + ')+' = '+sum+' см.');}
+    if(sub===1){var q=[ri(3,9),ri(3,9),ri(3,9),ri(3,9)],nm2=letters(4),sum2=q.reduce(function(x,y){return x+y},0);
+      return GT('g3',polyFig(nm2,q.map(function(x){return x+' см'}),true)+'Найдите периметр четырёхугольника '+nm2.join('')+'.',sum2,'см',
+        [[sum2-q[3],'Пропустили сторону','Периметр — сумма длин всех сторон.'],[2*(q[0]+q[1]),'Решили, что стороны попарно равны','Здесь стороны разные, складываем все четыре.']],
+        'Периметр — сумма всех сторон: '+q.join(' + ')+' = '+sum2+' см.');}
+    a=ri(3,9);var k=ri(2,6);
+    return GT('g3','В треугольнике ABC сторона AB равна '+a+' см, сторона BC на '+k+' см больше AB, а сторона CA в 2 раза больше AB. Найдите периметр треугольника.',a+(a+k)+2*a,'см',
+      [[a+k+2*a,'Не учли сторону AB','В периметр входят все три стороны, включая AB.'],[a+a+k+a+2,'Неверно поняли «в 2 раза больше»','«В 2 раза больше» значит умножить на 2.']],
+      'BC = '+a+' + '+k+' = '+(a+k)+', CA = 2 · '+a+' = '+(2*a)+'. Периметр: '+a+' + '+(a+k)+' + '+(2*a)+' = '+(4*a+k)+' см.');}
+  n=ri(3,8);var ps=ri(0,2),nmz=letters(n);
+  if(ps===0)return GT('g3',lineFig(nmz,Array.apply(null,Array(n-1)).map(function(){return ri(2,4)}),[],null)+'Точки отмечены на прямой. На сколько частей они делят прямую?',n+1,'',
+    [[n,'Посчитали точки','Кроме отрезков между точками есть ещё два луча по краям.'],[n-1,'Посчитали только отрезки','Два луча по краям тоже части прямой.']],
+    'Между '+n+' точками '+(n-1)+' отрезков и ещё два луча по краям: '+(n-1)+' + 2 = '+(n+1)+'.');
+  if(ps===1)return GT('g3','На прямой отмечено '+n+' точек. Сколько среди частей, на которые они делят прямую, отрезков (то есть частей, ограниченных с двух сторон)?',n-1,'',
+    [[n,'Посчитали точки','Отрезков на один меньше, чем точек.'],[n+1,'Посчитали все части','Лучи в это число не входят.']],
+    'Соседние точки образуют '+(n-1)+' отрезков.');
+  return GT('g3','Ломаная имеет '+n+' вершин. Сколько у неё звеньев?',n-1,'',
+    [[n,'Звеньев столько же, сколько вершин','У незамкнутой ломаной звеньев на одно меньше, чем вершин.'],[n+1,'Прибавили 1','Звеньев на одно меньше.']],
+    'Звенья соединяют соседние вершины: '+n+' − 1 = '+(n-1)+'.');
+}
+
+/* g4: окружность и круг (§4) */
+function gG4(){
+  var t=ri(0,4),r,x,d;
+  if(t===0){
+    if(Math.random()<.5){d=ri(3,40);
+      return GT('g4','Диаметр окружности равен '+d+' см. Найдите её радиус.',d/2,'см',
+        [[d*2,'Перепутали радиус и диаметр','Диаметр вдвое больше радиуса, значит радиус — половина диаметра.'],[d,'Не разделили','Радиус — половина диаметра.']],
+        'Диаметр равен двум радиусам: r = '+d+' : 2 = '+Nn(d/2)+' см.');}
+    r=ri(2,25);
+    return GT('g4','Радиус окружности равен '+r+' см. Найдите её диаметр.',2*r,'см',
+      [[r/2,'Перепутали радиус и диаметр','Диаметр вдвое больше радиуса.'],[r,'Не удвоили','Диаметр — это два радиуса.']],
+      'Диаметр состоит из двух радиусов: 2 · '+r+' = '+(2*r)+' см.');}
+  if(t===1){r=ri(3,12);x=ri(2,2*r-1);var N=pickL(2);
+    return GT('g4',circFig([{n:N[0],a:138},{n:N[1],a:42}],[['O',N[0],r+' см'],['O',N[1],r+' см'],[N[0],N[1],x+' см']])+'Точки '+N[0]+' и '+N[1]+' лежат на окружности с центром O, радиус равен '+r+' см, хорда '+N[0]+N[1]+' = '+x+' см. Найдите периметр треугольника '+N[0]+'O'+N[1]+'.',2*r+x,'см',
+      [[r+x,'Взяли один радиус','Оба отрезка O'+N[0]+' и O'+N[1]+' — радиусы.'],[2*(r+x),'Удвоили всё','Хорду нужно взять один раз.'],[3*r,'Решили, что хорда равна радиусу','Длина хорды дана: '+x+' см.']],
+      'O'+N[0]+' = O'+N[1]+' = '+r+' см как радиусы. Периметр: '+r+' + '+r+' + '+x+' = '+(2*r+x)+' см.');}
+  if(t===2){var kind=pick(['ext','ext','int','int']),a,b;
+    if(kind==='ext'){a=ri(2,9);b=ri(2,9);
+      if(Math.random()<.5)return GT('g4',tcFig(a,b,'ext','?')+'Окружности с центрами O₁ и O₂ касаются внешним образом. Их радиусы '+a+' см и '+b+' см. Найдите расстояние между центрами.',a+b,'см',
+        [[Math.abs(a-b),'Вычли радиусы','При внешнем касании радиусы лежат на одной прямой друг за другом, их длины складываются.'],[a*b,'Умножили радиусы','Расстояние между центрами равно сумме радиусов.']],
+        'Точка касания лежит на отрезке O₁O₂, поэтому O₁O₂ = '+a+' + '+b+' = '+(a+b)+' см.');
+      return GT('g4',tcFig(a,b,'ext',(a+b)+' см')+'Окружности касаются внешним образом, расстояние между центрами '+(a+b)+' см, радиус одной из них '+a+' см. Найдите радиус другой окружности.',b,'см',
+        [[a+b+a,'Сложили всё','Из расстояния между центрами нужно вычесть известный радиус.'],[Math.abs(b-a),'Взяли разность радиусов','Радиусы складываются.']],
+        'O₁O₂ = r₁ + r₂, поэтому r₂ = '+(a+b)+' − '+a+' = '+b+' см.');}
+    var R=ri(5,14);a=ri(2,R-2);
+    if(Math.random()<.5)return GT('g4',tcFig(R,a,'int','?')+'Окружность радиуса '+a+' см касается изнутри окружности радиуса '+R+' см. Найдите расстояние между центрами.',R-a,'см',
+      [[R+a,'Сложили радиусы','При внутреннем касании меньший радиус лежит внутри большего: расстояние — разность.'],[R,'Взяли больший радиус','Нужно вычесть радиус меньшей окружности.']],
+      'Центры лежат на одном радиусе большей окружности: O₁O₂ = '+R+' − '+a+' = '+(R-a)+' см.');
+    return GT('g4',tcFig(R,a,'int',(R-a)+' см')+'Меньшая окружность касается изнутри большей радиуса '+R+' см. Расстояние между центрами '+(R-a)+' см. Найдите радиус меньшей окружности.',a,'см',
+      [[R+(R-a),'Сложили','Радиус меньшей окружности — разность радиуса большей и расстояния.'],[R-a,'Взяли расстояние','Расстояние не равно радиусу.']],
+      'O₁O₂ = R − r, поэтому r = '+R+' − '+(R-a)+' = '+a+' см.');}
+  if(t===3){
+    if(Math.random()<.5){r=ri(2,20);
+      return GT('g4','Радиус окружности равен '+r+' см. Какую наибольшую длину может иметь хорда этой окружности?',2*r,'см',
+        [[r,'Взяли радиус','Самая длинная хорда — диаметр, то есть два радиуса.'],[4*r,'Взяли удвоенный диаметр','Хорда не длиннее диаметра.']],
+        'Наибольшая хорда — диаметр: 2 · '+r+' = '+(2*r)+' см.');}
+    d=2*ri(2,15);
+    return GT('g4','Диаметр окружности равен '+d+' см. Чему равен радиус окружности, если известно, что наибольшая хорда окружности равна диаметру?',d/2,'см',
+      [[d*2,'Перепутали','Радиус — половина диаметра.']],'Радиус — половина наибольшей хорды: '+d+' : 2 = '+(d/2)+' см.');}
+  r=ri(3,9);var ds=[];for(var i=0;i<5;i++)ds.push(pick([r-2,r-1,r,r,r+1,r+2,r+3]));
+  var w=ri(0,2),cnt=[ds.filter(function(v){return v===r}).length,ds.filter(function(v){return v<r}).length,ds.filter(function(v){return v>r}).length],NA=['на окружности','внутри окружности','вне окружности'];
+  return GT('g4','Радиус окружности равен '+r+' см. Расстояния от центра до точек A, B, C, D, E равны '+ds.join(' см, ')+' см. Сколько из этих точек лежат '+NA[w]+'?',cnt[w],'',
+    [[cnt[0]+cnt[1],'Включили лишние точки','Точка на окружности и точка внутри круга — разные случаи.'],[cnt[1],'Пересчитали не те точки','Сравните каждое расстояние с радиусом '+r+' см.'],[cnt[2],'Пересчитали не те точки','Сравните каждое расстояние с радиусом '+r+' см.'],[cnt[0],'Пересчитали не те точки','Сравните каждое расстояние с радиусом '+r+' см.']],
+    'Точка на окружности: расстояние равно '+r+' см; внутри — меньше '+r+'; вне — больше '+r+'. Подходят '+cnt[w]+' из 5.');
+}
+
+/* g5: угол, виды углов (§5) */
+function gG5(){
+  var t=ri(0,4),x,y,N;
+  if(t===0){x=ri(15,80);y=ri(15,175-x);N=pickL(3);var tot=x+y,sh=ri(0,2);
+    var rays=[{d:0,n:N[0]},{d:x,n:N[1]},{d:tot,n:N[2]}];
+    if(sh===0)return GT('g5',angFig(rays,[{a:0,b:x,r:46,l:x+'°'},{a:x,b:tot,r:62,l:y+'°'},{a:0,b:tot,r:92,l:'?'}])+'Луч O'+N[1]+' проходит внутри угла '+N[0]+'O'+N[2]+'. ∠'+N[0]+'O'+N[1]+' = '+x+'°, ∠'+N[1]+'O'+N[2]+' = '+y+'°. Найдите ∠'+N[0]+'O'+N[2]+'.',tot,'°',
+      [[Math.abs(x-y),'Вычли вместо сложения','Угол, составленный из двух углов, равен их сумме.'],[180-tot,'Нашли смежный угол','Нужен сам угол '+N[0]+'O'+N[2]+', а не смежный с ним.']],
+      '∠'+N[0]+'O'+N[2]+' = ∠'+N[0]+'O'+N[1]+' + ∠'+N[1]+'O'+N[2]+' = '+x+'° + '+y+'° = '+tot+'°.');
+    return GT('g5',angFig(rays,[{a:0,b:x,r:46,l:x+'°'},{a:x,b:tot,r:62,l:'?'},{a:0,b:tot,r:92,l:tot+'°'}])+'Луч O'+N[1]+' проходит внутри угла '+N[0]+'O'+N[2]+'. ∠'+N[0]+'O'+N[2]+' = '+tot+'°, ∠'+N[0]+'O'+N[1]+' = '+x+'°. Найдите ∠'+N[1]+'O'+N[2]+'.',y,'°',
+      [[tot+x,'Сложили вместо вычитания','Часть угла меньше всего угла: вычитаем.'],[180-y,'Нашли смежный угол','Нужен сам угол, а не смежный с ним.']],
+      '∠'+N[1]+'O'+N[2]+' = ∠'+N[0]+'O'+N[2]+' − ∠'+N[0]+'O'+N[1]+' = '+tot+'° − '+x+'° = '+y+'°.');}
+  if(t===1){x=ri(10,85);N=pickL(3);
+    var rs=[{d:0,n:N[0]},{d:x,n:N[1]},{d:2*x,n:N[2]}];
+    if(Math.random()<.5)return GT('g5',angFig(rs,[{a:0,b:x,r:50,eq:1},{a:x,b:2*x,r:50,eq:1,l:null},{a:0,b:x,r:50,l:x+'°'},{a:0,b:2*x,r:90,l:'?'}])+'Луч O'+N[1]+' — биссектриса угла '+N[0]+'O'+N[2]+'. ∠'+N[0]+'O'+N[1]+' = '+x+'°. Найдите ∠'+N[0]+'O'+N[2]+'.',2*x,'°',
+      [[x,'Не удвоили','Биссектриса делит угол пополам, весь угол вдвое больше.'],[180-2*x,'Нашли смежный угол','Нужен сам угол '+N[0]+'O'+N[2]+'.']],
+      'Биссектриса делит угол на два равных: ∠'+N[0]+'O'+N[2]+' = 2 · '+x+'° = '+(2*x)+'°.');
+    return GT('g5',angFig(rs,[{a:0,b:x,r:50,eq:1},{a:x,b:2*x,r:50,eq:1},{a:0,b:2*x,r:90,l:2*x+'°'}])+'Луч O'+N[1]+' — биссектриса угла '+N[0]+'O'+N[2]+', равного '+(2*x)+'°. Найдите ∠'+N[0]+'O'+N[1]+'.',x,'°',
+      [[2*x,'Не разделили','Биссектриса делит угол на две равные части.'],[90-x,'Нашли дополнение до 90°','Нужна половина угла, а не дополнение.']],
+      '∠'+N[0]+'O'+N[1]+' = '+(2*x)+'° : 2 = '+x+'°.');}
+  if(t===2){var sb=ri(0,2);
+    if(sb===0){x=ri(1,8);y=ri(5,55);
+      return GT('g5','Выразите угол '+x+'° '+y+'′ в минутах.',60*x+y,'′',
+        [[x+y,'Не перевели градусы в минуты','В одном градусе 60 минут: '+x+'° = '+(60*x)+'′.'],[60*x,'Забыли минуты','К '+(60*x)+'′ нужно прибавить ещё '+y+'′.']],
+        '1° = 60′, значит '+x+'° = '+(60*x)+'′. Всего '+(60*x)+' + '+y+' = '+(60*x+y)+'′.');}
+    if(sb===1){x=ri(2,9);
+      return GT('g5','Сколько градусов в угле '+(60*x)+'′?',x,'°',
+        [[60*x*60,'Умножили вместо деления','Чтобы перейти от минут к градусам, делим на 60.'],[x*10,'Неверно считали','В градусе 60 минут.']],
+        (60*x)+' : 60 = '+x+'°.');}
+    x=ri(1,8);
+    return GT('g5','Сколько минут в угле '+x+'°?',60*x,'′',
+      [[x,'Не перевели','В 1° содержится 60′.'],[100*x,'Считали по 100','В градусе 60 минут, а не 100.']],
+      x+' · 60 = '+(60*x)+'′.');}
+  if(t===3){var hh=ri(1,11),ang=30*hh<=180?30*hh:360-30*hh;
+    return GT('g5',clockFig(hh)+'Часы показывают '+hh+':00. Какой угол (меньший из двух) образуют часовая и минутная стрелки?',ang,'°',
+      [[30*hh,'Взяли угол «по ходу» без проверки','Ищем меньший из двух углов: если получилось больше 180°, вычитаем из 360°.'],[hh*12,'Неверно считали','Между соседними цифрами циферблата угол 30°.'],[360-ang,'Взяли больший угол','Нужен меньший из двух углов.']],
+      'Циферблат — 360°, между соседними цифрами 360° : 12 = 30°. Минутная стрелка на 12, часовая на '+hh+': '+hh+' · 30° = '+(30*hh)+'°.'+(30*hh>180?' Меньший угол: 360° − '+(30*hh)+'° = '+ang+'°.':''));}
+  var L=[],kinds=[0,0,0,0,0,0];for(var i=0;i<6;i++){var v=pick([ri(10,89),ri(10,89),ri(91,175),ri(91,175),90,180]);L.push(v)}
+  var KW=[['острых',function(v){return v<90},'острый угол меньше 90°'],['тупых',function(v){return v>90&&v<180},'тупой угол больше 90°, но меньше 180°'],['прямых',function(v){return v===90},'прямой угол равен 90°'],['развёрнутых',function(v){return v===180},'развёрнутый угол равен 180°']],kw=pick(KW),cnt=L.filter(kw[1]).length;
+  var other=KW.filter(function(k){return k!==kw});
+  return GT('g5','Даны углы: '+L.map(function(v){return v+'°'}).join(', ')+'. Сколько среди них '+kw[0]+'?',cnt,'',
+    [[L.filter(function(v){return v<=90}).length,'Включили прямые углы','Острый угол строго меньше 90°.'],[L.filter(function(v){return v>=90}).length,'Включили лишние углы','Проверьте границы: '+kw[2]+'.'],[cnt+1,'Пересчитали','Сверьте каждый угол: '+kw[2]+'.']],
+    'Проверяем каждый угол: '+kw[2]+'. Подходят '+cnt+' из 6.');
+}
+
+/* g6: смежные и вертикальные углы (§6) */
+function gG6(){
+  var t=ri(0,6),a,b,x,N;
+  if(t===0){a=pick([ri(20,80),ri(100,160)]);N=pickL(3);
+    return GT('g6',angFig([{d:0,n:N[0]},{d:180,n:N[2]},{d:a,n:N[1]}],[{a:0,b:a,r:46,l:a+'°'},{a:a,b:180,r:46,l:'?'}])+'Лучи O'+N[0]+' и O'+N[2]+' дополнительные, ∠'+N[0]+'O'+N[1]+' = '+a+'°. Найдите ∠'+N[1]+'O'+N[2]+'.',180-a,'°',
+      [[90-Math.abs(90-a)*0-a>0?90-a:-1,'Дополнили до 90°','Смежные углы дают 180°, а не 90°.'],[a,'Решили, что смежные равны','Равны вертикальные углы. Смежные углы дают в сумме 180°.'],[360-a,'Дополнили до 360°','Смежные углы дают 180°.']],
+      'Смежные углы в сумме дают 180°: ∠'+N[1]+'O'+N[2]+' = 180° − '+a+'° = '+(180-a)+'°.');}
+  if(t===1){var PR=pick([[1,2],[1,3],[1,4],[2,3],[1,5],[4,5],[2,7],[3,7],[5,7],[7,8]]),s=180/(PR[0]+PR[1]),big=Math.random()<.5;
+    return GT('g6','Градусные меры двух смежных углов относятся как '+PR[0]+' : '+PR[1]+'. Найдите '+(big?'больший':'меньший')+' угол.',(big?PR[1]:PR[0])*s,'°',
+      [[(big?PR[0]:PR[1])*s,'Нашли другой угол','Проверьте, какой угол спрашивают.'],[s,'Нашли одну часть','Одна часть — '+s+'°, а угол состоит из нескольких частей.']],
+      'Всего частей '+(PR[0]+PR[1])+', на них приходится 180°. Одна часть: '+(180/(PR[0]+PR[1]))+'°. Угол: '+(big?PR[1]:PR[0])+' · '+s+'° = '+((big?PR[1]:PR[0])*s)+'°.');}
+  if(t===2){x=2*ri(2,40);var bg=Math.random()<.5;
+    return GT('g6','Один из смежных углов на '+x+'° больше другого. Найдите '+(bg?'больший':'меньший')+' угол.',bg?(180+x)/2:(180-x)/2,'°',
+      [[bg?(180-x)/2:(180+x)/2,'Нашли другой угол','Проверьте, какой угол спрашивают.'],[180-x,'Вычли разность из 180°','Сумма углов 180°; если их разность '+x+'°, то углы — полусумма и полуразность.'],[x,'Взяли разность','Разность дана в условии, найти нужно угол.']],
+      'Больший угол = (180° + '+x+'°) : 2 = '+((180+x)/2)+'°, меньший = (180° − '+x+'°) : 2 = '+((180-x)/2)+'°.');}
+  if(t===3){a=pick([ri(20,80),ri(100,160)]);var k=ri(2,4),Q=[2,3,4][k-2]*0+k;
+    return GT('g6',crossFig(a)+'Две прямые пересекаются. ∠1 = '+a+'°. Найдите ∠'+k+'.',k===3?a:180-a,'°',
+      [[k===3?180-a:a,'Перепутали вертикальные и смежные','Вертикальные углы равны, смежные дают в сумме 180°.'],[360-a,'Дополнили до 360°','Смежные углы дают 180°.']],
+      k===3?'∠3 вертикален с ∠1, а вертикальные углы равны: ∠3 = '+a+'°.':'∠'+k+' смежный с ∠1, значит ∠'+k+' = 180° − '+a+'° = '+(180-a)+'°.');}
+  if(t===4){a=ri(20,80);var S=2*a;
+    return GT('g6','Сумма двух вертикальных углов равна '+S+'°. Найдите угол, смежный с одним из них.',180-a,'°',
+      [[a,'Нашли сам вертикальный угол','Каждый из вертикальных углов равен '+a+'°, а нужен смежный с ним.'],[180-S,'Вычли всю сумму','Вертикальные углы равны, каждый — половина суммы.'],[S,'Взяли сумму','Нужен смежный угол.']],
+      'Вертикальные углы равны, каждый '+S+'° : 2 = '+a+'°. Смежный: 180° − '+a+'° = '+(180-a)+'°.');}
+  if(t===5){a=pick([ri(20,80),ri(100,160)]);
+    return GT('g6','Две прямые пересекаются, один из образовавшихся углов равен '+a+'°. Найдите сумму остальных трёх углов.',360-a,'°',
+      [[180-a,'Взяли один смежный угол','Нужна сумма трёх углов: все четыре дают 360°.'],[2*(180-a)+a,'Перепутали состав','Один угол равен '+a+'°, другой вертикальный ему тоже '+a+'°.'],[180+a,'Неверно сложили','Четыре угла вместе составляют полный угол 360°.']],
+      'Все четыре угла в сумме дают 360°. Остальные три: 360° − '+a+'° = '+(360-a)+'°.');}
+  a=pick([ri(20,80),ri(100,160)]);
+  return GT('g6','Проведены биссектрисы двух смежных углов '+a+'° и '+(180-a)+'°. Найдите угол между этими биссектрисами.',90,'°',
+    [[a/2,'Нашли половину одного угла','Угол между биссектрисами равен сумме половин смежных углов.'],[180,'Взяли сумму смежных','Половины смежных углов в сумме дают 90°.']],
+    'Углы между биссектрисами: '+Nn(a/2)+'° + '+Nn((180-a)/2)+'° = 90°. Для любых смежных углов результат один и тот же.');
+}
+
+/* g7: перпендикулярные прямые (§7) */
+function gG7(){
+  var t=ri(0,4),x,N;
+  if(t===0){x=ri(10,80);N=pickL(3);
+    return GT('g7',angFig([{d:0,n:N[0]},{d:90,n:N[1]},{d:x,n:N[2],len:.95}],[{a:0,b:90,r:20,right:1},{a:0,b:x,r:50,l:x+'°'},{a:x,b:90,r:50,l:'?'}])+'Прямые O'+N[0]+' и O'+N[1]+' перпендикулярны, луч O'+N[2]+' лежит внутри угла '+N[0]+'O'+N[1]+'. ∠'+N[0]+'O'+N[2]+' = '+x+'°. Найдите ∠'+N[2]+'O'+N[1]+'.',90-x,'°',
+      [[180-x,'Дополнили до 180°','Угол '+N[0]+'O'+N[1]+' прямой, 90°, а не развёрнутый.'],[x,'Решили, что углы равны','Равенство было бы только у биссектрисы.'],[90+x,'Сложили','Из прямого угла вычитаем известную часть.']],
+      '∠'+N[0]+'O'+N[1]+' = 90°, он составлен из двух углов: ∠'+N[2]+'O'+N[1]+' = 90° − '+x+'° = '+(90-x)+'°.');}
+  if(t===1){
+    if(Math.random()<.5)return GT('g7','Две прямые пересекаются, и один из четырёх образовавшихся углов прямой. Сколько всего прямых углов получилось?',4,'',
+      [[1,'Решили, что прямой угол один','Смежный с прямым углом равен 180° − 90° = 90°, вертикальный тоже 90°.'],[2,'Не все посчитали','Все четыре угла по 90°.']],
+      'Смежный с прямым углом: 180° − 90° = 90°. Вертикальные углы равны. Значит, все четыре угла прямые.');
+    return GT('g7','Две прямые пересекаются под прямым углом. Найдите сумму трёх углов, не считая одного из четырёх.',270,'°',
+      [[180,'Взяли два угла','Нужны три угла по 90°.'],[360,'Взяли все четыре','Один угол не считаем.']],
+      'Все четыре угла по 90°. Три угла: 3 · 90° = 270°.');}
+  if(t===2){var PR=pick([[1,2],[2,3],[1,5],[2,7],[4,5],[1,4]]),s=90/(PR[0]+PR[1]),bg=Math.random()<.5;
+    return GT('g7','Луч делит прямой угол на два угла, которые относятся как '+PR[0]+' : '+PR[1]+'. Найдите '+(bg?'больший':'меньший')+' из них.',(bg?PR[1]:PR[0])*s,'°',
+      [[(bg?PR[0]:PR[1])*s,'Нашли другой угол','Проверьте, какой угол спрашивают.'],[(bg?PR[1]:PR[0])*(180/(PR[0]+PR[1])),'Взяли 180° вместо 90°','Прямой угол равен 90°.'],[s,'Нашли одну часть','В угле несколько частей.']],
+      'Прямой угол — 90°, частей '+(PR[0]+PR[1])+'. Одна часть: '+s+'°. Нужный угол: '+(bg?PR[1]:PR[0])+' · '+s+'° = '+((bg?PR[1]:PR[0])*s)+'°.');}
+  if(t===3){
+    if(Math.random()<.5)return GT('g7','Луч OC — биссектриса прямого угла AOB. Найдите ∠AOC.',45,'°',
+      [[90,'Взяли весь угол','Биссектриса делит угол пополам.'],[30,'Взяли треть','Биссектриса делит угол на две равные части.']],'Прямой угол 90°, биссектриса делит его пополам: 90° : 2 = 45°.');
+    return GT('g7','Луч OC — биссектриса прямого угла AOB, луч OD — продолжение луча OA за точку O. Найдите ∠COD.',135,'°',
+      [[45,'Нашли ∠AOC','∠COD смежный с ∠AOC: сумма 180°.'],[90,'Взяли прямой угол','Нужен угол COD, смежный с углом AOC.']],'∠AOC = 90° : 2 = 45°. Углы AOC и COD смежные: ∠COD = 180° − 45° = 135°.');}
+  x=ri(15,75);N=pickL(3);var w=ri(0,2);
+  var rs=[{d:0,n:N[0],ext:1,n2:N[0]+'′'},{d:90,n:N[1],ext:1,n2:N[1]+'′'},{d:x,n:N[2],len:.95}],q,ans,exp,arcs=[{a:0,b:90,r:20,right:1},{a:0,b:x,r:46,l:x+'°'}];
+  if(w===0){arcs.push({a:x,b:90,r:46,l:'?'});ans=90-x;exp='Угол между лучом и прямой '+N[0]+N[0]+'′, и ей перпендикулярной: '+x+'° + ∠ = 90°. ∠ = 90° − '+x+'° = '+(90-x)+'°.';q='Найдите угол между лучом O'+N[2]+' и лучом O'+N[1]+'.'}
+  else if(w===1){arcs.push({a:x,b:180,r:46,l:'?'});ans=180-x;exp='Лучи O'+N[0]+' и O'+N[0]+'′ дополнительные, углы смежные: 180° − '+x+'° = '+(180-x)+'°.';q='Найдите угол между лучом O'+N[2]+' и лучом O'+N[0]+'′.'}
+  else{arcs.push({a:270,b:360+x,r:46,l:'?'});ans=90+x;exp='Угол между лучом O'+N[2]+' и лучом O'+N[1]+'′ состоит из прямого угла 90° и угла '+x+'°: '+(90+x)+'°.';q='Найдите угол между лучом O'+N[2]+' и лучом O'+N[1]+'′.'}
+  return GT('g7',angFig(rs,arcs,{})+'Прямые '+N[0]+N[0]+'′ и '+N[1]+N[1]+'′ перпендикулярны и пересекаются в точке O. ∠'+N[0]+'O'+N[2]+' = '+x+'°. '+q,ans,'°',
+    [[90-x,'Взяли угол до перпендикуляра','Проверьте, между какими лучами нужно найти угол.'],[180-x,'Взяли смежный угол','Проверьте, между какими лучами нужно найти угол.'],[90+x,'Прибавили к прямому углу','Проверьте, между какими лучами нужно найти угол.'],[x,'Взяли данный угол','Нужен другой угол.']],exp);
+}
+/* ================= «Построй сам»: рисование пером или мышью на клетчатом поле ================= */
+var GC={M:30,C:60,COLS:15,ROWS:10};
+function dkey(p){return p.i+','+p.j}
+function dsame(a,b){return a.i===b.i&&a.j===b.j}
+function dlen(a,b){return Math.hypot(a.i-b.i,a.j-b.j)}
+function dang(o,a,b){var ux=a.i-o.i,uy=a.j-o.j,vx=b.i-o.i,vy=b.j-o.j;return Math.acos(Math.max(-1,Math.min(1,(ux*vx+uy*vy)/(Math.hypot(ux,uy)*Math.hypot(vx,vy)))))*180/Math.PI}
+function dnear(x,y){return Math.abs(x-y)<1e-6}
+function dfmt(x){return Nn(Math.round(x*100)/100)}
+function dgraph(segs){var deg={},pts={},adj={};segs.forEach(function(s){s.forEach(function(p){var q=dkey(p);deg[q]=(deg[q]||0)+1;pts[q]=p});var a=dkey(s[0]),b=dkey(s[1]);(adj[a]=adj[a]||[]).push(b);(adj[b]=adj[b]||[]).push(a)});return {deg:deg,pts:pts,adj:adj}}
+function dpath(segs){
+  if(!segs.length)return null;var g=dgraph(segs),ks=Object.keys(g.deg),ends=ks.filter(function(k){return g.deg[k]===1});
+  if(ks.some(function(k){return g.deg[k]>2})||ends.length!==2)return null;
+  var order=[ends[0]],prev=null,cur=ends[0];
+  while(true){var nx=g.adj[cur].filter(function(k){return k!==prev})[0];if(nx===undefined)break;order.push(nx);prev=cur;cur=nx;if(order.length>segs.length+1)return null}
+  return order.length===segs.length+1?order.map(function(k){return g.pts[k]}):null;
+}
+function dcycle(segs,n){
+  if(segs.length!==n)return null;var g=dgraph(segs),ks=Object.keys(g.deg);
+  if(ks.length!==n||ks.some(function(k){return g.deg[k]!==2}))return null;
+  var order=[ks[0]],prev=null,cur=ks[0];
+  for(var i=1;i<n;i++){var nx=g.adj[cur].filter(function(k){return k!==prev})[0];if(nx===undefined||order.indexOf(nx)>=0)return null;order.push(nx);prev=cur;cur=nx}
+  return order.map(function(k){return g.pts[k]});
+}
+function DT(mod,q,pre,sol,check,steps,text,type){
+  return {mod:mod,q:q,ans:F(0),traps:[],steps:steps,draw:{pre:pre||{segs:[],pts:[]},sol:sol||[],check:check,text:text,type:type||'Неверное построение'}};
+}
+function N_(i,j){return {i:i,j:j}}
+
+function drawG1(){
+  var w=ri(2,7),h=ri(2,5);
+  return DT('g1','Постройте прямоугольник со сторонами '+w+' и '+h+' клеток (сторона клетки — 1 см). Рисуйте отрезки от узла к узлу.',null,
+    [[N_(3,3),N_(3+w,3)],[N_(3+w,3),N_(3+w,3+h)],[N_(3+w,3+h),N_(3,3+h)],[N_(3,3+h),N_(3,3)]],
+    function(segs){
+      var P=dcycle(segs,4);if(!P)return 'Нужна замкнутая фигура из четырёх отрезков, соединённых концами.';
+      var sd=[dlen(P[0],P[1]),dlen(P[1],P[2]),dlen(P[2],P[3]),dlen(P[3],P[0])];
+      for(var k=0;k<4;k++)if(Math.abs(dang(P[k],P[(k+3)%4],P[(k+1)%4])-90)>.6)return 'Все углы прямоугольника должны быть прямыми.';
+      var got=[sd[0],sd[1]].sort(),want=[w,h].sort(function(a,b){return a-b});got=[sd[0],sd[1]].sort(function(a,b){return a-b});
+      if(!dnear(got[0],want[0])||!dnear(got[1],want[1]))return 'У вашего прямоугольника стороны '+dfmt(sd[0])+' и '+dfmt(sd[1])+' клеток, а нужны '+w+' и '+h+'.';
+      return true},
+    'Нужны две пары равных сторон и четыре прямых угла: '+w+' клеток и '+h+' клеток.','прямоугольник '+w+' × '+h,'Неверное построение');
+}
+function drawG3(){
+  if(Math.random()<.55){var n=pick([2,3,4,5,6,7,8,9]);
+    return DT('g3','Постройте отрезок длиной '+n+' клеток (сторона клетки — 1 см).',null,[[N_(3,4),N_(3+n,4)]],
+      function(segs){
+        if(segs.length!==1)return 'Нужен ровно один отрезок.';
+        var L=dlen(segs[0][0],segs[0][1]);
+        return dnear(L,n)?true:'У вашего отрезка длина '+dfmt(L)+' клетки, а нужно '+n+'.'},
+      'Отрезок вдоль линии сетки: считайте клетки от одного узла до другого.','отрезок длиной '+n,'Неверная длина отрезка');}
+  var a=ri(2,5),b=ri(2,5),c=ri(2,5);
+  return DT('g3','Постройте ломаную из трёх звеньев длиной '+a+', '+b+' и '+c+' клеток (в любом порядке, звенья соединены концами).',null,
+    [[N_(2,6),N_(2+a,6)],[N_(2+a,6),N_(2+a,6-b)],[N_(2+a,6-b),N_(2+a+c,6-b)]],
+    function(segs){
+      var P=dpath(segs);if(!P||P.length!==4)return 'Нужна ломаная из трёх звеньев, соединённых концами подряд.';
+      var got=[dlen(P[0],P[1]),dlen(P[1],P[2]),dlen(P[2],P[3])].sort(function(x,y){return x-y}),want=[a,b,c].sort(function(x,y){return x-y});
+      for(var i=0;i<3;i++)if(!dnear(got[i],want[i]))return 'Длины ваших звеньев: '+got.map(dfmt).join(', ')+' клеток, а нужны '+want.join(', ')+'.';
+      return true},
+    'Длина ломаной — сумма звеньев. Звенья: '+a+', '+b+', '+c+'.','ломаная со звеньями '+a+', '+b+', '+c,'Неверное построение');
+}
+function drawG5(){
+  var deg=pick([45,90,135]),O=N_(5,6),sol=[[O,N_(10,6)],[O,deg===45?N_(8,3):deg===90?N_(5,2):N_(2,3)]];
+  return DT('g5','Постройте угол, равный '+deg+'°. Вершина и стороны идут по линиям сетки или по диагоналям клеток.',null,sol,
+    function(segs){
+      if(segs.length!==2)return 'Нужны два отрезка — две стороны угла.';
+      var s0=segs[0],s1=segs[1],O2=null,A,B;
+      s0.forEach(function(p,x){s1.forEach(function(q,y){if(dsame(p,q)){O2=p;A=s0[1-x];B=s1[1-y]}})});
+      if(!O2)return 'Стороны угла должны выходить из одной точки.';
+      var ang=dang(O2,A,B);
+      return Math.abs(ang-deg)<.6?true:'У вашего угла '+Math.round(ang)+'°, а нужно '+deg+'°.'},
+    'Диагональ клетки образует со стороной клетки угол 45°, две стороны клетки — 90°, а диагональ и продолжение стороны — 135°.','угол '+deg+'°','Неверная величина угла');
+}
+function drawG6(){
+  var O=N_(7,5),A=N_(11,5),vecs=[[3,3],[-3,3],[-2,4],[2,4],[-4,2],[3,-3],[-3,-3]],v=pick(vecs),B=N_(7+v[0],5-v[1]),vert=Math.random()<.4;
+  var pre={segs:[[O,A],[O,B]],pts:[{n:'O',p:O},{n:'A',p:A},{n:'B',p:B}]},ea=N_(7-4,5);
+  var eb=N_(7-v[0],5+v[1]);
+  var sol=[[O,ea]];if(vert)sol.push([O,eb]);
+  return DT('g6',vert?'Постройте угол, вертикальный углу AOB: продолжите оба луча, OA и OB, за точку O.':'Постройте угол, смежный с углом AOB: продолжите луч OA за точку O.',pre,sol,
+    function(segs){
+      function has(dx,dy){return segs.some(function(s){var o=null,p=null;if(dsame(s[0],O)){p=s[1]}else if(dsame(s[1],O)){p=s[0]}else return false;var wx=p.i-O.i,wy=p.j-O.j;return dnear(wx*dy-wy*dx,0)&&(wx*dx+wy*dy)>0})}
+      var a=[A.i-O.i,A.j-O.j],b=[B.i-O.i,B.j-O.j];
+      if(!has(-a[0],-a[1]))return 'Нужен луч из точки O, продолжающий луч OA в обратную сторону, на одной прямой с ним.';
+      if(vert&&!has(-b[0],-b[1]))return 'Нужно продолжить и луч OB за точку O, на одной прямой с ним.';
+      return segs.length===(vert?2:1)?true:'Лишние отрезки: нужны только '+(vert?'два продолжения':'одно продолжение')+'.'},
+    vert?'Стороны вертикального угла — продолжения сторон данного угла за вершину.':'Смежный угол имеет общую сторону OB, а другие стороны OA и её продолжение образуют прямую.',vert?'продолжения лучей OA и OB':'продолжение луча OA','Неверное построение');
+}
+function drawG7(){
+  var A=N_(6,5),b=pick([[4,0],[0,-4],[3,-3],[-3,-3],[4,-2],[2,-4]]),B=N_(6+b[0],5+b[1]),pre={segs:[[A,B]],pts:[{n:'A',p:A},{n:'B',p:B}]},Q=N_(6-b[1],5+b[0]);
+  return DT('g7','Через точку A проведите отрезок, перпендикулярный отрезку AB. Рисуйте от узла к узлу.',pre,[[A,Q]],
+    function(segs){
+      if(segs.length!==1)return 'Нужен один отрезок, выходящий из точки A.';
+      var s=segs[0],E=dsame(s[0],A)?s[1]:dsame(s[1],A)?s[0]:null;
+      if(!E)return 'Перпендикуляр должен начинаться в точке A.';
+      var ang=dang(A,B,E);
+      return Math.abs(ang-90)<.6?true:'Угол между вашим отрезком и AB равен '+Math.round(ang)+'°, а нужен прямой угол 90°.'},
+    'Перпендикуляр образует с отрезком прямой угол 90°. Если AB идёт на a клеток вправо и b вниз, то перпендикуляр идёт на b клеток влево и a клеток вниз.','перпендикуляр к AB в точке A','Не прямой угол');
+}
+var DRAWERS={g1:drawG1,g3:drawG3,g5:drawG5,g6:drawG6,g7:drawG7};
+function drawGen(id){return DRAWERS[id]?DRAWERS[id]():null}
+
+function drawHTML(t){
+  return '<div class="fig"><canvas id="board" width="960" height="660" aria-label="Клетчатое поле для построения"></canvas></div>'+
+    '<div class="row"><button class="btn sm" id="dund" type="button">Отменить отрезок</button><button class="btn sm" id="dclr" type="button">Очистить</button><span class="note">Ведите пером или мышью от узла к узлу. Тот же отрезок ещё раз убирает его.</span></div>';
+}
+function judgeDraw(t){
+  var r=st.run,res=t.draw.check(r.segs||[]);
+  return res===true?{res:'ok'}:{res:'wrong',type:t.draw.type,msg:res};
+}
+function bindDraw(t){
+  var r=st.run,cv=document.getElementById('board');if(!cv)return;
+  var cx=cv.getContext('2d'),G=GC,locked=r.phase==='fb',drag=null,hover=null;r.segs=r.segs||[];
+  function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+  function px(n){return {x:G.M+n.i*G.C,y:G.M+n.j*G.C}}
+  function snap(e){var b=cv.getBoundingClientRect(),x=(e.clientX-b.left)*cv.width/b.width,y=(e.clientY-b.top)*cv.height/b.height;
+    return {i:Math.max(0,Math.min(G.COLS,Math.round((x-G.M)/G.C))),j:Math.max(0,Math.min(G.ROWS,Math.round((y-G.M)/G.C)))}}
+  function seg(a,b,col,w,dash){var p=px(a),q=px(b);cx.strokeStyle=col;cx.lineWidth=w;cx.lineCap='round';cx.setLineDash(dash||[]);cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();cx.setLineDash([])}
+  function paint(){
+    var W=cv.width,H=cv.height,ink=css('--ink'),pen=css('--pen'),ok=css('--ok');
+    cx.fillStyle=css('--paper');cx.fillRect(0,0,W,H);cx.strokeStyle=css('--grid');cx.lineWidth=1.5;
+    for(var i=0;i<=G.COLS;i++){cx.beginPath();cx.moveTo(G.M+i*G.C,G.M);cx.lineTo(G.M+i*G.C,G.M+G.ROWS*G.C);cx.stroke()}
+    for(var j=0;j<=G.ROWS;j++){cx.beginPath();cx.moveTo(G.M,G.M+j*G.C);cx.lineTo(G.M+G.COLS*G.C,G.M+j*G.C);cx.stroke()}
+    cx.fillStyle=css('--soft')||ink;
+    for(i=0;i<=G.COLS;i++)for(j=0;j<=G.ROWS;j++){cx.beginPath();cx.arc(G.M+i*G.C,G.M+j*G.C,3,0,6.283);cx.fill()}
+    t.draw.pre.segs.forEach(function(s){seg(s[0],s[1],ink,5)});
+    cx.fillStyle=ink;cx.font='700 26px "PT Serif",Georgia,serif';cx.textAlign='center';
+    t.draw.pre.pts.forEach(function(q){var p=px(q.p);cx.beginPath();cx.arc(p.x,p.y,7,0,6.283);cx.fill();cx.fillText(q.n,p.x+(q.n==='O'?-18:16),p.y+(q.n==='O'?24:-12))});
+    var good=locked&&r.fb&&r.fb.res==='ok';
+    if(locked&&!good)t.draw.sol.forEach(function(s){seg(s[0],s[1],ok,5,[12,9])});
+    var col=good?ok:pen;
+    r.segs.forEach(function(s){seg(s[0],s[1],col,5)});
+    cx.fillStyle=col;r.segs.forEach(function(s){s.forEach(function(n){var p=px(n);cx.beginPath();cx.arc(p.x,p.y,8,0,6.283);cx.fill()})});
+    if(drag)seg(drag.a,drag.b,pen,3,[10,8]);else if(hover&&!locked){var h=px(hover);cx.strokeStyle=pen;cx.lineWidth=2;cx.beginPath();cx.arc(h.x,h.y,12,0,6.283);cx.stroke()}
+  }
+  paint();
+  var und=document.getElementById('dund'),clr=document.getElementById('dclr');
+  if(locked){if(und)und.disabled=true;if(clr)clr.disabled=true;return}
+  cv.style.touchAction='none';
+  cv.addEventListener('pointerdown',function(e){e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}drag={a:snap(e),b:snap(e)};paint()});
+  cv.addEventListener('pointermove',function(e){e.preventDefault();hover=snap(e);if(drag)drag.b=hover;paint()});
+  cv.addEventListener('pointerup',function(e){if(!drag)return;var b=snap(e),a=drag.a;drag=null;
+    if(!dsame(a,b)){var k=-1;r.segs.forEach(function(s,n){if((dsame(s[0],a)&&dsame(s[1],b))||(dsame(s[0],b)&&dsame(s[1],a)))k=n});if(k>=0)r.segs.splice(k,1);else r.segs.push([a,b]);var old=app.querySelector('.fb');if(old)old.remove()}
+    paint()});
+  cv.addEventListener('pointercancel',function(){drag=null;paint()});
+  cv.addEventListener('pointerleave',function(){hover=null;paint()});
+  und.onclick=function(){r.segs.pop();paint()};clr.onclick=function(){r.segs=[];paint()};
+}
+/* ================= Главы 2 и 3: чертежи ================= */
+/* треугольник: kind 'sc'|'iso'|'right'; sides — подписи сторон AB, BC, CA; ang — подписи углов в вершинах;
+   ticks — [[номер стороны, число штрихов]]; extra {v,t:'median'|'height'|'bis',n}; fan — число отрезков из вершины B к стороне AC; right — вершина с прямым углом */
+function triFig(o){
+  var P=o.P||{iso:[[60,150],[180,36],[300,150]],sc:[[50,150],[215,38],[315,150]],right:[[50,38],[50,150],[250,150]]}[o.kind||'sc'],N=o.names||['A','B','C'],b='',i,cx=(P[0][0]+P[1][0]+P[2][0])/3,cy=(P[0][1]+P[1][1]+P[2][1])/3;
+  function mid(p,q,t){t=t==null?.5:t;return [p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t]}
+  function tick(p,q,n){var m=mid(p,q),dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L,ux=dx/L,uy=dy/L,k;for(k=0;k<n;k++){var s=(k-(n-1)/2)*7;b+=ln(m[0]+ux*s-nx*7,m[1]+uy*s-ny*7,m[0]+ux*s+nx*7,m[1]+uy*s+ny*7,{w:2,c:'var(--pen)'})}}
+  for(i=0;i<3;i++){var p=P[i],q=P[(i+1)%3];b+=ln(p[0],p[1],q[0],q[1],{w:2.5})}
+  if(o.fan){var B=P[1],A=P[0],C=P[2];for(i=1;i<=o.fan;i++){var f=mid(A,C,i/(o.fan+1));b+=ln(B[0],B[1],f[0],f[1],{w:2.5,c:'var(--pen)'})}}
+  if(o.extra){var v=o.extra.v,pv=P[v],a=P[(v+1)%3],c=P[(v+2)%3],foot,dx=c[0]-a[0],dy=c[1]-a[1],L2=dx*dx+dy*dy;
+    if(o.extra.t==='median')foot=mid(a,c);
+    else if(o.extra.t==='height'){var tt=((pv[0]-a[0])*dx+(pv[1]-a[1])*dy)/L2;foot=mid(a,c,tt)}
+    else{var la=Math.hypot(pv[0]-a[0],pv[1]-a[1]),lc=Math.hypot(pv[0]-c[0],pv[1]-c[1]);foot=mid(a,c,la/(la+lc))}
+    b+=ln(pv[0],pv[1],foot[0],foot[1],{w:2.5,c:'var(--pen)'})+dt(foot[0],foot[1]);
+    if(o.extra.t==='median'){tick(a,foot,1);tick(foot,c,1)}
+    if(o.extra.t==='height'){var u1=[(a[0]-foot[0])/Math.hypot(a[0]-foot[0],a[1]-foot[1])*14,(a[1]-foot[1])/Math.hypot(a[0]-foot[0],a[1]-foot[1])*14],u2=[(pv[0]-foot[0])/Math.hypot(pv[0]-foot[0],pv[1]-foot[1])*14,(pv[1]-foot[1])/Math.hypot(pv[0]-foot[0],pv[1]-foot[1])*14];
+      b+='<path d="M'+r1(foot[0]+u1[0])+' '+r1(foot[1]+u1[1])+' L'+r1(foot[0]+u1[0]+u2[0])+' '+r1(foot[1]+u1[1]+u2[1])+' L'+r1(foot[0]+u2[0])+' '+r1(foot[1]+u2[1])+'" fill="none" stroke="var(--pen)" stroke-width="2"/>'}
+    b+=tx(foot[0],foot[1]+22,o.extra.n||'D',{b:1})}
+  (o.ticks||[]).forEach(function(t){tick(P[t[0]],P[(t[0]+1)%3],t[1])});
+  if(o.right!=null){var r=o.right,R0=P[r],R1=P[(r+1)%3],R2=P[(r+2)%3],d1=Math.hypot(R1[0]-R0[0],R1[1]-R0[1]),d2=Math.hypot(R2[0]-R0[0],R2[1]-R0[1]),e1=[(R1[0]-R0[0])/d1*16,(R1[1]-R0[1])/d1*16],e2=[(R2[0]-R0[0])/d2*16,(R2[1]-R0[1])/d2*16];
+    b+='<path d="M'+r1(R0[0]+e1[0])+' '+r1(R0[1]+e1[1])+' L'+r1(R0[0]+e1[0]+e2[0])+' '+r1(R0[1]+e1[1]+e2[1])+' L'+r1(R0[0]+e2[0])+' '+r1(R0[1]+e2[1])+'" fill="none" stroke="var(--pen)" stroke-width="2"/>'}
+  (o.sides||[]).forEach(function(l,i){if(l==null)return;var p=P[i],q=P[(i+1)%3],m=mid(p,q),dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L;if((m[0]-cx)*nx+(m[1]-cy)*ny<0){nx=-nx;ny=-ny}
+    b+=tx(m[0]+nx*18,m[1]+ny*18+5,l,qm(l))});
+  (o.ang||[]).forEach(function(l,i){if(l==null)return;var p=P[i],vx=cx-p[0],vy=cy-p[1],L=Math.hypot(vx,vy);b+=tx(p[0]+vx/L*34,p[1]+vy/L*34+5,l,{s:14,c:l==='?'?'var(--pen)':null,b:l==='?'})});
+  for(i=0;i<3;i++){var pp=P[i],vx2=pp[0]-cx,vy2=pp[1]-cy,vl=Math.hypot(vx2,vy2);b+=dt(pp[0],pp[1])+tx(pp[0]+vx2/vl*16,pp[1]+vy2/vl*16+5,N[i],{b:1})}
+  return sv(360,o.h||180,b,'Треугольник');
+}
+/* два отрезка, пересекающихся в общей середине O */
+function crossSegFig(){
+  var b='',A=[70,150],B=[290,30],C=[70,30],D=[290,150],O=[180,90];
+  b+=ln(A[0],A[1],B[0],B[1],{w:2.5})+ln(C[0],C[1],D[0],D[1],{w:2.5})+ln(A[0],A[1],C[0],C[1],{w:2,c:'var(--pen)'})+ln(B[0],B[1],D[0],D[1],{w:2,c:'var(--pen)'});
+  [[A,O],[O,B]].forEach(function(s){var m=[(s[0][0]+s[1][0])/2,(s[0][1]+s[1][1])/2];b+=ln(m[0]-6,m[1]-6,m[0]+6,m[1]+6,{w:2.5,c:'var(--pen)'})});
+  [[C,O],[O,D]].forEach(function(s){var m=[(s[0][0]+s[1][0])/2,(s[0][1]+s[1][1])/2];b+=ln(m[0]-6,m[1]+6,m[0]+6,m[1]-6,{w:2.5,c:'var(--pen)'})});
+  b+=dt(O[0],O[1])+tx(O[0]+4,O[1]+22,'O',{b:1})+[['A',A,-16,18],['B',B,14,-6],['C',C,-16,-6],['D',D,14,18]].map(function(x){return dt(x[1][0],x[1][1])+tx(x[1][0]+x[2],x[1][1]+x[3],x[0],{b:1})}).join('');
+  return sv(360,176,b,'Пересекающиеся отрезки');
+}
+/* точка на серединном перпендикуляре к отрезку AB */
+function bisFig(pname){
+  var b='',A=[50,130],B=[310,130],M=[180,130],P=[180,36];
+  b+=ln(A[0],A[1],B[0],B[1],{w:2.5})+ln(P[0],P[1],M[0],M[1],{w:2.5,c:'var(--pen)'})+ln(P[0],P[1],A[0],A[1],{w:2})+ln(P[0],P[1],B[0],B[1],{w:2});
+  b+='<path d="M166 130 L166 116 L180 116" fill="none" stroke="var(--pen)" stroke-width="2"/>';
+  [[A,M],[M,B]].forEach(function(s){var m=[(s[0][0]+s[1][0])/2,130];b+=ln(m[0],m[1]-7,m[0],m[1]+7,{w:2.5,c:'var(--pen)'})});
+  b+=dt(A[0],A[1])+dt(B[0],B[1])+dt(M[0],M[1])+dt(P[0],P[1])+tx(A[0]-8,A[1]+22,'A',{b:1})+tx(B[0]+8,B[1]+22,'B',{b:1})+tx(M[0]+14,M[1]+20,'M',{b:1})+tx(P[0],P[1]-12,pname||'P',{b:1});
+  return sv(360,164,b,'Серединный перпендикуляр');
+}
+/* две параллельные прямые и секущая; углы 1–8 */
+function transFig(opts){
+  opts=opts||{};var b='',y1=58,y2=130,x1=200,x2=150,lab=opts.labels||{};
+  b+=ln(30,y1,330,y1,{w:2.5})+ln(30,y2,330,y2,{w:2.5})+ln(x2-45,y2+34,x1+45,y1-34,{w:2.5,c:'var(--pen)'});
+  b+=tx(14,y1+5,'a',{b:1,a:'middle'})+tx(14,y2+5,'b',{b:1,a:'middle'})+tx(x1+52,y1-36,'c',{b:1,c:'var(--pen)'});
+  b+=opts.par?'<path d="M300 '+(y1-14)+' l10 7 l-10 7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M300 '+(y2-14)+' l10 7 l-10 7" fill="none" stroke="currentColor" stroke-width="2"/>':'';
+  var pos={1:[x1-30,y1-14],2:[x1+32,y1-14],3:[x1+30,y1+24],4:[x1-34,y1+16],5:[x2-30,y2-14],6:[x2+32,y2-14],7:[x2+30,y2+24],8:[x2-34,y2+16]};
+  for(var k=1;k<=8;k++){var p=pos[k],l=lab[k]||String(k);b+=tx(p[0],p[1]+5,l,{s:15,c:lab[k]?'var(--pen)':null,b:!!lab[k]})}
+  b+=dt(x1,y1)+dt(x2,y2);
+  return sv(360,188,b,'Две прямые и секущая');
+}
+var TRP={alt:[[3,5],[4,6]],cor:[[1,5],[2,6],[3,7],[4,8]],side:[[4,5],[3,6]]};
+function trVal(k,al){return k%2===0?al:180-al}
+
+/* ================= Глава 2. Признаки равенства треугольников ================= */
+function gG8(){
+  var t=ri(0,4),a,b,c,P,N;
+  if(t===0){do{a=ri(4,12);b=ri(4,12);c=ri(4,12)}while(a+b<=c||a+c<=b||b+c<=a);P=a+b+c;
+    return GT('g8',triFig({kind:'sc',sides:[a+' см',b+' см',c+' см']})+'Найдите периметр треугольника ABC.',P,'см',
+      [[a+b,'Пропустили одну сторону','В периметр входят все три стороны.'],[Math.max(a,b,c)*3,'Решили, что все стороны равны','Здесь стороны разные, складываем все три.']],
+      'Периметр — сумма сторон: '+a+' + '+b+' + '+c+' = '+P+' см.');}
+  if(t===1){a=ri(4,12);b=ri(4,12);c=ri(Math.abs(a-b)+1,a+b-1);var which=ri(0,2),nm=['MN','NK','MK'],on=['AB','BC','AC'],vals=[a,b,c],g=[0,1,2].filter(function(x){return x!==which});
+    return GT('g8','Треугольники ABC и MNK равны: вершины A, B, C соответствуют вершинам M, N, K. '+on[g[0]]+' = '+vals[g[0]]+' см, '+on[g[1]]+' = '+vals[g[1]]+' см, '+on[which]+' = '+vals[which]+' см. Найдите '+nm[which]+'.',vals[which],'см',
+      [[vals[g[0]],'Взяли не ту сторону','Равны соответственные стороны: M↔A, N↔B, K↔C.'],[a+b+c,'Нашли периметр','Нужна одна сторона, соответствующая '+on[which]+'.']],
+      'Равные треугольники имеют равные соответственные стороны. '+nm[which]+' соответствует '+on[which]+', поэтому '+nm[which]+' = '+vals[which]+' см.');}
+  if(t===2){var PR=pick([[2,3,4],[3,4,5],[1,2,2],[3,5,7],[2,2,3],[4,5,6]]),s=ri(2,6),Pp=(PR[0]+PR[1]+PR[2])*s,big=Math.random()<.5;
+    if(Math.max.apply(null,PR)>=PR[0]+PR[1]+PR[2]-Math.max.apply(null,PR))s=s;
+    return GT('g8','Периметр треугольника равен '+Pp+' см, его стороны относятся как '+PR.join(' : ')+'. Найдите '+(big?'наибольшую':'наименьшую')+' сторону.',(big?Math.max.apply(null,PR):Math.min.apply(null,PR))*s,'см',
+      [[(big?Math.min.apply(null,PR):Math.max.apply(null,PR))*s,'Нашли другую сторону','Проверьте, какую сторону спрашивают.'],[s,'Нашли одну часть','Сторона состоит из нескольких частей.']],
+      'Всего частей '+(PR[0]+PR[1]+PR[2])+', одна часть '+Pp+' : '+(PR[0]+PR[1]+PR[2])+' = '+s+' см. Сторона: '+(big?Math.max.apply(null,PR):Math.min.apply(null,PR))+' · '+s+' = '+((big?Math.max.apply(null,PR):Math.min.apply(null,PR))*s)+' см.');}
+  if(t===3){var n=ri(1,4);
+    return GT('g8',triFig({kind:'sc',fan:n})+'На рисунке из вершины B проведено '+n+' '+(n===1?'отрезок':n<5?'отрезка':'отрезков')+' к стороне AC. Сколько всего треугольников на рисунке?',(n+2)*(n+1)/2,'',
+      [[n+1,'Посчитали только маленькие треугольники','Есть и треугольники, составленные из нескольких соседних.'],[(n+1)*(n+2),'Посчитали каждую пару дважды','Основание треугольника определяется двумя точками на AC; пары не упорядочены.']],
+      'Основание треугольника — отрезок между двумя из '+(n+2)+' точек на AC: '+(n+2)+' · '+(n+1)+' : 2 = '+((n+2)*(n+1)/2)+'.');}
+  a=pick([30,40,50,60,70,80,100,110]);
+  return GT('g8','Треугольники ABC и MNK равны (A↔M, B↔N, C↔K). ∠B = '+a+'°. Найдите ∠N.',a,'°',
+    [[180-a,'Взяли смежный угол','Равные треугольники имеют равные соответственные углы.'],[a/2,'Разделили пополам','Соответственные углы равны, а не вдвое меньше.']],
+    '∠N соответствует ∠B, поэтому ∠N = '+a+'°.');
+}
+function gG9(){
+  var t=ri(0,3),a,b,c,x;
+  if(t===0){a=ri(3,12);b=ri(3,12);c=ri(3,12);var sub=ri(0,1);
+    if(sub===0)return GT('g9',crossSegFig()+'Отрезки AB и CD пересекаются в точке O, которая является серединой каждого из них. AC = '+a+' см. Найдите BD.',a,'см',
+      [[2*a,'Удвоили','Треугольники AOC и BOD равны по двум сторонам и углу между ними, поэтому AC = BD.'],[a/2,'Разделили пополам','AC и BD — соответственные стороны равных треугольников.']],
+      'AO = OB, CO = OD, ∠AOC = ∠BOD (вертикальные), значит △AOC = △BOD по двум сторонам и углу между ними. Тогда BD = AC = '+a+' см.');
+    return GT('g9',crossSegFig()+'Отрезки AB и CD пересекаются в точке O, которая является серединой каждого. AO = '+a+' см, CO = '+b+' см, AC = '+c+' см. Найдите периметр треугольника BOD.',a+b+c,'см',
+      [[a+b,'Не учли третью сторону','В периметр BOD входят OB, OD и BD.'],[2*(a+b+c),'Удвоили','Нужен периметр одного треугольника.']],
+      'OB = AO = '+a+', OD = CO = '+b+', BD = AC = '+c+'. Периметр: '+a+' + '+b+' + '+c+' = '+(a+b+c)+' см.');}
+  if(t===1){a=ri(4,12);b=ri(4,12);c=ri(Math.abs(a-b)+1,a+b-1);
+    return GT('g9','В треугольниках ABC и MNK: AB = MN = '+a+' см, AC = MK = '+b+' см, ∠A = ∠M. BC = '+c+' см. Найдите периметр треугольника MNK.',a+b+c,'см',
+      [[a+b,'Не нашли третью сторону','Треугольники равны по первому признаку, поэтому NK = BC.'],[a+b+2*c,'Лишнее слагаемое','В периметр входят три стороны: MN, MK, NK.']],
+      'Треугольники равны по двум сторонам и углу между ними. Тогда NK = BC = '+c+' см. Периметр MNK: '+a+' + '+b+' + '+c+' = '+(a+b+c)+' см.');}
+  if(t===2){a=ri(6,14);b=ri(4,10);c=ri(4,10);
+    return GT('g9','В треугольниках ABC и MNK: AB = MN = '+a+' см, ∠A = ∠M, ∠B = ∠N. AC = '+b+' см, BC = '+c+' см. Найдите периметр треугольника MNK.',a+b+c,'см',
+      [[a+b,'Не нашли третью сторону','По второму признаку (сторона и два прилежащих угла) треугольники равны.']],
+      'Равны сторона AB = MN и два прилежащих к ней угла, значит △ABC = △MNK по второму признаку. MK = AC = '+b+', NK = BC = '+c+'. Периметр: '+a+' + '+b+' + '+c+' = '+(a+b+c)+' см.');}
+  x=pick([30,40,50,60,70,110,120]);
+  return GT('g9','В треугольниках ABC и MNK: AB = MN, AC = MK, ∠A = ∠M. ∠B = '+x+'°. Чему равен ∠N?',x,'°',
+    [[180-x,'Взяли смежный угол','∠N соответствует ∠B: треугольники равны по первому признаку.'],[x/2,'Разделили пополам','Соответственные углы равных треугольников равны.']],
+    'Треугольники равны по двум сторонам и углу между ними (AB = MN, AC = MK, ∠A = ∠M). Соответственные углы равны: ∠N = ∠B = '+x+'°.');
+}
+function gG10(){
+  var t=ri(0,4),a,b,c,x;
+  if(t===0){a=ri(5,12);b=ri(5,12);c=2*ri(3,8);x=ri(3,10);
+    return GT('g10',triFig({kind:'sc',extra:{v:1,t:'median',n:'M'},sides:[a+' см',null,null],ang:[null,null,null]})+'BM — медиана треугольника ABC. AB = '+a+' см, BM = '+x+' см, AC = '+c+' см. Найдите периметр треугольника ABM.',a+x+c/2,'см',
+      [[a+x+c,'Взяли всю сторону AC','Медиана делит AC пополам: AM = '+(c/2)+' см.'],[a+x,'Не учли сторону AM','В периметр ABM входят AB, BM и AM.']],
+      'Медиана делит сторону пополам: AM = '+c+' : 2 = '+(c/2)+'. Периметр ABM: '+a+' + '+x+' + '+(c/2)+' = '+(a+x+c/2)+' см.');}
+  if(t===1){x=ri(10,85);
+    return GT('g10',triFig({kind:'sc',extra:{v:1,t:'bis',n:'D'}})+'BD — биссектриса угла B треугольника ABC, ∠ABC = '+(2*x)+'°. Найдите ∠ABD.',x,'°',
+      [[2*x,'Не разделили пополам','Биссектриса делит угол на два равных.'],[180-x,'Взяли смежный угол','Нужна половина угла B.']],
+      'Биссектриса делит угол пополам: ∠ABD = '+(2*x)+'° : 2 = '+x+'°.');}
+  if(t===2)return GT('g10','Сколько всего медиан, биссектрис и высот можно провести в треугольнике (по одной из каждой вершины)?',9,'',
+    [[3,'Посчитали только один вид','Из каждой вершины можно провести медиану, биссектрису и высоту.'],[6,'Посчитали два вида','Видов три: медианы, биссектрисы, высоты.']],'Вершин три, и из каждой проводятся три отрезка: 3 · 3 = 9.');
+  if(t===3){x=2*ri(3,15);
+    return GT('g10',triFig({kind:'sc',extra:{v:1,t:'median',n:'M'}})+'BM — медиана треугольника ABC, AM = '+x/2+' см. Найдите AC.',x,'см',
+      [[x/4,'Разделили вместо удвоения','Медиана делит AC на две равные части, AC вдвое длиннее AM.'],[x/2,'Взяли AM','Нужна вся сторона AC.']],
+      'M — середина AC, значит AC = 2 · AM = 2 · '+x/2+' = '+x+' см.');}
+  x=pick([20,30,40,50,60,70]);
+  return GT('g10',triFig({kind:'sc',extra:{v:1,t:'height',n:'H'}})+'BH — высота треугольника ABC. Найдите ∠BHC.',90,'°',
+    [[180,'Взяли развёрнутый угол','Высота перпендикулярна стороне, угол между ними 90°.'],[x,'Взяли случайный угол','Высота образует со стороной прямой угол.']],
+    'Высота — перпендикуляр к стороне AC, поэтому ∠BHC = 90°.');
+}
+function gG11(){
+  var t=ri(0,4),a,b,P,x;
+  if(t===0){a=ri(4,12);do{b=ri(2,2*a-1)}while(b===a);P=2*a+b;
+    return GT('g11',triFig({kind:'iso',ticks:[[0,1],[1,1]],sides:[a+' см',a+' см',null]})+'В равнобедренном треугольнике ABC боковые стороны AB = BC = '+a+' см, периметр равен '+P+' см. Найдите основание AC.',b,'см',
+      [[P-a,'Вычли одну боковую сторону','Боковых сторон две, вычитаем обе.'],[(P-a)/2,'Разделили не то','Основание — это P минус две боковые стороны.']],
+      'AC = P − AB − BC = '+P+' − '+a+' − '+a+' = '+b+' см.');}
+  if(t===1){b=ri(2,10);a=ri(Math.floor(b/2)+2,14);P=2*a+b;
+    return GT('g11',triFig({kind:'iso',ticks:[[0,1],[1,1]],sides:[null,null,b+' см']})+'В равнобедренном треугольнике ABC основание AC = '+b+' см, периметр равен '+P+' см. Найдите боковую сторону AB.',a,'см',
+      [[P-b,'Не разделили на 2','Боковых сторон две и они равны: делим '+(P-b)+' пополам.'],[P/3,'Решили, что все стороны равны','Здесь основание отличается от боковых сторон.']],
+      'Боковые стороны равны: AB = (P − AC) : 2 = ('+P+' − '+b+') : 2 = '+a+' см.');}
+  if(t===2){x=ri(30,80);
+    return GT('g11',triFig({kind:'iso',ang:[x+'°',null,'?'],ticks:[[0,1],[1,1]]})+'В равнобедренном треугольнике ABC с основанием AC угол A равен '+x+'°. Найдите ∠C.',x,'°',
+      [[180-x,'Взяли смежный угол','Углы при основании равнобедренного треугольника равны.'],[90-x/2,'Решили иначе','Достаточно вспомнить свойство углов при основании.']],
+      'Углы при основании равны: ∠C = ∠A = '+x+'°.');}
+  if(t===3){b=2*ri(3,10);
+    return GT('g11',triFig({kind:'iso',extra:{v:1,t:'bis',n:'D'},ticks:[[0,1],[1,1]],sides:[null,null,b+' см']})+'BD — биссектриса равнобедренного треугольника ABC, проведённая к основанию AC = '+b+' см. Найдите AD.',b/2,'см',
+      [[b,'Взяли всё основание','Биссектриса, проведённая к основанию, является и медианой.'],[b*2,'Удвоили','AD — половина основания.']],
+      'В равнобедренном треугольнике биссектриса к основанию является медианой: AD = '+b+' : 2 = '+(b/2)+' см.');}
+  a=ri(3,15);
+  if(Math.random()<.5)return GT('g11','Сторона равностороннего треугольника равна '+a+' см. Найдите его периметр.',3*a,'см',
+    [[2*a,'Взяли две стороны','У равностороннего треугольника три равные стороны.'],[a*a,'Нашли квадрат','Периметр — сумма сторон.']],
+    'Все три стороны равны: 3 · '+a+' = '+(3*a)+' см.');
+  return GT('g11','Периметр равностороннего треугольника равен '+(3*a)+' см. Найдите его сторону.',a,'см',
+    [[3*a/2,'Разделили на 2','У равностороннего треугольника три равные стороны.']],
+    'Стороны равны: '+(3*a)+' : 3 = '+a+' см.');
+}
+function gG12(){
+  var t=ri(0,3),a,b,P;
+  if(t===0){a=ri(4,12);do{b=ri(2,2*a-1)}while(b===a);P=2*a+b;
+    return GT('g12',triFig({kind:'iso',ang:['α',null,'α']})+'В треугольнике ABC ∠A = ∠C, AB = '+a+' см, периметр равен '+P+' см. Найдите AC.',b,'см',
+      [[P-a,'Решили, что AC лежит против…','Равные углы A и C лежат против сторон BC и AB, поэтому BC = AB.'],[P-2*a+a,'Не нашли BC','Сначала найдите BC = AB.']],
+      'Против равных углов лежат равные стороны: BC = AB = '+a+' см. AC = '+P+' − '+a+' − '+a+' = '+b+' см.');}
+  if(t===1){a=ri(4,12);b=2*ri(2,8);
+    return GT('g12',triFig({kind:'iso',extra:{v:1,t:'height',n:'D'}})+'В треугольнике ABC медиана BD является высотой. AB = '+a+' см, AC = '+b+' см. Найдите периметр треугольника ABC.',2*a+b,'см',
+      [[a+b,'Не нашли BC','Медиана BD является высотой, поэтому треугольник равнобедренный: BC = AB.'],[a+b/2,'Взяли половину','Нужна вся сторона AC.']],
+      'Если медиана является высотой, то треугольник равнобедренный: BC = AB = '+a+'. Периметр: '+a+' + '+a+' + '+b+' = '+(2*a+b)+' см.');}
+  if(t===2){a=ri(4,12);b=ri(3,12);
+    return GT('g12','В треугольнике ABC биссектриса BD является высотой, AB = '+a+' см, AD = '+b+' см. Найдите AC.',2*b,'см',
+      [[b,'Взяли половину','Если биссектриса является высотой, треугольник равнобедренный и BD — медиана.'],[a+b,'Сложили стороны','D — середина AC.']],
+      'Биссектриса — высота, значит △ABC равнобедренный, BD — ещё и медиана. AC = 2 · AD = 2 · '+b+' = '+(2*b)+' см.');}
+  a=ri(4,12);b=ri(3,10);
+  return GT('g12','В треугольнике ABC ∠B = ∠C, AB = '+a+' см, BC = '+b+' см. Найдите периметр треугольника.',2*a+b,'см',
+    [[a+2*b,'Перепутали равные стороны','Равны стороны, лежащие против равных углов B и C, то есть AC = AB.'],[a+b,'Не нашли третью сторону','Нужна и сторона AC.']],
+    'Равные углы B и C лежат против сторон AC и AB, значит AC = AB = '+a+'. Периметр: '+a+' + '+b+' + '+a+' = '+(2*a+b)+' см.');
+}
+function gG13(){
+  var t=ri(0,2),a,b,x;
+  if(t===0){a=pick([30,35,40,45,50,55,60,65,70]);
+    return GT('g13','В четырёхугольнике ABCD сторона AB равна CD, а BC равна AD, AC — диагональ. ∠BAC = '+a+'°. Найдите ∠DCA.',a,'°',
+      [[180-a,'Взяли смежный угол','Треугольники ABC и CDA равны по трём сторонам: AB = CD, BC = DA, AC — общая.'],[a/2,'Разделили пополам','Соответственные углы равных треугольников равны.']],
+      'Треугольники ABC и CDA равны по трём сторонам (AB = CD, BC = DA, AC — общая). ∠BAC соответствует ∠DCA, значит ∠DCA = '+a+'°.');}
+  if(t===1){a=ri(4,12);b=ri(4,12);var c=ri(Math.abs(a-b)+1,a+b-1);
+    return GT('g13','Стороны треугольника ABC равны '+a+' см, '+b+' см и '+c+' см. Стороны треугольника MNK равны '+c+' см, '+a+' см и '+b+' см. Найдите периметр треугольника MNK.',a+b+c,'см',
+      [[a+b,'Взяли две стороны','Периметр — сумма всех трёх сторон.']],
+      'Треугольники равны по трём сторонам. Периметр: '+a+' + '+b+' + '+c+' = '+(a+b+c)+' см.');}
+  a=ri(5,14);b=ri(4,10);x=ri(3,9);
+  return GT('g13','В четырёхугольнике ABCD стороны AB = CD = '+a+' см и BC = AD = '+b+' см, диагональ AC = '+x+' см. Найдите периметр четырёхугольника.',2*(a+b),'см',
+    [[a+b,'Взяли две стороны','Периметр — сумма четырёх сторон.'],[2*(a+b)+x,'Прибавили диагональ','Диагональ в периметр не входит.']],
+    'Периметр — сумма четырёх сторон: '+a+' + '+b+' + '+a+' + '+b+' = '+(2*(a+b))+' см. Диагональ в периметр не входит.');
+}
+function gG14(){
+  var t=ri(0,3),a,b,x;
+  if(t===0){a=ri(4,15);
+    return GT('g14',bisFig('P')+'Точка P лежит на серединном перпендикуляре к отрезку AB, PA = '+a+' см. Найдите PB.',a,'см',
+      [[2*a,'Удвоили','Точка серединного перпендикуляра равноудалена от концов отрезка.'],[a/2,'Разделили пополам','PA и PB равны.']],
+      'Любая точка серединного перпендикуляра равноудалена от концов отрезка: PB = PA = '+a+' см.');}
+  if(t===1){a=ri(5,14);b=2*ri(2,9);x=ri(3,12);
+    return GT('g14',bisFig('P')+'Точка P лежит на серединном перпендикуляре к отрезку AB, AB = '+b+' см, PA = '+a+' см. Найдите периметр треугольника APB.',2*a+b,'см',
+      [[a+b,'Не учли PB','PB = PA.'],[a+b/2,'Взяли половину AB','В периметр входит вся сторона AB.']],
+      'PB = PA = '+a+'. Периметр: '+a+' + '+a+' + '+b+' = '+(2*a+b)+' см.');}
+  if(t===2){b=2*ri(3,15);
+    return GT('g14','Серединный перпендикуляр к отрезку AB, равному '+b+' см, пересекает его в точке M. Найдите AM.',b/2,'см',
+      [[b,'Взяли весь отрезок','M — середина отрезка AB.'],[b*2,'Удвоили','AM — половина AB.']],
+      'Серединный перпендикуляр проходит через середину: AM = '+b+' : 2 = '+(b/2)+' см.');}
+  a=ri(4,12);b=ri(3,10);
+  return GT('g14','O — точка пересечения серединных перпендикуляров к сторонам треугольника ABC (центр описанной окружности). OA = '+a+' см, AB = '+b+' см. Найдите периметр треугольника AOB.',2*a+b,'см',
+    [[a+b,'Не учли OB','O равноудалена от вершин: OB = OA.'],[3*a,'Решили, что AB = OA','AB дано отдельно.']],
+    'O равноудалена от вершин: OB = OA = '+a+'. Периметр: '+a+' + '+a+' + '+b+' = '+(2*a+b)+' см.');
+}
+
+/* ================= Глава 3. Параллельность прямых ================= */
+function lin(m,c){return (m===1?'':m)+'x'+(c?' + '+c:'')}
+function gG15(){
+  var t=ri(0,2),x,al;
+  var kinds=[['alt','накрест лежащие'],['cor','соответственные'],['side','односторонние']];
+  if(t<2){
+    var kd=t===0?pick([kinds[0],kinds[1]]):kinds[2],pr=pick(TRP[kd[0]]),m1=ri(1,3),m2=ri(1,3);x=ri(10,40);var v=0;
+    if(kd[0]!=='side'){v=m1*x+ri(0,20);var c1=v-m1*x,c2;var tries=0;do{m2=ri(1,3)}while((m2===m1||v-m2*x<0)&&++tries<30);if(m2===m1||v-m2*x<0)return gG15();c2=v-m2*x;if(v>170||v<20)return gG15();
+      return GT('g15',transFig({labels:{}})+'Углы '+pr[0]+' и '+pr[1]+' — '+kd[1]+'. ∠'+pr[0]+' = ('+lin(m1,c1)+')°, ∠'+pr[1]+' = ('+lin(m2,c2)+')°. При каком x прямые a и b параллельны?',x,'',
+        [[(v)/1,'Нашли угол, а не x','Приравняйте выражения и найдите x.'],[x+10,'Ошиблись в решении','Решите уравнение '+lin(m1,c1)+' = '+lin(m2,c2)+'.']],
+        kd[1].charAt(0).toUpperCase()+kd[1].slice(1)+' углы равны при параллельных прямых: '+lin(m1,c1)+' = '+lin(m2,c2)+'. Отсюда x = '+x+'.');}
+    var s1=m1*x+ri(0,15);if(s1>150||s1<20)return gG15();var s2=180-s1,c2b,m2b;var tr2=0;do{m2b=ri(1,3)}while((s2-m2b*x<0||m2b===m1)&&++tr2<30);if(s2-m2b*x<0||m2b===m1)return gG15();c2b=s2-m2b*x;
+    if(s2<20||s2>160)return gG15();
+    return GT('g15',transFig({})+'Углы '+pr[0]+' и '+pr[1]+' — односторонние. ∠'+pr[0]+' = ('+lin(m1,s1-m1*x)+')°, ∠'+pr[1]+' = ('+lin(m2b,c2b)+')°. При каком x прямые a и b параллельны?',x,'',
+      [[s1,'Нашли угол','Сумма односторонних углов должна быть 180°: решите уравнение.']],
+      'Прямые параллельны, если сумма односторонних углов равна 180°: ('+lin(m1,s1-m1*x)+') + ('+lin(m2b,c2b)+') = 180. Отсюда x = '+x+'.');}
+  al=pick([40,50,60,70,80]);var pr2=pick(TRP.cor.concat(TRP.alt));
+  return GT('g15',transFig({labels:{}})+'Секущая c пересекает прямые a и b. ∠'+pr2[0]+' = '+trVal(pr2[0],al)+'°, ∠'+pr2[1]+' = '+(trVal(pr2[1],al)+(Math.random()<.5?0:0))+'°. Чему равна сумма этих двух углов, если a ∥ b?',trVal(pr2[0],al)+trVal(pr2[1],al),'°',
+    [[180,'Решили, что сумма всегда 180°','Для накрест лежащих и соответственных углов сумма равна удвоенному углу.']],
+    'При a ∥ b оба угла равны '+trVal(pr2[0],al)+'°. Сумма: '+(trVal(pr2[0],al)+trVal(pr2[1],al))+'°.');
+}
+function gG16(){
+  var t=ri(0,3),n;
+  if(t===0)return GT('g16','Сколько прямых, параллельных данной прямой, можно провести через точку, не лежащую на ней?',1,'',
+    [[2,'Решили, что их две','По аксиоме параллельных такая прямая единственная.'],[0,'Решили, что их нет','Параллельная прямая существует и единственна.']],'По аксиоме параллельных через точку вне прямой проходит одна и только одна прямая, параллельная данной.');
+  if(t===1){n=ri(4,8);
+    return GT('g16','Прямые a₁, a₂, …, a'+n+' параллельны одной и той же прямой b. Сколько пар параллельных прямых среди a₁, …, a'+n+'?',n*(n-1)/2,'',
+      [[n,'Посчитали прямые','Нужно считать пары прямых.'],[n*(n-1),'Посчитали пары дважды','Пара a₁ и a₂ — то же, что a₂ и a₁.']],
+      'Две прямые, параллельные третьей, параллельны между собой. Пар: '+n+' · '+(n-1)+' : 2 = '+(n*(n-1)/2)+'.');}
+  if(t===2){var al=pick([20,35,50,65,80]);
+    return GT('g16','Прямые a и b параллельны, прямая c перпендикулярна a. Найдите угол между прямыми c и b.',90,'°',
+      [[al,'Взяли случайный угол','Прямая, перпендикулярная одной из параллельных, перпендикулярна и другой.'],[180,'Взяли развёрнутый угол','Угол между перпендикулярными прямыми равен 90°.']],
+      'Прямая, перпендикулярная одной из двух параллельных прямых, перпендикулярна и другой: угол 90°.');}
+  n=ri(3,7);
+  return GT('g16','Сколько прямых, не пересекающих данную прямую a, можно провести через точку вне её на одной плоскости?',1,'',
+    [[n,'Решили, что их много','Прямая, не пересекающая a, — это параллельная прямая, она единственна.']],'Прямые на плоскости, не пересекающие данную, параллельны ей. Через точку вне прямой такая прямая только одна.');
+}
+function gG17(){
+  var t=ri(0,3),al=pick([35,40,50,55,65,70,75,80]),pr,pr2;
+  if(t===0){var gp=pick(TRP.cor.concat(TRP.alt));
+    return GT('g17',transFig({par:1})+'Прямые a и b параллельны. ∠'+gp[0]+' = '+trVal(gp[0],al)+'°. Найдите ∠'+gp[1]+'.',trVal(gp[1],al),'°',
+      [[180-trVal(gp[1],al),'Взяли смежный угол','При параллельных прямых соответственные и накрест лежащие углы равны.']],
+      'Углы '+gp[0]+' и '+gp[1]+' — '+(TRP.cor.some(function(q){return q[0]===gp[0]&&q[1]===gp[1]})?'соответственные':'накрест лежащие')+', при a ∥ b они равны: '+trVal(gp[1],al)+'°.');}
+  if(t===1){var gs=pick(TRP.side);
+    return GT('g17',transFig({par:1})+'Прямые a и b параллельны. ∠'+gs[0]+' = '+trVal(gs[0],al)+'°. Найдите ∠'+gs[1]+'.',180-trVal(gs[0],al),'°',
+      [[trVal(gs[0],al),'Решили, что углы равны','Односторонние углы при параллельных прямых в сумме дают 180°.']],
+      'Углы '+gs[0]+' и '+gs[1]+' — односторонние, при a ∥ b их сумма 180°: '+(180-trVal(gs[0],al))+'°.');}
+  if(t===2){var PR=pick([[2,3],[1,4],[1,2],[4,5],[2,7],[1,5]]),s=180/(PR[0]+PR[1]),bg=Math.random()<.5;
+    return GT('g17','Прямые a и b параллельны. Два односторонних угла относятся как '+PR[0]+' : '+PR[1]+'. Найдите '+(bg?'больший':'меньший')+' из них.',(bg?PR[1]:PR[0])*s,'°',
+      [[(bg?PR[0]:PR[1])*s,'Нашли другой угол','Проверьте, какой угол спрашивают.'],[s,'Нашли одну часть','Угол состоит из нескольких частей.']],
+      'Сумма односторонних углов 180°, частей '+(PR[0]+PR[1])+', одна часть '+s+'°. Нужный угол: '+(bg?PR[1]:PR[0])+' · '+s+' = '+((bg?PR[1]:PR[0])*s)+'°.');}
+  return GT('g17',transFig({par:1})+'Прямые a и b параллельны. ∠2 = '+al+'°. Найдите сумму ∠4 и ∠6.',2*al,'°',
+    [[180,'Решили, что сумма 180°','∠4 = ∠2 (вертикальные), ∠6 = ∠2 (соответственные): оба равны '+al+'°.']],
+    '∠4 = ∠2 = '+al+'° как вертикальные, ∠6 = ∠2 = '+al+'° как соответственные. Сумма: '+(2*al)+'°.');
+}
+function gG18(){
+  var t=ri(0,3),al=pick([30,40,50,55,65,70,75]);
+  if(t===0)return GT('g18','Стороны угла β соответственно параллельны сторонам острого угла α = '+al+'°, и угол β острый. Найдите β.',al,'°',
+    [[180-al,'Взяли смежный угол','Если оба угла острые, то углы с параллельными сторонами равны.']],'Углы со сторонами, соответственно параллельными, равны, если оба острые (или оба тупые): β = '+al+'°.');
+  if(t===1)return GT('g18','Стороны угла β соответственно параллельны сторонам острого угла α = '+al+'°, и угол β тупой. Найдите β.',180-al,'°',
+    [[al,'Решили, что углы равны','Один угол острый, другой тупой: они в сумме дают 180°.']],'Если один угол острый, а другой тупой, то у углов со сторонами, соответственно параллельными, сумма равна 180°: β = 180° − '+al+'° = '+(180-al)+'°.');
+  if(t===2)return GT('g18','Стороны угла β соответственно перпендикулярны сторонам острого угла α = '+al+'°, и угол β острый. Найдите β.',al,'°',
+    [[90-al,'Дополнили до 90°','Углы со сторонами, соответственно перпендикулярными, равны, если оба острые.'],[180-al,'Взяли смежный угол','Оба угла острые, поэтому они равны.']],'Углы со взаимно перпендикулярными сторонами равны, если оба острые: β = '+al+'°.');
+  return GT('g18','Стороны угла β соответственно перпендикулярны сторонам острого угла α = '+al+'°, и угол β тупой. Найдите β.',180-al,'°',
+    [[al,'Решили, что углы равны','Острый и тупой углы со взаимно перпендикулярными сторонами дают в сумме 180°.']],'Острый и тупой угол со взаимно перпендикулярными сторонами в сумме дают 180°: β = '+(180-al)+'°.');
+}
+
+/* ================= Теория для тренажёра ================= */
+THEORY.g8={q:'Отметьте все верные утверждения.',steps:'Треугольник имеет три вершины, три стороны и три угла. Равные треугольники имеют равные соответственные стороны и углы.',
+ T:['Треугольник имеет три вершины, три стороны и три угла.','Периметр треугольника — сумма длин трёх его сторон.','В равных треугольниках соответственные стороны равны.','В равных треугольниках соответственные углы равны.','Равные треугольники можно совместить наложением.','Против равных сторон равных треугольников лежат равные углы.'],
+ F:[['Периметр треугольника равен произведению его сторон.','Путают периметр'],['Равные треугольники всегда имеют разные стороны.','Путают равенство'],['У треугольника четыре угла.','Путают элементы'],['Если у двух треугольников равны периметры, то они равны.','Путают равенство и равенство периметров'],['В равных треугольниках все стороны равны между собой.','Путают равенство треугольников и равносторонний'],['Равные треугольники обязательно расположены одинаково.','Путают равенство']]};
+THEORY.g9={q:'Отметьте все верные утверждения.',steps:'Первый признак: две стороны и угол между ними. Второй признак: сторона и два прилежащих угла.',
+ T:['Если две стороны и угол между ними одного треугольника равны двум сторонам и углу между ними другого, то треугольники равны.','Если сторона и два прилежащих к ней угла одного треугольника равны стороне и двум прилежащим к ней углам другого, то треугольники равны.','Из равенства треугольников следует равенство соответственных сторон.','Первый признак использует две стороны и угол между ними.','Второй признак использует сторону и два прилежащих угла.'],
+ F:[['Треугольники равны, если равны две стороны и угол, не лежащий между ними.','Путают признак'],['Треугольники равны, если равны три угла.','Путают признаки'],['Треугольники равны, если равны только две стороны.','Неполный признак'],['Второй признак использует две стороны и угол.','Путают признаки'],['Если у двух треугольников равны по два угла, то равны и все стороны.','Путают признаки']]};
+THEORY.g10={q:'Отметьте все верные утверждения.',steps:'Высота — перпендикуляр к прямой с вершиной. Медиана соединяет вершину с серединой противоположной стороны. Биссектриса делит угол пополам.',
+ T:['Медиана треугольника соединяет вершину с серединой противоположной стороны.','Биссектриса треугольника делит угол пополам.','Высота треугольника перпендикулярна прямой, содержащей противоположную сторону.','В треугольнике три медианы, три биссектрисы и три высоты.','Медиана делит противолежащую сторону на два равных отрезка.'],
+ F:[['Высота всегда делит сторону пополам.','Путают высоту и медиану'],['Биссектриса всегда перпендикулярна стороне.','Путают биссектрису и высоту'],['Медиана всегда перпендикулярна стороне.','Путают медиану и высоту'],['В треугольнике ровно одна медиана.','Не знают количество'],['Высота всегда лежит внутри треугольника.','Не учитывают тупой угол']]};
+THEORY.g11={q:'Отметьте все верные утверждения.',steps:'У равнобедренного треугольника две стороны равны, углы при основании равны. Медиана, проведённая к основанию, является биссектрисой и высотой.',
+ T:['У равнобедренного треугольника две боковые стороны равны.','Углы при основании равнобедренного треугольника равны.','Биссектриса, проведённая к основанию, является медианой и высотой.','У равностороннего треугольника все стороны равны.','Равносторонний треугольник является равнобедренным.'],
+ F:[['У равнобедренного треугольника все стороны разные.','Путают определение'],['Углы при вершине равнобедренного треугольника равны углам при основании всегда.','Путают углы'],['Равнобедренный треугольник всегда равносторонний.','Путают виды'],['Медиана к основанию не совпадает с высотой.','Не знают свойства'],['У равнобедренного треугольника ровно один угол при основании.','Путают элементы']]};
+THEORY.g12={q:'Отметьте все верные утверждения.',steps:'Если два угла треугольника равны, он равнобедренный. Если высота является биссектрисой или медианой, то треугольник равнобедренный.',
+ T:['Если два угла треугольника равны, то он равнобедренный.','Если в треугольнике высота является медианой, то он равнобедренный.','Если в треугольнике биссектриса является высотой, то он равнобедренный.','Против равных углов треугольника лежат равные стороны.','Если медиана треугольника является биссектрисой, то он равнобедренный.'],
+ F:[['Если высота треугольника проходит внутри, то он равнобедренный.','Не знают признак'],['Если две стороны треугольника различны, то он равнобедренный.','Путают признак'],['Против равных углов лежат разные стороны.','Путают признак'],['Любой треугольник с высотой — равнобедренный.','Не знают признак'],['Если один угол прямой, то треугольник равнобедренный.','Путают признак']]};
+THEORY.g13={q:'Отметьте все верные утверждения.',steps:'Третий признак: три стороны. Если три стороны одного треугольника равны трём сторонам другого, то треугольники равны.',
+ T:['Если три стороны одного треугольника равны трём сторонам другого, то треугольники равны.','Треугольник жёсткая фигура: его форма определяется длинами сторон.','Из равенства трёх сторон следует равенство соответственных углов.','Третий признак использует три стороны.'],
+ F:[['Если три угла одного треугольника равны трём углам другого, то треугольники равны.','Путают признаки'],['Для равенства по третьему признаку достаточно двух сторон.','Неполный признак'],['Для равенства треугольников нужны только равные периметры.','Путают периметр'],['Треугольник с данными тремя сторонами можно составить всегда.','Не знают неравенство треугольника']]};
+THEORY.g14={q:'Отметьте все верные утверждения.',steps:'Серединный перпендикуляр проходит через середину отрезка перпендикулярно ему. Все его точки равноудалены от концов отрезка.',
+ T:['Серединный перпендикуляр проходит через середину отрезка.','Серединный перпендикуляр перпендикулярен отрезку.','Каждая точка серединного перпендикуляра равноудалена от концов отрезка.','Если точка равноудалена от концов отрезка, она лежит на его серединном перпендикуляре.','Серединные перпендикуляры к сторонам треугольника пересекаются в одной точке.'],
+ F:[['Серединный перпендикуляр проходит через один из концов отрезка.','Путают понятие'],['Точки серединного перпендикуляра ближе к одному концу отрезка.','Не знают свойство'],['Серединный перпендикуляр параллелен отрезку.','Путают понятие'],['У отрезка бесконечно много серединных перпендикуляров.','Не знают единственности']]};
+THEORY.g15={q:'Отметьте все верные утверждения.',steps:'Прямые параллельны, если накрест лежащие углы равны, или соответственные углы равны, или сумма односторонних углов равна 180°.',
+ T:['Если накрест лежащие углы равны, то прямые параллельны.','Если соответственные углы равны, то прямые параллельны.','Если сумма односторонних углов равна 180°, то прямые параллельны.','Параллельные прямые не имеют общих точек.','Две прямые, перпендикулярные третьей, параллельны.'],
+ F:[['Если односторонние углы равны, то прямые всегда параллельны.','Путают признак'],['Если накрест лежащие углы в сумме дают 180°, то прямые параллельны.','Путают признак'],['Параллельные прямые пересекаются в одной точке.','Путают понятие'],['Если соответственные углы в сумме дают 90°, то прямые параллельны.','Путают признак']]};
+THEORY.g16={q:'Отметьте все верные утверждения.',steps:'Через точку, не лежащую на прямой, проходит единственная параллельная ей прямая. Две прямые, параллельные третьей, параллельны между собой.',
+ T:['Через точку вне прямой проходит единственная прямая, параллельная данной.','Две прямые, параллельные третьей, параллельны между собой.','Если прямая пересекает одну из двух параллельных прямых, то она пересекает и другую.','Прямая, перпендикулярная одной из двух параллельных, перпендикулярна и другой.'],
+ F:[['Через точку вне прямой можно провести две различные параллельные ей прямые.','Не знают аксиому'],['Если прямая пересекает одну из параллельных прямых, то она параллельна другой.','Не знают свойство'],['Две прямые, перпендикулярные третьей, пересекаются.','Путают свойство'],['Прямая, параллельная одной из двух параллельных, пересекает другую.','Не знают свойство']]};
+THEORY.g17={q:'Отметьте все верные утверждения.',steps:'При параллельных прямых накрест лежащие и соответственные углы равны, а сумма односторонних углов равна 180°.',
+ T:['При параллельных прямых накрест лежащие углы равны.','При параллельных прямых соответственные углы равны.','При параллельных прямых сумма односторонних углов равна 180°.','Вертикальные углы при параллельных прямых тоже равны.'],
+ F:[['При параллельных прямых односторонние углы равны.','Путают свойство'],['При параллельных прямых накрест лежащие углы в сумме дают 180°.','Путают свойство'],['При параллельных прямых соответственные углы в сумме дают 180°.','Путают свойство'],['При параллельных прямых накрест лежащие углы не равны.','Путают свойство']]};
+THEORY.g18={q:'Отметьте все верные утверждения.',steps:'Углы с соответственно параллельными сторонами равны или в сумме дают 180°. Углы с соответственно перпендикулярными сторонами тоже.',
+ T:['Если стороны двух углов соответственно параллельны, то углы равны или в сумме дают 180°.','Если стороны двух углов соответственно перпендикулярны, то углы равны или в сумме дают 180°.','Два острых угла с соответственно параллельными сторонами равны.','Острый и тупой угол с соответственно перпендикулярными сторонами в сумме дают 180°.'],
+ F:[['Углы с соответственно параллельными сторонами всегда равны.','Путают свойство'],['Углы с соответственно перпендикулярными сторонами всегда в сумме дают 90°.','Путают свойство'],['Острый и тупой угол с параллельными сторонами равны.','Путают свойство'],['Два острых угла с перпендикулярными сторонами в сумме дают 180°.','Путают свойство']]};
+
+/* ================= Темы глав 2 и 3 ================= */
+var MODS_EXTRA=[
+ {id:'g8',ch:2,par:'§8',title:'Треугольники',sub:'Элементы, периметр, равные треугольники',gen:gG8},
+ {id:'g9',ch:2,par:'§9',title:'Первый и второй признаки равенства',sub:'Две стороны и угол · сторона и два угла',gen:gG9,key:true},
+ {id:'g10',ch:2,par:'§10',title:'Высота, медиана, биссектриса',sub:'Три замечательных отрезка треугольника',gen:gG10},
+ {id:'g11',ch:2,par:'§11',title:'Равнобедренный треугольник',sub:'Боковые стороны, основание, углы при основании',gen:gG11,key:true},
+ {id:'g12',ch:2,par:'§12',title:'Признаки равнобедренного треугольника',sub:'Равные углы · высота, биссектриса, медиана',gen:gG12},
+ {id:'g13',ch:2,par:'§13',title:'Третий признак равенства',sub:'Три стороны',gen:gG13},
+ {id:'g14',ch:2,par:'§14',title:'Серединный перпендикуляр к отрезку',sub:'Равноудалённость от концов отрезка',gen:gG14},
+ {id:'g15',ch:3,par:'§15',title:'Признаки параллельности прямых',sub:'Накрест лежащие, соответственные, односторонние углы',gen:gG15,key:true},
+ {id:'g16',ch:3,par:'§16',title:'Аксиома параллельных прямых',sub:'Единственность параллельной и следствия',gen:gG16},
+ {id:'g17',ch:3,par:'§17',title:'Свойства параллельных прямых',sub:'Углы при параллельных прямых и секущей',gen:gG17,key:true},
+ {id:'g18',ch:3,par:'§18*',title:'Углы с параллельными и перпендикулярными сторонами',sub:'Равны или в сумме дают 180°',gen:gG18}
+];
+var LESSONS_EXTRA={
+ g8:{rule:'Треугольник — фигура из трёх точек (вершин), не лежащих на одной прямой, и трёх отрезков (сторон). Периметр треугольника — сумма длин его сторон.<br>Равные треугольники совмещаются наложением: у них равны соответственные стороны и соответственные углы. Против равных сторон лежат равные углы.',
+  pic:triFig({kind:'sc',sides:['AB','BC','CA'],ang:['∠A','∠B','∠C']}),picNote:'Вершины A, B, C; стороны AB, BC, CA; углы A, B, C.',
+  ex:[['Стороны 5, 6 и 7 см','Периметр: 5 + 6 + 7 = 18 см.'],['△ABC = △MNK, AB = 7 см','Соответственная сторона MN тоже 7 см.'],['Стороны относятся как 2 : 3 : 4, периметр 36 см','Часть: 36 : 9 = 4 см, стороны 8, 12 и 16 см.']],
+  trap:'Ошибка: путать соответственные вершины. В записи △ABC = △MNK вершина A соответствует M, B — N, C — K.'},
+ g9:{rule:'Первый признак: если две стороны и угол между ними одного треугольника равны двум сторонам и углу между ними другого, то треугольники равны.<br>Второй признак: если сторона и два прилежащих к ней угла одного треугольника равны стороне и двум прилежащим к ней углам другого, то треугольники равны.<br>Из равенства треугольников следует равенство остальных соответственных элементов.',
+  pic:crossSegFig(),picNote:'AO = OB, CO = OD, ∠AOC = ∠BOD (вертикальные), значит △AOC = △BOD, и AC = BD.',
+  ex:[['AO = OB, CO = OD, AC = 6 см','△AOC = △BOD по первому признаку, BD = 6 см.'],['AB = MN, ∠A = ∠M, ∠B = ∠N','Равны по второму признаку.'],['△ABC = △MNK, ∠B = 40°','∠N = 40°.']],
+  trap:'Ошибка: применять признак, когда угол не лежит между равными сторонами. Равенства «две стороны и угол не между ними» недостаточно.'},
+ g10:{rule:'Медиана соединяет вершину с серединой противоположной стороны. Биссектриса делит угол пополам. Высота — перпендикуляр из вершины к прямой, содержащей противоположную сторону.<br>В треугольнике три медианы, три биссектрисы и три высоты.',
+  pic:triFig({kind:'sc',extra:{v:1,t:'median',n:'M'}}),picNote:'BM — медиана: AM = MC.',
+  ex:[['M — середина AC = 14 см','AM = MC = 7 см.'],['BD — биссектриса угла 70°','∠ABD = ∠DBC = 35°.'],['BH — высота','∠BHC = 90°.']],
+  trap:'Ошибка: считать, что высота всегда делит сторону пополам. Это верно только для равнобедренного треугольника, проведённой к основанию.'},
+ g11:{rule:'Равнобедренный треугольник имеет две равные стороны — боковые. Третья сторона — основание.<br>Свойства: углы при основании равны; биссектриса, проведённая к основанию, является медианой и высотой. У равностороннего треугольника все стороны равны, и он равнобедренный.',
+  pic:triFig({kind:'iso',extra:{v:1,t:'bis',n:'D'},ticks:[[0,1],[1,1]]}),picNote:'AB = BC. BD — биссектриса, медиана и высота: AD = DC, BD ⟂ AC.',
+  ex:[['Боковые стороны по 7 см, основание 4 см','Периметр: 7 + 7 + 4 = 18 см.'],['∠A = 50° при основании','∠C = 50°.'],['Периметр 20 см, основание 6 см','Боковая сторона: (20 − 6) : 2 = 7 см.']],
+  trap:'Ошибка: делить периметр на 3 в равнобедренном треугольнике. Равны только боковые стороны.'},
+ g12:{rule:'Признаки равнобедренного треугольника: если два угла треугольника равны, то он равнобедренный (стороны, лежащие против равных углов, равны).<br>Если высота является биссектрисой, или высота — медианой, или медиана — биссектрисой, то треугольник равнобедренный.',
+  pic:triFig({kind:'sc',ang:['α',null,'α']}),picNote:'∠A = ∠C, значит BA = BC.',
+  ex:[['∠A = ∠C, AB = 8 см','BC = AB = 8 см.'],['Медиана BD — высота, AC = 12 см','AB = BC; AD = 6 см.'],['Биссектриса BD — высота','Треугольник равнобедренный.']],
+  trap:'Ошибка: считать равными стороны, прилежащие к равным углам. Равны стороны, лежащие против равных углов.'},
+ g13:{rule:'Третий признак равенства треугольников: если три стороны одного треугольника равны трём сторонам другого, то такие треугольники равны.<br>Поэтому треугольник — жёсткая фигура: его форма определена длинами сторон.',
+  pic:triFig({kind:'sc',sides:['a','b','c']}),picNote:'Три равные стороны определяют треугольник.',
+  ex:[['AB = CD, BC = AD, AC — общая','△ABC = △CDA по трём сторонам.'],['Стороны 4, 5, 6 и 6, 4, 5 см','Треугольники равны, периметры по 15 см.'],['Диагональ делит четырёхугольник','Если противоположные стороны равны, получаются равные треугольники.']],
+  trap:'Ошибка: считать, что равенства трёх углов достаточно для равенства треугольников. Нужны именно стороны.'},
+ g14:{rule:'Серединный перпендикуляр к отрезку — прямая, перпендикулярная отрезку и проходящая через его середину.<br>Любая точка серединного перпендикуляра равноудалена от концов отрезка. Если точка равноудалена от концов отрезка, то она лежит на его серединном перпендикуляре. Серединные перпендикуляры к сторонам треугольника пересекаются в одной точке — центре описанной окружности.',
+  pic:bisFig('P'),picNote:'PA = PB, AM = MB, PM ⟂ AB.',
+  ex:[['PA = 9 см, P на серединном перпендикуляре','PB = 9 см.'],['AB = 12 см','AM = 6 см.'],['OA = 5 см, O — центр описанной окружности','OB = OC = 5 см.']],
+  trap:'Ошибка: считать серединный перпендикуляр просто перпендикуляром. Он обязательно проходит через середину отрезка.'},
+ g15:{rule:'Накрест лежащие, соответственные и односторонние углы образуются при пересечении двух прямых секущей.<br>Прямые параллельны, если выполняется любое условие: накрест лежащие углы равны; соответственные углы равны; сумма односторонних углов равна 180°.',
+  pic:transFig({par:1}),picNote:'Накрест лежащие: ∠3 и ∠5, ∠4 и ∠6. Соответственные: ∠1 и ∠5, ∠2 и ∠6, ∠3 и ∠7, ∠4 и ∠8. Односторонние: ∠4 и ∠5, ∠3 и ∠6.',
+  ex:[['∠3 = 70°, ∠5 = 70°','Накрест лежащие равны, значит a ∥ b.'],['∠4 = 110°, ∠5 = 70°','Односторонние дают 180°, значит a ∥ b.'],['∠1 = 60°, ∠5 = 65°','Соответственные не равны, прямые не параллельны.']],
+  trap:'Ошибка: считать, что односторонние углы при параллельных прямых равны. Их сумма 180°.'},
+ g16:{rule:'Аксиома параллельных прямых: через точку, не лежащую на данной прямой, проходит только одна прямая, параллельная данной.<br>Следствия: две прямые, параллельные третьей, параллельны между собой. Если прямая пересекает одну из двух параллельных прямых, то она пересекает и другую. Прямая, перпендикулярная одной из двух параллельных прямых, перпендикулярна и другой.',
+  pic:null,ex:[['a ∥ c и b ∥ c','Тогда a ∥ b.'],['a ∥ b, c ⟂ a','Тогда c ⟂ b.'],['4 прямые параллельны одной','Среди них 4 · 3 : 2 = 6 пар параллельных.']],
+  trap:'Ошибка: думать, что через точку вне прямой можно провести несколько параллельных ей прямых. Такая прямая только одна.'},
+ g17:{rule:'Если две параллельные прямые пересечены секущей, то накрест лежащие углы равны, соответственные углы равны, а сумма односторонних углов равна 180°.<br>Это теоремы, обратные признакам параллельности.',
+  pic:transFig({par:1,labels:{2:'α',6:'α'}}),picNote:'При a ∥ b: ∠2 = ∠6 = α (соответственные), ∠4 = ∠6 (накрест лежащие), ∠4 + ∠5 = 180° (односторонние).',
+  ex:[['a ∥ b, ∠3 = 110°','∠5 = 110° (накрест лежащие), ∠4 = 70° (смежный с ∠3).'],['a ∥ b, ∠4 = 65°','∠6 = 65° (накрест лежащие), ∠5 = 115° (односторонний с ∠4).'],['Односторонние углы 2 : 3','Части: 180° : 5 = 36°; углы 72° и 108°.']],
+  trap:'Ошибка: применять свойство к непараллельным прямым. Равенство накрест лежащих углов верно только при a ∥ b.'},
+ g18:{rule:'Если стороны двух углов соответственно параллельны, то углы равны (когда оба острые или оба тупые) или в сумме дают 180° (когда один острый, а другой тупой).<br>То же верно для углов с соответственно перпендикулярными сторонами.',
+  pic:null,ex:[['Острый угол 40°, сторона параллельны, другой угол острый','Он равен 40°.'],['Острый угол 40°, стороны параллельны, другой угол тупой','180° − 40° = 140°.'],['Стороны перпендикулярны, оба угла острые','Углы равны.']],
+  trap:'Ошибка: всегда считать такие углы равными. Если один острый, а другой тупой, они дают в сумме 180°.'}
+};
+/* ================= Теория для тренажёра (мультивыбор) ================= */
+THEORY.g1={q:'Отметьте все верные утверждения.',steps:'Периметр многоугольника — сумма длин его сторон. Прямой угол равен 90°, развёрнутый — 180°. Площадь прямоугольника — произведение соседних сторон.',
+ T:['Периметр многоугольника — это сумма длин всех его сторон.','Прямой угол равен 90°.','Развёрнутый угол равен 180°.','У квадрата все стороны равны.','У прямоугольника противоположные стороны равны.','Площадь прямоугольника равна произведению длин двух соседних сторон.'],
+ F:[['Периметр прямоугольника равен произведению его соседних сторон.','Путают периметр и площадь'],['Площадь измеряют в сантиметрах.','Путают единицы'],['Развёрнутый угол равен 360°.','Путают виды углов'],['Острый угол больше прямого.','Путают виды углов'],['У квадрата только две равные стороны.','Путают квадрат и прямоугольник'],['Периметр квадрата со стороной a равен a · a.','Путают периметр и площадь'],['Прямой угол равен 180°.','Путают виды углов']]};
+THEORY.g2={q:'Отметьте все верные утверждения.',steps:'Точка, прямая и плоскость — основные фигуры, их не определяют. Аксиомы принимают без доказательства, теоремы доказывают.',
+ T:['Точка, прямая и плоскость — основные фигуры геометрии, они принимаются без определения.','Аксиома — утверждение, которое принимается без доказательства.','Теорему нужно доказывать, опираясь на аксиомы и уже доказанные теоремы.','В планиметрии изучают фигуры, лежащие в одной плоскости.','Куб изучается в стереометрии.','Равные фигуры можно совместить наложением.','Через две точки проходит только одна прямая.'],
+ F:[['Каждую геометрическую фигуру, включая точку, нужно определить.','Путают основные понятия'],['Теорема принимается без доказательства.','Путают аксиомы и теоремы'],['Треугольник изучается в стереометрии.','Путают планиметрию и стереометрию'],['Через две точки можно провести ровно две прямые.','Не знают аксиому прямой'],['Равные фигуры обязательно имеют разный размер.','Путают равенство фигур'],['Окружность — фигура стереометрии.','Путают планиметрию и стереометрию'],['Аксиому всегда доказывают через теоремы.','Путают аксиомы и теоремы']]};
+THEORY.g3={q:'Отметьте все верные утверждения.',steps:'Прямая бесконечна в обе стороны, луч — в одну, отрезок ограничен двумя точками. Из трёх точек на прямой одна лежит между двумя другими.',
+ T:['Прямая не имеет концов.','Луч имеет начало и бесконечен в одну сторону.','Отрезок ограничен двумя точками — своими концами.','Из трёх точек на прямой одна и только одна лежит между двумя другими.','Если точка C лежит на отрезке AB, то AC + CB = AB.','Середина отрезка делит его на два равных отрезка.','Ломаная состоит из звеньев, последовательно соединённых концами.','Длина ломаной равна сумме длин её звеньев.'],
+ F:[['У луча два начала.','Путают луч и прямую'],['Через одну точку можно провести только одну прямую.','Не знают свойства прямой'],['Длина отрезка может быть отрицательной.','Путают свойства длины'],['Если C лежит на отрезке AB, то AC = CB.','Путают точку и середину'],['У прямой есть середина.','Путают прямую и отрезок'],['Длина ломаной равна наибольшему из её звеньев.','Путают длину ломаной'],['Отрезок имеет бесконечную длину.','Путают отрезок и прямую']]};
+THEORY.g4={q:'Отметьте все верные утверждения.',steps:'Окружность — линия, все точки которой одинаково удалены от центра. Диаметр — хорда, проходящая через центр, он вдвое больше радиуса.',
+ T:['Все точки окружности одинаково удалены от её центра.','Радиус — отрезок, соединяющий центр с точкой окружности.','Диаметр равен двум радиусам.','Диаметр — самая длинная хорда окружности.','Хорда — отрезок, соединяющий две точки окружности.','Круг — часть плоскости, ограниченная окружностью.','Все радиусы одной окружности равны.'],
+ F:[['Центр принадлежит окружности.','Путают центр и точки окружности'],['Радиус вдвое больше диаметра.','Путают радиус и диаметр'],['Любая хорда проходит через центр.','Путают хорду и диаметр'],['Окружность — это часть плоскости с внутренними точками.','Путают окружность и круг'],['Через две точки можно провести только одну окружность.','Не знают свойства окружности'],['Диаметр короче радиуса.','Путают радиус и диаметр'],['Хорда может быть длиннее диаметра.','Путают хорду и диаметр']]};
+THEORY.g5={q:'Отметьте все верные утверждения.',steps:'Острый угол меньше 90°, тупой — от 90° до 180°, прямой равен 90°, развёрнутый — 180°. Биссектриса делит угол пополам.',
+ T:['Острый угол меньше 90°.','Тупой угол больше 90°, но меньше 180°.','Развёрнутый угол равен 180°.','Биссектриса делит угол на два равных угла.','Градус — одна сто восьмидесятая часть развёрнутого угла.','В одном градусе 60 минут.','Если луч проходит внутри угла, то угол равен сумме двух углов, на которые он делится.'],
+ F:[['Тупой угол меньше 90°.','Путают виды углов'],['Прямой угол равен 180°.','Путают виды углов'],['В одном градусе 100 минут.','Путают единицы'],['Биссектриса делит угол на два неравных угла.','Путают биссектрису'],['Острый угол может быть равен 90°.','Путают виды углов'],['Развёрнутый угол равен 90°.','Путают виды углов'],['Угол может иметь отрицательную градусную меру.','Путают свойства угла']]};
+THEORY.g6={q:'Отметьте все верные утверждения.',steps:'Сумма смежных углов равна 180°. Вертикальные углы равны. Биссектрисы смежных углов перпендикулярны.',
+ T:['Сумма смежных углов равна 180°.','Вертикальные углы равны.','Смежные углы имеют общую сторону, а две другие стороны образуют прямую.','Если смежные углы равны, то каждый из них прямой.','При пересечении двух прямых образуются две пары вертикальных углов.','Биссектрисы смежных углов перпендикулярны.','Угол, смежный с острым, тупой.'],
+ F:[['Смежные углы всегда равны.','Путают смежные и вертикальные'],['Сумма вертикальных углов равна 180°.','Путают смежные и вертикальные'],['Угол, смежный с прямым, острый.','Путают виды углов'],['Вертикальные углы дают в сумме 180°.','Путают смежные и вертикальные'],['Угол, смежный с тупым, тупой.','Путают виды углов'],['Смежные углы в сумме дают 360°.','Путают сумму смежных углов'],['У смежных углов нет общей стороны.','Путают определение смежных углов']]};
+THEORY.g7={q:'Отметьте все верные утверждения.',steps:'Две прямые, которые пересекаются под прямым углом, перпендикулярны. Через точку на прямой проходит единственная перпендикулярная ей прямая.',
+ T:['Прямые перпендикулярны, если при пересечении образуют прямой угол.','Если при пересечении двух прямых один угол прямой, то все четыре угла прямые.','Через любую точку прямой можно провести единственную прямую, перпендикулярную данной.','Через точку, не лежащую на прямой, можно провести единственную перпендикулярную ей прямую.','Перпендикулярные прямые образуют четыре прямых угла.','Биссектриса прямого угла образует с его сторонами углы по 45°.'],
+ F:[['Перпендикулярные прямые никогда не пересекаются.','Путают перпендикулярность и параллельность'],['Через точку на прямой можно провести две перпендикулярные ей прямые.','Не знают свойства перпендикуляра'],['Перпендикулярные прямые образуют угол 45°.','Путают величину угла'],['Если один из углов при пересечении прямых равен 60°, то прямые перпендикулярны.','Не знают признака'],['Перпендикулярные прямые образуют только два прямых угла.','Не знают свойства'],['Угол между перпендикулярными прямыми равен 180°.','Путают величину угла']]};
+
+/* ================= Темы ================= */
+var MODS=[
+ {id:'g1',ch:1,par:'§1',title:'Повторение: периметр, площадь, углы',sub:'Материал 5–6 классов, который понадобится в геометрии',gen:gG1},
+ {id:'g2',ch:1,par:'§2',title:'Предмет геометрии',sub:'Основные фигуры, аксиомы, теоремы, планиметрия и стереометрия',gen:gG2},
+ {id:'g3',ch:1,par:'§3',title:'Прямая, луч, отрезок, ломаная',sub:'Длина отрезка, середина, периметр, ломаная',gen:gG3,key:true},
+ {id:'g4',ch:1,par:'§4',title:'Окружность и круг',sub:'Радиус, диаметр, хорда, касание окружностей',gen:gG4},
+ {id:'g5',ch:1,par:'§5',title:'Угол. Виды углов',sub:'Измерение, биссектриса, острые, прямые и тупые углы',gen:gG5,key:true},
+ {id:'g6',ch:1,par:'§6',title:'Смежные и вертикальные углы',sub:'Сумма смежных 180°, вертикальные равны',gen:gG6,key:true},
+ {id:'g7',ch:1,par:'§7',title:'Перпендикулярные прямые',sub:'Прямой угол, перпендикуляр, углы при пересечении',gen:gG7}
+];
+MODS=MODS.concat(MODS_EXTRA);
+function modOf(id){for(var i=0;i<MODS.length;i++)if(MODS[i].id===id)return MODS[i]}
+var CHAPS=[
+ {n:1,title:'Начальные понятия геометрии',ready:true},
+ {n:2,title:'Признаки равенства треугольников',ready:true},
+ {n:3,title:'Параллельность прямых на плоскости',ready:true},
+ {n:4,title:'Сумма углов треугольника',ready:false,list:'Сумма углов · Внешний угол · Соотношения между сторонами и углами · Неравенство треугольника · Прямоугольные треугольники · Биссектриса угла · Угол в 30° · Расстояние между параллельными прямыми'},
+ {n:5,title:'Задачи на построение',ready:false,list:'Построение треугольника по трём сторонам · Биссектриса и середина отрезка · Перпендикуляр · Геометрическое место точек'}
+];
+/* планы диагностики и итогового теста по главам; draw — темы, где одно задание выполняется рисованием */
+var PLANS={
+ 1:{diag:['g1','g2','g3','g3','g4','g4','g5','g5','g5','g6','g6','g6','g7','g7'],final:{g1:1,g2:2,g3:4,g4:3,g5:4,g6:4,g7:2},ddraw:['g3','g5','g7'],fdraw:['g1','g3','g5','g6','g7']},
+ 2:{diag:['g8','g8','g9','g9','g9','g10','g10','g11','g11','g11','g12','g12','g13','g14'],final:{g8:2,g9:4,g10:3,g11:4,g12:3,g13:2,g14:2},ddraw:[],fdraw:[]},
+ 3:{diag:['g15','g15','g15','g16','g16','g17','g17','g17','g17','g18','g18','g15'],final:{g15:6,g16:3,g17:8,g18:3},ddraw:[],fdraw:[]}
+};
+/* ================= Уроки ================= */
+var LESSONS={
+ g1:{rule:'Периметр многоугольника — сумма длин всех его сторон. У прямоугольника P = 2 · (a + b), у квадрата P = 4a. Площадь прямоугольника S = a · b.<br>Прямой угол равен 90°, развёрнутый — 180°, полный — 360°.',
+  pic:null,ex:[['Периметр прямоугольника 20 см, одна сторона 6 см','a + b = 20 : 2 = 10, вторая сторона 10 − 6 = 4 см.'],['Квадрат со стороной 7 см','P = 4 · 7 = 28 см, S = 7 · 7 = 49 см².'],['Одна треть развёрнутого угла','180° : 3 = 60°.']],
+  trap:'Ошибка: считать периметр прямоугольника как a + b. В периметр входят все четыре стороны.'},
+ g2:{rule:'Основные фигуры геометрии — точка, прямая и плоскость. Их не определяют, а описывают их свойства.<br>Аксиома — свойство, которое принимают без доказательства. Например: через любые две точки проходит единственная прямая.<br>Теорема — утверждение, которое доказывают. Планиметрия изучает фигуры на плоскости, стереометрия — фигуры в пространстве.',
+  pic:solidFig('cube'),picNote:'Куб: 8 вершин, 12 рёбер, 6 граней. Невидимые рёбра рисуют штрихами.',
+  ex:[['Сколько отрезков с концами в 5 точках на прямой?','Каждая пара точек даёт отрезок: 5 · 4 : 2 = 10.'],['Площадь поверхности куба с ребром 3 см','Граней 6, каждая 3 · 3 = 9: 6 · 9 = 54 см².'],['Куб — это планиметрия или стереометрия?','Куб не лежит в одной плоскости, поэтому это стереометрия.']],
+  trap:'Ошибка: считать отрезки AB и BA разными. Это один и тот же отрезок.'},
+ g3:{rule:'Прямая бесконечна в обе стороны. Луч имеет начало и бесконечен в одну сторону. Отрезок ограничен двумя точками — концами.<br>Если точка C лежит на отрезке AB, то AC + CB = AB. Середина отрезка делит его на две равные части.<br>Ломаная состоит из звеньев, её длина — сумма длин звеньев. Периметр многоугольника — сумма длин его сторон.',
+  pic:lineFig(['A','C','B'],[5,3],['5 см','3 см'],'8 см'),picNote:'AC + CB = AB: 5 + 3 = 8.',
+  ex:[['AC = 4 см, CB = 7 см','AB = 4 + 7 = 11 см.'],['M — середина AB, AM = 6 см','AB = 2 · 6 = 12 см.'],['Ломаная со звеньями 3, 5 и 4 см','3 + 5 + 4 = 12 см.']],
+  trap:'Ошибка: при вычислении части отрезка складывать, а не вычитать: если AB = 10, AC = 4, то CB = 10 − 4 = 6.'},
+ g4:{rule:'Окружность — линия, все точки которой одинаково удалены от центра. Круг — часть плоскости, ограниченная окружностью.<br>Радиус соединяет центр с точкой окружности. Хорда соединяет две точки окружности. Диаметр — хорда, проходящая через центр: d = 2r. Диаметр — самая длинная хорда.<br>Окружности касаются снаружи, когда расстояние между центрами равно сумме радиусов, и изнутри, когда оно равно разности радиусов.',
+  pic:circFig([{n:'A',a:180},{n:'B',a:0}],[['A','B','диаметр']]),picNote:'Диаметр AB проходит через центр O и равен двум радиусам.',
+  ex:[['Диаметр 14 см','Радиус: 14 : 2 = 7 см.'],['Радиусы 3 см и 5 см, внешнее касание','Расстояние между центрами 3 + 5 = 8 см.'],['Радиусы 9 см и 4 см, внутреннее касание','Расстояние между центрами 9 − 4 = 5 см.']],
+  trap:'Ошибка: путать радиус и диаметр. Диаметр всегда вдвое больше радиуса.'},
+ g5:{rule:'Угол образуют два луча с общим началом. Его измеряют в градусах: развёрнутый угол равен 180°.<br>Острый угол меньше 90°, прямой равен 90°, тупой больше 90° и меньше 180°, развёрнутый равен 180°. В одном градусе 60 минут: 1° = 60′.<br>Если луч проходит внутри угла, то угол равен сумме двух частей. Биссектриса делит угол пополам.',
+  pic:angFig([{d:0,n:'A'},{d:40,n:'B'},{d:80,n:'C'}],[{a:0,b:40,r:50,eq:1},{a:40,b:80,r:50,eq:1},{a:0,b:80,r:90,l:'80°'}]),picNote:'OB — биссектриса угла AOC: ∠AOB = ∠BOC = 40°.',
+  ex:[['∠AOB = 35°, ∠BOC = 50°','∠AOC = 35° + 50° = 85°.'],['Биссектриса угла 76°','Каждый угол по 76° : 2 = 38°.'],['2° 15′ в минутах','2 · 60 + 15 = 135′.']],
+  trap:'Ошибка: считать, что в градусе 100 минут. В градусе 60 минут, как в часе.'},
+ g6:{rule:'Смежные углы имеют общую сторону, а две другие стороны образуют прямую. Сумма смежных углов равна 180°.<br>Вертикальные углы образуются при пересечении двух прямых: стороны одного являются продолжением сторон другого. Вертикальные углы равны.<br>Биссектрисы смежных углов перпендикулярны.',
+  pic:crossFig(55),picNote:'∠1 и ∠3 вертикальные, поэтому равны. ∠1 и ∠2 смежные: ∠2 = 180° − ∠1.',
+  ex:[['Один из смежных углов 70°','Другой: 180° − 70° = 110°.'],['∠1 = 55°, ищем вертикальный ∠3','∠3 = 55°.'],['Смежные углы относятся как 1 : 2','Три части на 180°: по 60° и 120°.']],
+  trap:'Ошибка: считать смежные углы равными. Равны вертикальные, а смежные в сумме дают 180°.'},
+ g7:{rule:'Две прямые перпендикулярны, если при пересечении они образуют прямой угол (90°). Тогда все четыре угла прямые.<br>Через любую точку прямой проходит единственная перпендикулярная ей прямая. Биссектриса прямого угла образует со сторонами углы по 45°.',
+  pic:angFig([{d:0,n:'A',ext:1},{d:90,n:'B',ext:1}],[{a:0,b:90,r:22,right:1},{a:90,b:180,r:22,right:1},{a:180,b:270,r:22,right:1},{a:270,b:360,r:22,right:1}]),picNote:'Если один угол прямой, то остальные три тоже прямые.',
+  ex:[['∠AOB = 90°, луч OC внутри, ∠AOC = 25°','∠COB = 90° − 25° = 65°.'],['Биссектриса прямого угла','90° : 2 = 45°.'],['Один из четырёх углов прямой','Остальные три тоже по 90°, сумма трёх — 270°.']],
+  trap:'Ошибка: дополнять до 180° вместо 90°. Прямой угол равен 90°.'}
+};
+Object.keys(LESSONS_EXTRA).forEach(function(k){LESSONS[k]=LESSONS_EXTRA[k]});
+function fmtEx(s){return s}
+
+/* ================= Прохождение ================= */
+function progress(){
+  var p={diag:{},final:{},passed:{},best:{}};
+  st.events.forEach(function(e){
+    if(e.kind==='diag'){var c=e.mod||'c1';if(!p.diag[c]||e.ts>p.diag[c].ts)p.diag[c]=e}
+    if(e.kind==='module'){p.best[e.mod]=Math.max(p.best[e.mod]||0,e.score);if(e.passed)p.passed[e.mod]=true}
+    if(e.kind==='final'){var c2=e.mod||'c1';if(!p.final[c2]||e.score>p.final[c2].score)p.final[c2]=e}
+  });
+  return p;
+}
+function modStatus(id,p){
+  if(p.passed[id])return 'ok';
+  var d=p.diag['c'+modOf(id).ch];
+  if(d)return (d.need||[]).indexOf(id)>=0?'need':'fine';
+  return '';
+}
+function nextStep(p){
+  for(var k=0;k<CHAPS.length;k++){
+    var c=CHAPS[k];if(!c.ready)continue;
+    var ms=MODS.filter(function(m){return m.ch===c.n}),d=p.diag['c'+c.n],left=ms.filter(function(m){return !p.passed[m.id]});
+    if(!left.length&&p.final['c'+c.n])continue;
+    if(!d&&left.length===ms.length)return {text:'Начните с диагностики главы '+c.n+': «'+c.title+'». По ней приложение покажет, какие темы повторять.',btn:'Диагностика главы '+c.n,act:'diag',ch:c.n};
+    if(left.length){
+      var need=(d&&d.need||[]).filter(function(id){return !p.passed[id]});
+      need.sort(function(a,b){return MODS.findIndex(function(m){return m.id===a})-MODS.findIndex(function(m){return m.id===b})});
+      var nm=need.length?need[0]:left[0].id;
+      return {text:(need.length?'Следующая тема: ':'Дальше по порядку: ')+modOf(nm).title+(need.length?'. В диагностике здесь были ошибки.':'.'),btn:'Открыть тему',act:'mod',mod:nm};
+    }
+    return {text:'Все темы главы '+c.n+' пройдены. Можно сдавать итоговый тест.',btn:'Итоговый тест главы '+c.n,act:'final',ch:c.n};
+  }
+  return {text:'Все доступные темы пройдены. Остальные главы появятся позже.',btn:'Повторить диагностику',act:'diag',ch:1};
+}
+function buildTasks(kind,modId){
+  var items=[],i,ch,pl;
+  if(kind==='check'){for(i=0;i<CHECK_N;i++)items.push([modId,typedGen(modId)]);var d=drawGen(modId);if(d)items[CHECK_N-1]=[modId,d]}
+  else{ch=+String(modId).replace('c','');pl=PLANS[ch];
+    if(kind==='diag'){pl.diag.forEach(function(id){items.push([id,typedGen(id)])});
+      pl.ddraw.forEach(function(id){var k=-1;items.forEach(function(x,n){if(x[0]===id)k=n});if(k>=0)items[k]=[id,drawGen(id)]})}
+    if(kind==='final'){Object.keys(pl.final).forEach(function(id){for(var k=0;k<pl.final[id];k++)items.push([id,typedGen(id)])});
+      pl.fdraw.forEach(function(id){var k=-1;items.forEach(function(x,n){if(k<0&&x[0]===id)k=n});if(k>=0)items[k]=[id,drawGen(id)]});
+      items=shuffle(items)}}
+  return items.map(function(x){return x[1]});
+}
+function startRun(kind,modId){
+  var tasks=kind==='train'?[trainTask(modId)]:buildTasks(kind,modId);
+  st.run={kind:kind,mod:modId||null,tasks:tasks,i:0,results:[],phase:'ask',fb:null,input:'',picked:null,sel:[]};
+  st.view='run';render();window.scrollTo(0,0);
+}
+function runTitle(r){
+  var cn=r.mod&&/^c\d/.test(r.mod)?' главы '+r.mod.slice(1):'';
+  return r.kind==='diag'?'Диагностика'+cn:r.kind==='final'?'Итоговый тест'+cn:r.kind==='check'?'Проверка: '+modOf(r.mod).title:'Тренажёр: '+modOf(r.mod).title;
+}
+
+/* ================= Состояние ================= */
+/* Настройка отправки результата: адрес прокси (Cloudflare Worker). Пусто — только кнопки Telegram и «Скопировать». */
+var CFG={endpoint:''};
+var st={view:'home',tab:'play',db:null,user:null,uid:null,isOwner:/(^|[#&])parent($|&)/.test(location.hash),canWrite:null,
+  events:[],allEvents:[],run:null,mod:null,saveMsg:''};
+var LS='geom_events_v1';
+function lsRead(){try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){return []}}
+function lsWrite(a){try{localStorage.setItem(LS,JSON.stringify(a.slice(-300)))}catch(e){}}
+var app=document.getElementById('app');
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+
+/* Прогресс из событий */
+/* ================= Запись событий ================= */
+async function saveEvent(ev){
+  ev.uid='local';ev.ts=Date.now();
+  st.events.push(ev);
+  lsWrite(lsRead().concat([ev]));
+  st.saveMsg='';
+  if(!CFG.endpoint){st.saveMsg='local';return}
+  try{
+    var ac=new AbortController(),tm=setTimeout(function(){ac.abort()},10000);
+    var r=await fetch(CFG.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:reportText(ev)}),signal:ac.signal});
+    clearTimeout(tm);
+    st.saveMsg=r.ok?'sent':'fail';
+  }catch(e){st.saveMsg='fail'}
+}
+
+/* ================= Ранеры заданий ================= */
+var CHECK_N=8,CHECK_PASS=6; /* проверка темы: заданий и сколько верных нужно для зачёта */
+
+/* ================= Отрисовка ================= */
+function render(){
+  if(st.view==='home')return st.tab==='parent'?renderParent():renderHome();
+  if(st.view==='lesson')return renderLesson();
+  if(st.view==='run')return renderRun();
+  if(st.view==='summary')return renderSummary();
+}
+function header(){
+  var h='<div class="top"><div class="brand">Геометрия 7<small>по программе 7 класса</small></div>';
+  if(st.isOwner&&st.view==='home')h+='<div class="tabs"><button class="tab" data-tab="play" aria-current="'+(st.tab==='play')+'">Занятия</button><button class="tab" data-tab="parent" aria-current="'+(st.tab==='parent')+'">Результаты</button></div>';
+  return h+'</div>';
+}
+function bindHeader(){
+  app.querySelectorAll('[data-tab]').forEach(function(b){b.onclick=function(){st.tab=b.dataset.tab;render()}});
+}
+
+function renderHome(){
+  var p=progress(),ns=nextStep(p);
+  var h=header();
+  h+='<section class="sheet"><div class="next"><div class="meta">Следующий шаг</div><p>'+ns.text+'</p><div><button class="btn pen" id="nx">'+ns.btn+'</button></div></div></section>';
+  CHAPS.forEach(function(c){
+    if(c.ready){
+      var arr=MODS.filter(function(m){return m.ch===c.n}),o='<div class="mods">',d=p.diag['c'+c.n],f=p.final['c'+c.n];
+      arr.forEach(function(m){
+        var s=modStatus(m.id,p),chip=s==='ok'?'<span class="chip ok">пройдено</span>':s==='need'?'<span class="chip need">повторить</span>':s==='fine'?'<span class="chip">ок в диагностике</span>':'';
+        if(m.key)chip='<span class="chip key">главное</span> '+chip;
+        o+='<button class="mod" data-mod="'+m.id+'"><span class="n">'+m.par.replace('§','')+'</span><span class="t"><b>'+m.title+'</b><span>'+m.sub+'</span></span><span>'+chip+'</span></button>';
+      });
+      h+='<section class="sheet"><h3>Глава '+c.n+'. '+c.title+'</h3>'+o+'</div>'+
+        '<div class="row between"><div><b>Диагностика</b><p class="note">'+PLANS[c.n].diag.length+' заданий.'+(d?' Последний раз: '+d.score+' из '+d.max+'.':'')+'</p></div><button class="btn" data-dg="'+c.n+'">'+(d?'Ещё раз':'Начать')+'</button></div>'+
+        '<div class="row between"><div><b>Итоговый тест</b><p class="note">'+Object.keys(PLANS[c.n].final).reduce(function(s,k){return s+PLANS[c.n].final[k]},0)+' заданий, ответы нужно вписать.'+(f?' Лучший результат: '+f.score+' из '+f.max+'.':'')+'</p></div><button class="btn main" data-fn="'+c.n+'">Сдать тест</button></div></section>';
+    }else{
+      h+='<section class="sheet soon"><h3>Глава '+c.n+'. '+c.title+'</h3><p class="note">Позже. '+c.list+'.</p></section>';
+    }
+  });
+  app.innerHTML=h;bindHeader();
+  document.getElementById('nx').onclick=function(){
+    if(ns.act==='diag')startRun('diag','c'+ns.ch);else if(ns.act==='final')startRun('final','c'+ns.ch);else{st.mod=ns.mod;st.view='lesson';render();window.scrollTo(0,0)}};
+  app.querySelectorAll('[data-dg]').forEach(function(b){b.onclick=function(){startRun('diag','c'+b.dataset.dg)}});
+  app.querySelectorAll('[data-fn]').forEach(function(b){b.onclick=function(){startRun('final','c'+b.dataset.fn)}});
+  app.querySelectorAll('[data-mod]').forEach(function(b){b.onclick=function(){st.mod=b.dataset.mod;st.view='lesson';render();window.scrollTo(0,0)}});
+}
+
+function renderLesson(){
+  var m=modOf(st.mod),L=LESSONS[m.id],arr=MODS.filter(function(x){return x.ch===m.ch}),i=arr.indexOf(m);
+  var h='<div class="top"><div class="brand">Глава '+m.ch+'<small>'+m.par+', тема '+(i+1)+' из '+arr.length+'</small></div><button class="btn sm" id="back">К темам</button></div>';
+  h+='<section class="sheet"><div class="steps"><span class="step" aria-current="true">1 Объяснение</span><span class="step">2 Тренажёр</span><span class="step">3 Проверка</span></div><h2>'+m.title+'</h2>';
+  h+='<div class="box rule"><div class="h">Правило</div><p class="math">'+L.rule+'</p></div>';
+  if(L.pic)h+='<div class="box">'+L.pic+(L.picNote?'<p class="note">'+L.picNote+'</p>':'')+'</div>';
+  h+='<div class="box"><div class="h">Разобранные примеры</div>';
+  L.ex.forEach(function(e){h+='<p class="math"><b>'+e[0]+'</b> — '+e[1]+'</p>'});
+  h+='</div><div class="box warn"><div class="h">Частая ошибка</div><p>'+L.trap+'</p></div>';
+  h+='<div class="row"><button class="btn" id="tr">Тренажёр</button><button class="btn main" id="ck">Проверка: '+CHECK_N+' заданий</button></div>';
+  h+='<p class="note">В проверке нужно решить верно '+CHECK_PASS+' из '+CHECK_N+'. Результат увидит родитель.</p></section>';
+  app.innerHTML=h;
+  document.getElementById('back').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
+  document.getElementById('tr').onclick=function(){startRun('train',m.id)};
+  document.getElementById('ck').onclick=function(){startRun('check',m.id)};
+}
+
+function renderRun(){
+  var r=st.run,t=r.tasks[r.i],total=r.kind==='train'?null:r.tasks.length;
+  var h='<div class="top"><div class="brand">'+runTitle(r)+'</div><button class="btn sm" id="quit">'+(r.kind==='train'?'Закончить':'Выйти')+'</button></div>';
+  h+='<section class="sheet">';
+  if(total)h+='<div class="row between"><span class="meta">Задание '+(r.i+1)+' из '+total+'</span></div><div class="bar" role="progressbar" aria-valuenow="'+r.i+'" aria-valuemax="'+total+'"><i style="width:'+Math.round(r.i/total*100)+'%"></i></div>';
+  else h+='<span class="meta">Решено верно: '+r.results.filter(function(x){return x.ok}).length+' из '+r.results.length+'</span>';
+  h+='<div class="q">'+t.q+'</div>';
+  var locked=r.phase==='fb';
+  if(t.multi){
+    h+='<p class="hint">Отметьте все верные утверждения. Верных несколько.</p><div class="opts multi">';
+    t.multi.forEach(function(o,k){
+      var on=!!r.sel[k],cls='opt chk',tag='';
+      if(locked){
+        if(o.ok&&on)cls+=' right';else if(!o.ok&&on)cls+=' wrong';else if(o.ok&&!on){cls+=' miss';tag='<span class="tag">пропущено</span>'}
+      }
+      h+='<button class="'+cls+'" data-m="'+k+'" aria-pressed="'+(on?'true':'false')+'"'+(locked?' disabled':'')+'><span class="bx">'+(on?'✓':'')+'</span><span class="lb">'+o.h+tag+'</span></button>';
+    });
+    h+='</div>';
+  }else if(t.draw){
+    h+=drawHTML(t);
+  }else if(t.choice){
+    h+='<div class="opts">';
+    t.choice.opts.forEach(function(o,k){
+      var cls='opt';if(locked){if(k===t.choice.correct)cls+=' right';else if(k===r.picked)cls+=' wrong'}
+      h+='<button class="'+cls+'" data-opt="'+k+'"'+(locked?' disabled':'')+'>'+o+'</button>';
+    });
+    h+='</div>';
+  }else{
+    var cls=locked?(r.fb.res==='ok'?' ok':' bad'):'';
+    var hint=ansHint(t);if(hint)h+='<p class="note" id="fmt">'+hint+'</p>';
+    h+='<div class="ans"><input id="in" class="'+cls.trim()+'" type="text" inputmode="'+(COARSE?'none':'text')+'" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="'+esc(r.input)+'"'+(locked?' disabled':'')+'>';
+    if(!locked){
+      if(COARSE){
+        var keys=['1','2','3','⌫','4','5','6',',','7','8','9','0'];
+        h+='<div class="pad">';
+        keys.forEach(function(k){
+          if(k===' ')h+='<button data-k=" " aria-label="Пробел">␣</button>';
+          else if(k==='pow')h+='<button class="fn" data-pow="1" aria-pressed="'+!!r.pow+'" aria-label="Степень: следующие цифры станут показателем">xⁿ</button>';
+          else h+='<button'+(k==='⌫'||k==='−'||k==='/'?' class="fn"':'')+' data-k="'+k+'"'+(k==='⌫'?' aria-label="Стереть"':'')+'>'+k+'</button>';
+        });
+        h+='</div>';
+      }else h+='';
+    }
+    h+='</div>';
+    if(!locked)h+='<div class="prev" id="pv" aria-live="polite">'+previewHTML(parseAns(r.input))+'</div>';
+  }
+  if(r.fb&&r.phase==='fb'){
+    var f=r.fb;
+    if(f.res==='ok')h+='<div class="fb ok"><b>'+PRAISE[Math.floor(Math.random()*PRAISE.length)]+'</b></div>';
+    else h+='<div class="fb bad"><b>Неверно. '+(t.multi?'Верные утверждения: '+t.multi.filter(function(o){return o.ok}).map(function(o){return o.h}).join('; ')+'.':'Ответ: '+(t.choice?t.choice.opts[t.choice.correct]:showAns(t)))+'</b>'+(f.msg?'<p>'+f.msg+'</p>':'')+'<div class="sol">'+t.steps+'</div></div>';
+  }else if(r.fb&&r.fb.res==='form')h+='<div class="fb form"><b>Почти</b><p>'+r.fb.msg+'</p></div>';
+  else if(r.fb&&r.fb.res==='invalid')h+='<div class="fb form"><b>Ответ не удалось разобрать</b><p>Запишите число цифрами. Примеры: 45, 4,5, 1 250.</p></div>';
+  h+='<div class="row">';
+  if(!locked)h+='<button class="btn main" id="go"'+(t.multi&&!r.sel.some(Boolean)?' disabled':'')+'>Ответить</button>';
+  else h+='<button class="btn main" id="nxt">'+(total&&r.i===total-1?'Завершить':'Дальше')+'</button>';
+  h+='</div>';
+  if(!locked&&!t.choice&&!t.multi&&!t.draw)h+='<p class="note">Число пишите цифрами. Десятичную дробь — через запятую, например 4,5.</p>';
+  h+='</section>';
+  app.innerHTML=h;
+  document.getElementById('quit').onclick=function(){
+    if(r.kind==='train'||confirmQuit()){st.view=r.kind==='train'?'lesson':'home';render()}
+  };
+  bindRun();
+  var inp=document.getElementById('in');if(inp&&!locked&&!t.multi)inp.focus({preventScroll:true});
+}
+var COARSE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+var quitArm=0;
+function confirmQuit(){
+  /* окна подтверждения в странице не работают: нужен второй клик */
+  var now=Date.now();
+  if(now-quitArm<4000)return true;
+  quitArm=now;
+  var b=document.getElementById('quit');if(b)b.textContent='Нажмите ещё раз: результаты не сохранятся';
+  return false;
+}
+var PRAISE=['Верно!','Отлично!','Так держать!','Молодец!','Точно!','Класс!'];
+function burst(){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  var box=app.querySelector('.fb.ok');if(!box)return;
+  var rc=box.getBoundingClientRect(),c=document.createElement('div'),cols=['#c4372b','#f2b01e','#2c7a4b','#2f6fd0','#8a4bc4','#e8682a'],h='',i;
+  c.className='confetti';c.setAttribute('aria-hidden','true');
+  c.style.left=Math.min(rc.left+60,innerWidth-20)+'px';c.style.top=Math.max(rc.top+10,20)+'px';
+  for(i=0;i<34;i++){
+    var a=-Math.PI*(.1+.8*Math.random()),v=90+Math.random()*150,x1=Math.cos(a)*v,y1=Math.sin(a)*v;
+    h+='<i style="background:'+cols[i%cols.length]+';--x1:'+x1.toFixed(0)+'px;--y1:'+y1.toFixed(0)+'px;--x2:'+(x1*1.3+(Math.random()-.5)*60).toFixed(0)+'px;--y2:'+(y1+170+Math.random()*120).toFixed(0)+'px;--r:'+(Math.random()*360).toFixed(0)+'deg;animation-delay:'+(Math.random()*.12).toFixed(2)+'s"></i>';
+  }
+  c.innerHTML=h;document.body.appendChild(c);setTimeout(function(){c.remove()},1500);
+}
+function submit(){
+  var r=st.run,t=r.tasks[r.i],fb;
+  if(t.multi){
+    if(!r.sel.some(Boolean))return;
+    var bad=null,miss=false;
+    t.multi.forEach(function(o,k){var on=!!r.sel[k];if(on&&!o.ok&&!bad)bad=o;if(!on&&o.ok)miss=true});
+    if(!bad&&!miss)fb={res:'ok'};
+    else fb={res:'wrong',type:bad?(bad.type||T_OTHER):'Пропущено верное утверждение',msg:bad?'Отмечено неверное утверждение.':'Верных утверждений больше, чем отмечено.'};
+  }else if(t.choice){
+    if(r.picked===null)return;
+    var ok=r.picked===t.choice.correct;
+    if(ok)fb={res:'ok'};
+    else{var v=t.choice.vals[r.picked];fb=v?wrongOf(t,v):{res:'wrong',type:T_OTHER,msg:''};fb.res='wrong'}
+  }else if(t.draw){
+    fb=judgeDraw(t);
+  }else{
+    fb=judge(t,r.input);
+    if(fb.res==='invalid'||fb.res==='form'){r.fb=fb;r.phase='ask';render();return}
+  }
+  r.fb=fb;r.phase='fb';
+  r.results.push({ok:fb.res==='ok',mod:t.mod,type:fb.res==='ok'?null:(fb.type||T_OTHER)});
+  render();
+  if(fb.res==='ok')burst();
+}
+/* Enter: первое нажатие проверяет ответ, второе открывает следующее задание */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'||e.repeat||st.view!=='run'||e.isComposing)return;
+  var t=e.target;
+  if(t&&t.tagName==='BUTTON'&&!t.hasAttribute('data-m'))return;
+  var nx=document.getElementById('nxt'),g=document.getElementById('go');
+  if(nx){e.preventDefault();nx.click()}
+  else if(g&&!g.disabled){e.preventDefault();g.click()}
+});
+function bindRun(){
+  var r=st.run;
+  if(r.tasks[r.i].draw)bindDraw(r.tasks[r.i]);
+  var inp=document.getElementById('in');
+  if(inp){
+    inp.oninput=function(){r.input=inp.value;r.fb=null;var pv=document.getElementById('pv');if(pv)pv.innerHTML=previewHTML(parseAns(r.input));
+      var old=app.querySelector('.fb');if(old)old.remove()};
+    inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();e.stopPropagation();if(!e.repeat)submit()}
+      else if(r.pow&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[0-9-]$/.test(e.key)){e.preventDefault();putPow(e.key)}};
+  }
+  function putPow(c){
+    var a=inp.selectionStart==null?inp.value.length:inp.selectionStart,z=inp.selectionEnd==null?a:inp.selectionEnd,ch=c==='-'?'⁻':SUPD[+c];
+    inp.value=inp.value.slice(0,a)+ch+inp.value.slice(z);inp.setSelectionRange(a+1,a+1);inp.dispatchEvent(new Event('input'))}
+  function powBtn(){app.querySelectorAll('[data-pow]').forEach(function(b){b.classList.toggle('on',!!r.pow);b.setAttribute('aria-pressed',!!r.pow)})}
+  powBtn();
+  app.querySelectorAll('[data-pow]').forEach(function(b){
+    b.onmousedown=function(e){e.preventDefault()};b.onpointerdown=function(e){e.preventDefault()};
+    b.onclick=function(){r.pow=!r.pow;powBtn();if(inp)inp.focus({preventScroll:true})}});
+  app.querySelectorAll('[data-k]').forEach(function(b){
+    b.onmousedown=function(e){e.preventDefault()};
+    b.onpointerdown=function(e){e.preventDefault()};
+    b.onclick=function(){if(!inp)return;
+      var s=inp.selectionStart==null?inp.value.length:inp.selectionStart,e2=inp.selectionEnd==null?s:inp.selectionEnd,k=b.dataset.k,pos;
+      if(r.pow&&k!=='⌫'){if(k==='−')k='⁻';else if(/^[0-9]$/.test(k))k=SUPD[+k];else{r.pow=false;powBtn()}}
+      if(k==='⌫'){
+        if(s===e2&&s>0){inp.value=inp.value.slice(0,s-1)+inp.value.slice(e2);pos=s-1}
+        else{inp.value=inp.value.slice(0,s)+inp.value.slice(e2);pos=s}
+      }else{inp.value=inp.value.slice(0,s)+k+inp.value.slice(e2);pos=s+k.length}
+      inp.focus({preventScroll:true});inp.setSelectionRange(pos,pos);inp.dispatchEvent(new Event('input'))};
+  });
+  app.querySelectorAll('[data-opt]').forEach(function(b){b.onclick=function(){r.picked=Number(b.dataset.opt);submit()}});
+  app.querySelectorAll('[data-m]').forEach(function(b){b.onclick=function(){
+    var k=Number(b.dataset.m);r.sel[k]=!r.sel[k];
+    b.setAttribute('aria-pressed',r.sel[k]?'true':'false');b.firstChild.textContent=r.sel[k]?'✓':'';
+    var g=document.getElementById('go');if(g)g.disabled=!r.sel.some(Boolean)}});
+  var go=document.getElementById('go');if(go)go.onclick=submit;
+  var nx=document.getElementById('nxt');
+  if(nx)nx.onclick=function(){
+    var total=r.kind==='train'?null:r.tasks.length;
+    if(total&&r.i===total-1)return finishRun();
+    r.i++;
+    if(r.kind==='train'){var g=modOf(r.mod).gen();r.tasks.push(multiOf(g))}
+    r.phase='ask';r.fb=null;r.input='';r.segs=[];r.pow=false;r.picked=null;r.sel=[];render();window.scrollTo(0,0);
+  };
+}
+
+async function finishRun(){
+  var r=st.run,score=r.results.filter(function(x){return x.ok}).length,max=r.tasks.length,errors={},badMods={};
+  r.results.forEach(function(x){if(!x.ok){errors[x.type]=(errors[x.type]||0)+1;badMods[x.mod]=true}});
+  var ev={kind:r.kind==='check'?'module':r.kind,mod:r.mod||'',title:runTitle(r),score:score,max:max,errors:errors};
+  if(r.kind==='check')ev.passed=score>=CHECK_PASS;
+  if(r.kind==='diag')ev.need=Object.keys(badMods);
+  if(r.kind==='final'){ev.mark=markOf(score/max);ev.need=Object.keys(badMods)}
+  r.ev=ev;r.badMods=Object.keys(badMods);
+  st.view='summary';render();window.scrollTo(0,0);
+  await saveEvent(ev);
+  if(st.view==='summary')render();
+}
+function markOf(f){
+  return f>=.95?10:f>=.85?9:f>=.75?8:f>=.65?7:f>=.55?6:f>=.45?5:f>=.35?4:f>=.25?3:f>=.15?2:1;
+}
+
+
+function reportText(ev){
+  var d=new Date(ev.ts||Date.now()),pad=function(n){return (n<10?'0':'')+n};
+  var l=['Геометрия 7. Результат: '+ev.title+'.','Баллы: '+ev.score+' из '+ev.max+(ev.mark?', отметка '+ev.mark+' по десятибалльной шкале':'')+'.'];
+  if(ev.kind==='module')l.push(ev.passed?'Тема пройдена.':'Тема не пройдена: нужно '+CHECK_PASS+' из '+CHECK_N+'.');
+  var need=(ev.need||[]).map(function(id){return modOf(id).title});
+  if(need.length)l.push('Слабые темы: '+need.join('; ')+'.');
+  var er=Object.keys(ev.errors||{}).sort(function(a,b){return ev.errors[b]-ev.errors[a]});
+  if(er.length)l.push('Ошибки: '+er.map(function(k){return k+(ev.errors[k]>1?' ×'+ev.errors[k]:'')}).join('; ')+'.');
+  l.push('Время: '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes())+'.');
+  return l.join('\n');
+}
+function renderSummary(){
+  var r=st.run,ev=r.ev;
+  var h='<div class="top"><div class="brand">'+esc(ev.title)+'</div></div><section class="sheet"><div class="meta">Результат</div>';
+  h+='<div class="score"><span class="big">'+ev.score+'<span style="font-size:.45em;color:var(--ink-soft)"> / '+ev.max+'</span></span>'+(ev.mark?'<span class="mark" title="Ориентировочная отметка">'+ev.mark+'</span>':'')+'</div>';
+  if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно '+CHECK_PASS+' верных ответов из '+CHECK_N+'. Перечитайте объяснение и попробуйте ещё раз: числа будут другие.')+'</p>';
+  if(r.kind==='diag')h+='<p>'+(ev.need.length?'Темы для повторения: '+ev.need.map(function(id){return modOf(id).title}).join('; ')+'.':'Ошибок нет: можно переходить к итоговому тесту.')+'</p>';
+  if(r.kind==='final')h+='<p class="note">Отметка по десятибалльной шкале ориентировочная.</p>';
+  var errs=Object.keys(ev.errors);
+  if(errs.length){h+='<div class="box"><div class="h">Где были ошибки</div><div class="tags">'+errs.map(function(k){return '<span class="tag">'+esc(k)+(ev.errors[k]>1?' × '+ev.errors[k]:'')+'</span>'}).join('')+'</div></div>'}
+  if(r.kind!=='check'&&r.badMods.length){h+='<div class="box"><div class="h">Что повторить</div><div class="row">'+r.badMods.map(function(id){return '<button class="btn sm" data-open="'+id+'">'+modOf(id).title+'</button>'}).join('')+'</div></div>'}
+  var msg=st.saveMsg;
+  h+='<p class="note" id="sv">'+(msg==='sent'?'Результат отправлен родителю.':msg==='fail'?'Результат не отправлен, сохранён на этом устройстве.':msg==='local'?'Результат сохранён на этом устройстве.':'Сохраняю результат…')+'</p>';
+  if(msg!=='sent')h+='<div class="box"><div class="h">Результат для папы</div><p class="note">Отправьте результат папе: нажмите «Отправить в Telegram».</p><pre class="rp" id="rp">'+esc(reportText(ev))+'</pre><div class="row"><a class="btn main lnk" id="tg" target="_blank" rel="noopener noreferrer" href="https://t.me/share/url?url='+encodeURIComponent(location.href.split('#')[0])+'&text='+encodeURIComponent(reportText(ev))+'">Отправить в Telegram</a><button class="btn sm" id="cp">Скопировать</button><span class="note" id="cpn"></span></div><p class="note">В Telegram выберите контакт папы и нажмите «Отправить». Если Telegram не открылся, скопируйте текст и отправьте вручную.</p></div>';
+  h+='<div class="row">';
+  if(r.kind==='check'){h+='<button class="btn" id="again">Ещё раз</button><button class="btn main" id="home">К темам</button>'}
+  else h+='<button class="btn main" id="home">К темам</button>';
+  h+='</div></section>';
+  app.innerHTML=h;
+  document.getElementById('home').onclick=function(){st.view='home';render();window.scrollTo(0,0)};
+  var ag=document.getElementById('again');if(ag)ag.onclick=function(){startRun('check',r.mod)};
+  var cp=document.getElementById('cp');
+  if(cp)cp.onclick=function(){
+    var tx=reportText(ev),n=document.getElementById('cpn'),el=document.getElementById('rp');
+    function sel(){var rg=document.createRange();rg.selectNodeContents(el);var sl=getSelection();sl.removeAllRanges();sl.addRange(rg);n.textContent='Текст выделен: нажмите «Копировать» в меню.'}
+    try{navigator.clipboard.writeText(tx).then(function(){n.textContent='Скопировано.'},sel)}catch(e){sel()}};
+  app.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){st.mod=b.dataset.open;st.view='lesson';render();window.scrollTo(0,0)}});
+}
+
+/* ================= Родитель ================= */
+function renderParent(){
+  var mine=null,evs=lsRead().sort(function(a,b){return b.ts-a.ts});
+  var kid=evs.filter(function(e){return e.uid!==mine});
+  var ids=[];evs.forEach(function(e){if(e.uid!==mine&&ids.indexOf(e.uid)<0)ids.push(e.uid)});
+  function who(uid){return uid===mine?'вы':ids.length>1?'ученик '+(ids.indexOf(uid)+1):'ученик'}
+  var agg={};kid.forEach(function(e){Object.keys(e.errors||{}).forEach(function(k){agg[k]=(agg[k]||0)+e.errors[k]})});
+  var aggKeys=Object.keys(agg).sort(function(a,b){return agg[b]-agg[a]});
+  var h=header()+'<section class="sheet"><h3>Результаты</h3>';
+  h+='<p class="note">Здесь только записи с этого устройства. Остальные приходят в Telegram.</p>';
+  h+='<div class="box"><div class="h">Чаще всего ошибки</div>'+(aggKeys.length?'<div class="tags">'+aggKeys.slice(0,8).map(function(k){return '<span class="tag">'+esc(k)+' × '+agg[k]+'</span>'}).join('')+'</div>':'<p class="note">Пока нет данных от ученика.</p>')+'</div>';
+  h+='<div class="row between"><div class="meta">Этапы</div><button class="btn sm" id="cp">Скопировать сводку</button></div><div class="list">';
+  if(!evs.length)h+='<p class="note">Результатов пока нет. Они появятся здесь после первого пройденного этапа.</p>';
+  evs.slice(0,60).forEach(function(e){
+    var d=new Date(e.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var st2=e.kind==='module'?(e.passed?'пройдено':'не пройдено'):e.kind==='final'?'отметка '+e.mark:'';
+    var errs=Object.keys(e.errors||{});
+    h+='<div class="ev"><div class="head"><b>'+esc(e.title)+'</b><span class="note">'+d+', '+who(e.uid)+'</span></div><div>'+e.score+' из '+e.max+(st2?', '+st2:'')+'</div>'+(errs.length?'<div class="tags">'+errs.map(function(k){return '<span class="tag">'+esc(k)+(e.errors[k]>1?' × '+e.errors[k]:'')+'</span>'}).join('')+'</div>':'')+'</div>';
+  });
+  h+='</div><p class="note">Записи с пометкой «вы» — ваши пробные прохождения.</p></section>';
+  app.innerHTML=h;bindHeader();
+  document.getElementById('cp').onclick=function(){
+    var txt=kid.slice(0,15).map(function(e){return new Date(e.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' — '+e.title+': '+e.score+' из '+e.max+(Object.keys(e.errors||{}).length?'. Ошибки: '+Object.keys(e.errors).join(', '):'')}).join('\n')||'Результатов нет';
+    var b=document.getElementById('cp');
+    try{navigator.clipboard.writeText(txt).then(function(){b.textContent='Скопировано'},function(){b.textContent='Не удалось скопировать'})}catch(e){b.textContent='Не удалось скопировать'}
+  };
+}
+
+/* ================= Запуск ================= */
+st.events=lsRead();st.allEvents=st.events.slice();
+render();
+window.addEventListener('hashchange',function(){st.isOwner=/(^|[#&])parent($|&)/.test(location.hash);if(!st.isOwner)st.tab='play';if(st.view==='home')render()});
+</script>
+</body></html>
