@@ -1135,6 +1135,9 @@ function renderParent(){
 /* ================= Запуск ================= */
 st.events=lsRead();st.allEvents=st.events.slice();
 render();
-window.addEventListener('hashchange',function(){st.isOwner=/(^|[#&])parent($|&)/.test(location.hash);if(!st.isOwner)st.tab='play';if(st.view==='home')render()});
+/* прямые ссылки: app.html#frac40 — сводный тест по дробям, app.html#alg40 — сводный тест по 7 классу */
+function hashTest(){var k=location.hash.replace(/^#/,'');if(SVOD[k]&&!(st.view==='run'&&st.run&&st.run.kind===k))startRun(k)}
+hashTest();
+window.addEventListener('hashchange',function(){st.isOwner=/(^|[#&])parent($|&)/.test(location.hash);if(!st.isOwner)st.tab='play';hashTest();if(st.view==='home')render()});
 </script>
 </body></html>
