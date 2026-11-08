@@ -703,11 +703,12 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 
 /* Прогресс из событий */
 function progress(){
-  var ev=st.events,p={diag:null,passed:{},best:{},final:null};
+  var ev=st.events,p={diag:null,passed:{},best:{},final:null,frac:null};
   ev.forEach(function(e){
     if(e.kind==='diag'&&(!p.diag||e.ts>p.diag.ts))p.diag=e;
     if(e.kind==='module'){p.best[e.mod]=Math.max(p.best[e.mod]||0,e.score);if(e.passed)p.passed[e.mod]=true}
     if(e.kind==='final'&&(!p.final||e.score>p.final.score))p.final=e;
+    if(e.kind==='frac40'&&(!p.frac||e.score>p.frac.score))p.frac=e;
   });
   return p;
 }
@@ -723,6 +724,50 @@ function nextStep(p){
   need.sort(function(a,b){return MODS.findIndex(function(m){return m.id===a})-MODS.findIndex(function(m){return m.id===b})});
   if(need.length)return {text:'Следующая тема: '+modOf(need[0]).title+'. В диагностике здесь были ошибки.',btn:'Открыть тему',act:'mod',mod:need[0]};
   return {text:'Все нужные темы пройдены. Можно сдавать итоговый тест.',btn:'Итоговый тест',act:'final'};
+}
+
+/* ================= Сводный тест по дробям: 40 вопросов, закрепление после ошибок ================= */
+var FRAC_N=40,FRAC_MODS=['m5','m6','m7','m8','m9'];
+function sigOf(q){return q.replace(/<span class="fr"><span>[^<]*<\/span><span>[^<]*<\/span><\/span>/g,'F').replace(/<[^>]+>/g,'').replace(/\d+/g,'#').replace(/\s+/g,' ').trim()}
+function fracMain(){
+  var ids=[];FRAC_MODS.forEach(function(id){for(var k=0;k<FRAC_N/FRAC_MODS.length;k++)ids.push(id)});ids=shuffle(ids);
+  return ids.map(function(id,k){var t=typedGen(id);t.sig=sigOf(t.q);t.no=k+1;t.mode=k%2===0?'typed':'choice';return t.mode==='typed'?t:multiOf(t)});
+}
+/* новый вопрос на «тот же пример»: та же тема и тот же вид записи условия, в том же режиме ответа */
+function remGen(base){
+  var t=null,i;
+  for(i=0;i<300;i++){var c=typedGen(base.mod);if(sigOf(c.q)===base.sig){t=c;break}}
+  if(!t)t=typedGen(base.mod);
+  t.sig=base.sig;t.mode=base.mode;
+  return base.mode==='typed'?t:multiOf(t);
+}
+function queueRem(r,base,n,origNo){
+  var blk={origNo:origNo,failed:false},arr=[],j;
+  for(j=0;j<n;j++){var t=remGen(base);t.rem={base:base,origNo:origNo,blk:blk,k:j+1,n:n,last:j===n-1};arr.push(t)}
+  r.tasks.splice.apply(r.tasks,[r.i+1,0].concat(arr));r.asked+=n;
+}
+function warnBox(title,text){return '<div class="fb form"><b>'+title+'</b><p>'+text+'</p></div>'}
+function afterAnswer(t,fb){
+  var r=st.run,ok=fb.res==='ok',res={ok:ok,mod:t.mod,type:ok?null:(fb.type||T_OTHER)};
+  if(r.kind!=='frac40'){r.results.push(res);return}
+  if(!t.rem){
+    r.results.push(res);
+    if(!ok){queueRem(r,t,2,t.no);
+      fb.extra=warnBox('Прочитайте внимательно причину ошибки','Сейчас будут заданы <b>2 новых вопроса</b> на такой же пример. Если ответить верно на оба, вопрос №'+t.no+' будет засчитан.');
+      fb.nextLabel='Дальше: 2 вопроса на закрепление'}
+    return}
+  var B=t.rem.blk;r.remResults.push(res);if(!ok)B.failed=true;
+  if(t.rem.last){
+    if(B.failed){queueRem(r,t.rem.base,4,t.rem.origNo);
+      fb.extra=warnBox('В этом блоке была ошибка','Прочитайте внимательно разбор. Сейчас будут заданы <b>4 новых вопроса</b> на такой же пример. Вопрос №'+t.rem.origNo+' засчитается, когда весь блок будет решён без ошибок.');
+      fb.nextLabel='Дальше: 4 вопроса на закрепление'}
+    else{r.fixed++;fb.extra='<div class="fb ok"><b>Блок пройден: вопрос №'+t.rem.origNo+' засчитан.</b></div>'}
+  }else if(!ok){fb.extra=warnBox('Здесь тоже ошибка','Прочитайте внимательно разбор. Блок нужно дорешать до конца, после него будут заданы <b>4 новых вопроса</b>.')}
+}
+function fracMeta(r){
+  var t=r.tasks[r.i],done=r.tasks.slice(0,r.i).filter(function(x){return !x.rem}).length,pct=Math.round(done/FRAC_N*100);
+  var head=t.rem?'<span class="meta">Закрепление '+t.rem.k+' из '+t.rem.n+' · для вопроса №'+t.rem.origNo+'</span>':'<span class="meta">Вопрос '+t.no+' из '+FRAC_N+'</span>';
+  return '<div class="row between">'+head+'</div><div class="bar" role="progressbar" aria-valuenow="'+done+'" aria-valuemax="'+FRAC_N+'"><i style="width:'+pct+'%"></i></div>';
 }
 
 /* ================= Запись событий ================= */
@@ -744,6 +789,7 @@ async function saveEvent(ev){
 var CHECK_N=8,CHECK_PASS=6; /* проверка темы: заданий и сколько верных нужно для зачёта */
 function typedGen(id){var t,i=0;do{t=modOf(id).gen()}while(t.choice&&++i<30);return t}
 function buildTasks(kind,modId){
+  if(kind==='frac40')return fracMain();
   var tasks=[],i;
   if(kind==='check'){for(i=0;i<CHECK_N;i++)tasks.push(typedGen(modId));}
   if(kind==='diag'){
@@ -760,11 +806,11 @@ function buildTasks(kind,modId){
 }
 function startRun(kind,modId){
   var tasks=kind==='train'?[multiOf(modOf(modId).gen())]:buildTasks(kind,modId);
-  st.run={kind:kind,mod:modId||null,tasks:tasks,i:0,results:[],phase:'ask',fb:null,input:'',picked:null,sel:[]};
+  st.run={kind:kind,mod:modId||null,tasks:tasks,i:0,results:[],remResults:[],asked:0,fixed:0,phase:'ask',fb:null,input:'',picked:null,sel:[]};
   st.view='run';render();window.scrollTo(0,0);
 }
 function runTitle(r){
-  return r.kind==='diag'?'Диагностика':r.kind==='final'?'Итоговый тест':r.kind==='check'?'Проверка: '+modOf(r.mod).title:'Тренажёр: '+modOf(r.mod).title;
+  return r.kind==='frac40'?'Сводный тест по дробям':r.kind==='diag'?'Диагностика':r.kind==='final'?'Итоговый тест':r.kind==='check'?'Проверка: '+modOf(r.mod).title:'Тренажёр: '+modOf(r.mod).title;
 }
 
 /* ================= Отрисовка ================= */
@@ -800,7 +846,9 @@ function renderHome(){
   h+='<section class="sheet"><h3>Опора: знаки и дроби</h3><p class="note">Материал 6 класса. Нужен, чтобы решать задания 7 класса без ошибок в знаках и дробях.</p>'+modList(6)+'</section>';
   h+='<section class="sheet"><h3>Программа 7 класса</h3><p class="note">Темы из учебника «Алгебра 7»: степени, выражения, одночлены.</p>'+modList(7)+'</section>';
   h+='<section class="sheet"><div class="row between"><div><h3>Итоговый тест</h3><p class="note">20 заданий: ответы нужно вписать.'+(p.final?' Лучший результат: '+p.final.score+' из '+p.final.max+'.':'')+'</p></div><button class="btn main" id="fn">Сдать тест</button></div></section>';
+  h+='<section class="sheet"><div class="row between"><div><h3>Сводный тест по дробям</h3><p class="note">40 вопросов по темам 5–9: ответ нужно либо вписать, либо отметить верные утверждения. После ошибки — закрепление: 2 новых вопроса на такой же пример, при новой ошибке блоки по 4.'+(p.frac?' Лучший результат: '+p.frac.score+' из '+p.frac.max+'.':'')+'</p></div><button class="btn main" id="fz">Начать</button></div></section>';
   app.innerHTML=h;bindHeader();
+  document.getElementById('fz').onclick=function(){startRun('frac40')};
   document.getElementById('nx').onclick=function(){
     if(ns.act==='diag')startRun('diag');else if(ns.act==='final')startRun('final');else{st.mod=ns.mod;st.view='lesson';render();window.scrollTo(0,0)}};
   document.getElementById('dg').onclick=function(){startRun('diag')};
@@ -835,7 +883,8 @@ function renderRun(){
   var r=st.run,t=r.tasks[r.i],total=r.kind==='train'?null:r.tasks.length;
   var h='<div class="top"><div class="brand">'+runTitle(r)+'</div><button class="btn sm" id="quit">'+(r.kind==='train'?'Закончить':'Выйти')+'</button></div>';
   h+='<section class="sheet">';
-  if(total)h+='<div class="row between"><span class="meta">Задание '+(r.i+1)+' из '+total+'</span></div><div class="bar" role="progressbar" aria-valuenow="'+r.i+'" aria-valuemax="'+total+'"><i style="width:'+Math.round(r.i/total*100)+'%"></i></div>';
+  if(r.kind==='frac40')h+=fracMeta(r);
+  else if(total)h+='<div class="row between"><span class="meta">Задание '+(r.i+1)+' из '+total+'</span></div><div class="bar" role="progressbar" aria-valuenow="'+r.i+'" aria-valuemax="'+total+'"><i style="width:'+Math.round(r.i/total*100)+'%"></i></div>';
   else h+='<span class="meta">Решено верно: '+r.results.filter(function(x){return x.ok}).length+' из '+r.results.length+'</span>';
   h+='<div class="q">'+t.q+'</div>';
   var locked=r.phase==='fb';
@@ -881,9 +930,10 @@ function renderRun(){
     else h+='<div class="fb bad"><b>Неверно. '+(t.multi?'Верные утверждения: '+t.multi.filter(function(o){return o.ok}).map(function(o){return o.h}).join('; ')+'.':'Ответ: '+(t.choice?t.choice.opts[t.choice.correct]:showAns(t)))+'</b>'+(f.msg?'<p>'+f.msg+'</p>':'')+'<div class="sol">'+t.steps+'</div></div>';
   }else if(r.fb&&r.fb.res==='form')h+='<div class="fb form"><b>Почти</b><p>'+r.fb.msg+'</p></div>';
   else if(r.fb&&r.fb.res==='invalid')h+='<div class="fb form"><b>Ответ не удалось разобрать</b><p>Запишите число цифрами. Примеры: −3, 70 000, 3/4, −1 1/2.</p></div>';
+  if(r.fb&&r.fb.extra&&r.phase==='fb')h+=r.fb.extra;
   h+='<div class="row">';
   if(!locked)h+='<button class="btn main" id="go"'+(t.multi&&!r.sel.some(Boolean)?' disabled':'')+'>Ответить</button>';
-  else h+='<button class="btn main" id="nxt">'+(total&&r.i===total-1?'Завершить':'Дальше')+'</button>';
+  else h+='<button class="btn main" id="nxt">'+(total&&r.i===total-1?'Завершить':(r.fb&&r.fb.nextLabel||'Дальше'))+'</button>';
   h+='</div>';
   if(!locked&&!t.choice&&!t.multi)h+='<p class="note">Дробь вводите как 3/4, смешанное число как 1 1/2, отрицательное с минусом: −2/5. Степень: нажмите xⁿ и введите показатель, например 2⁵.</p>';
   h+='</section>';
@@ -935,7 +985,7 @@ function submit(){
     if(fb.res==='invalid'||fb.res==='form'){r.fb=fb;r.phase='ask';render();return}
   }
   r.fb=fb;r.phase='fb';
-  r.results.push({ok:fb.res==='ok',mod:t.mod,type:fb.res==='ok'?null:(fb.type||T_OTHER)});
+  afterAnswer(t,fb);
   render();
   if(fb.res==='ok')burst();
 }
@@ -994,12 +1044,13 @@ function bindRun(){
 }
 
 async function finishRun(){
-  var r=st.run,score=r.results.filter(function(x){return x.ok}).length,max=r.tasks.length,errors={},badMods={};
+  var r=st.run,score=r.results.filter(function(x){return x.ok}).length,max=r.kind==='frac40'?FRAC_N:r.tasks.length,errors={},badMods={};
   r.results.forEach(function(x){if(!x.ok){errors[x.type]=(errors[x.type]||0)+1;badMods[x.mod]=true}});
   var ev={kind:r.kind==='check'?'module':r.kind,mod:r.mod||'',title:runTitle(r),score:score,max:max,errors:errors};
   if(r.kind==='check')ev.passed=score>=CHECK_PASS;
   if(r.kind==='diag')ev.need=Object.keys(badMods);
   if(r.kind==='final'){ev.mark=markOf(score/max);ev.need=Object.keys(badMods)}
+  if(r.kind==='frac40'){ev.mark=markOf(score/max);ev.need=Object.keys(badMods);ev.rem={asked:r.asked,wrong:r.results.filter(function(x){return !x.ok}).length,fixed:r.fixed}}
   r.ev=ev;r.badMods=Object.keys(badMods);
   st.view='summary';render();window.scrollTo(0,0);
   await saveEvent(ev);
@@ -1018,6 +1069,7 @@ function reportText(ev){
   if(need.length)l.push('Слабые темы: '+need.join('; ')+'.');
   var er=Object.keys(ev.errors||{}).sort(function(a,b){return ev.errors[b]-ev.errors[a]});
   if(er.length)l.push('Ошибки: '+er.map(function(k){return k+(ev.errors[k]>1?' ×'+ev.errors[k]:'')}).join('; ')+'.');
+  if(ev.rem)l.push('Закрепление после ошибок: дополнительных вопросов '+ev.rem.asked+', исправлено ошибок '+ev.rem.fixed+' из '+ev.rem.wrong+'.');
   l.push('Время: '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes())+'.');
   return l.join('\n');
 }
@@ -1027,7 +1079,8 @@ function renderSummary(){
   h+='<div class="score"><span class="big">'+ev.score+'<span style="font-size:.45em;color:var(--ink-soft)"> / '+ev.max+'</span></span>'+(ev.mark?'<span class="mark" title="Ориентировочная отметка">'+ev.mark+'</span>':'')+'</div>';
   if(r.kind==='check')h+='<p>'+(ev.passed?'Тема пройдена.':'Нужно '+CHECK_PASS+' верных ответов из '+CHECK_N+'. Перечитайте объяснение и попробуйте ещё раз: числа будут другие.')+'</p>';
   if(r.kind==='diag')h+='<p>'+(ev.need.length?'Темы для повторения: '+ev.need.map(function(id){return modOf(id).title}).join('; ')+'.':'Ошибок нет: можно переходить к итоговому тесту.')+'</p>';
-  if(r.kind==='final')h+='<p class="note">Отметка по десятибалльной шкале ориентировочная.</p>';
+  if(r.kind==='final'||r.kind==='frac40')h+='<p class="note">Отметка по десятибалльной шкале ориентировочная.</p>';
+  if(r.kind==='frac40')h+='<p>Первая попытка: '+ev.score+' из '+ev.max+'. Закрепление после ошибок: дополнительных вопросов — '+ev.rem.asked+', исправлено ошибок — '+ev.rem.fixed+' из '+ev.rem.wrong+'.</p>';
   var errs=Object.keys(ev.errors);
   if(errs.length){h+='<div class="box"><div class="h">Где были ошибки</div><div class="tags">'+errs.map(function(k){return '<span class="tag">'+esc(k)+(ev.errors[k]>1?' × '+ev.errors[k]:'')+'</span>'}).join('')+'</div></div>'}
   if(r.kind!=='check'&&r.badMods.length){h+='<div class="box"><div class="h">Что повторить</div><div class="row">'+r.badMods.map(function(id){return '<button class="btn sm" data-open="'+id+'">'+modOf(id).title+'</button>'}).join('')+'</div></div>'}
