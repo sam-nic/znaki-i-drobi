@@ -22,7 +22,7 @@ h1,h2,h3{margin:0}
 .top .ttl{flex:1;min-width:0}
 .top .ttl b{display:block;font-weight:800;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top .ttl span{color:var(--soft);font-size:14px}
-.ibtn{width:46px;height:46px;border-radius:14px;background:var(--panel);border:1px solid var(--line);font-size:22px;display:grid;place-items:center}
+.ibtn{width:46px;height:46px;flex:none;border-radius:14px;background:var(--panel);border:1px solid var(--line);font-size:22px;display:grid;place-items:center}
 .btn{display:block;width:100%;min-height:58px;border-radius:18px;font-weight:800;font-size:20px;letter-spacing:.02em;padding:12px 18px;color:#071030;background:linear-gradient(180deg,#ffe27a,#ffb12e);box-shadow:0 6px 0 #b8741a,0 10px 24px rgba(255,177,46,.35);transition:transform .08s}
 .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8741a}
 .btn.alt{color:var(--txt);background:linear-gradient(180deg,#2c3c8a,#1c2766);box-shadow:0 6px 0 #0e1544}
@@ -55,9 +55,9 @@ h1,h2,h3{margin:0}
 .field label{color:var(--soft);font-size:15px}
 .field input{width:100%;min-height:54px;border-radius:16px;border:2px solid var(--line);background:rgba(7,11,31,.7);color:var(--txt);font:600 20px Rubik,sans-serif;padding:0 16px;user-select:text;-webkit-user-select:text}
 .swatches{display:flex;gap:12px}
-.sw{width:52px;height:52px;border-radius:50%;border:3px solid transparent;position:relative}
+.sw{width:52px;height:52px;flex:none;border-radius:50%;border:3px solid rgba(255,255,255,.25);background:rgba(7,11,31,.6);position:relative}
 .sw[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 18px currentColor}
-.sw::after{content:"";position:absolute;inset:12px 21px;border-radius:4px;background:currentColor;box-shadow:0 0 10px currentColor}
+.sw::after{content:"";position:absolute;left:50%;top:9px;width:10px;height:28px;margin-left:-5px;border-radius:5px;background:currentColor;box-shadow:0 0 10px currentColor}
 .rank{display:flex;align-items:center;gap:12px}
 .rank .medal{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:radial-gradient(circle at 35% 30%,#ffe27a,#c98a12);color:#4a2d00;flex:none}
 .rank .bar{height:12px;background:rgba(255,255,255,.12);border-radius:8px;overflow:hidden;margin-top:6px}
